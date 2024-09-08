@@ -1,10 +1,8 @@
 import {
   type Application,
-  // Assets,
   type FederatedPointerEvent,
   Graphics,
   Point,
-  // Sprite,
 } from "pixi.js";
 
 type Edges = {
@@ -18,7 +16,6 @@ type Edges = {
 // always multiply this with the deltaTIme
 const SPEED = 4;
 
-// const consumers: Sprite[] = [];
 const consumers: Graphics[] = [];
 const targets: Graphics[] = [];
 
