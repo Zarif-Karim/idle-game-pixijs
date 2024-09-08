@@ -11,7 +11,7 @@ import { makeTarget } from "./lib/utils";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
-const SPEED = 4;
+const SPEED = 1;
 const EDGES = { top: 0, left: 0, right: 640, bottom:360 };
 
 // const consumers: Graphics[] = [];
@@ -56,7 +56,7 @@ const assignJobs = (app: Application) => {
 function doWork(w: Worker, j: Graphics, app: Application) {
   const work = ({deltaTime}: { deltaTime: number }) => {
     console.log(`Worker-${w.id}: working...`)
-    const c = w.object;
+    const c = w.view;
     moveTowardsTarget(c, j, SPEED * deltaTime);
 
     if (checkCircleCollision(c, j)) {
@@ -135,7 +135,7 @@ function addNewWorker(app: Application) {
   workers.push(w);
 
   // add to screen
-  app.stage.addChild(w.object);
+  app.stage.addChild(w.view);
 }
 
 const randomPositionTopSide = () => {
