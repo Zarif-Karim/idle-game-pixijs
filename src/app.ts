@@ -7,17 +7,12 @@ import {
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
-
-type Edges = {
-  top: number;
-  left: number;
-  right: number;
-  bottom: number;
-};
+import { makeTarget } from "./lib/utils";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
 const SPEED = 4;
+const EDGES = { top: 0, left: 0, right: 640, bottom:360 };
 
 // const consumers: Graphics[] = [];
 const jobs: Queue<Graphics> = new Queue();
@@ -80,12 +75,14 @@ function doWork(w: Worker, j: Graphics, app: Application) {
         * by adding them back in the queue. Look into the
         * benefits of re-using vs creating new workers!
         */
-      addNewWorker();
+      app.stage.removeChild(c);
+      addNewWorker(app);
     }
   };
 
   app.ticker.add(work, w);
 }
+
 
 function checkCircleCollision(circle1: Graphics, circle2: Graphics) {
   // Calculate the distance between the centers of the circles
@@ -122,24 +119,27 @@ function moveTowardsTarget(object: any, target: any, speed: number) {
 }
 
 const addWorkers = (app: Application) => {
-  const { x: left, y: top, width, height } = app.screen;
-  const [right, bottom] = [left + width, top + height];
-  const edges = { top, left, right, bottom };
   // populate a consumer randomly on the edges
-  generateRandomWorkers(edges, app);
-};
-
-const generateRandomWorkers = (edges: Edges, app: Application) => {
-  const amount = 1;
+  const amount = 5;
   for (let i = 0; i < amount; i++) {
-    // consumers.push(makeTarget(randomPositionTopSide(edges), targetSize));
-    addNewWorker();
+    addNewWorker(app);
 
   }
-  // app.stage.addChild(...consumers);
 };
 
-const randomPositionTopSide = ({ top, right, left }: Edges) => {
+function addNewWorker(app: Application) {
+  const randomPos = randomPositionTopSide();
+  const w = new Worker(randomPos);
+
+  // add to queue
+  workers.push(w);
+
+  // add to screen
+  app.stage.addChild(w.object);
+}
+
+const randomPositionTopSide = () => {
+  const { top, right, left } = EDGES;
   const topLeft = new Point(left, top);
   const topRight = new Point(right, top);
   return randomPoint(topLeft, topRight);
@@ -158,16 +158,8 @@ const randomPoint = (a: Point, b: Point) => {
 
 const targetAdder = (app: Application) => {
   app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
-    // only add one target for now
-    // on a new click remove the old target if not already removed
-    if (targets.length > 0) {
-      targets.forEach((t) => app.stage.removeChild(t));
-      // emptying the array
-      targets.length = 0;
-    }
-
     const t = app.stage.addChild(makeTarget(e.global, 10));
-    targets.push(t);
+    jobs.push(t);
   });
 };
 
