@@ -5,6 +5,9 @@ import {
   Point,
 } from "pixi.js";
 
+import { Queue } from "./lib/queue";
+import { Worker } from "./lib/worker";
+
 type Edges = {
   top: number;
   left: number;
@@ -16,8 +19,9 @@ type Edges = {
 // always multiply this with the deltaTIme
 const SPEED = 4;
 
-const consumers: Graphics[] = [];
-const targets: Graphics[] = [];
+// const consumers: Graphics[] = [];
+const jobs: Queue<Graphics> = new Queue();
+const workers: Queue<Worker> = new Queue();
 
 export default async (
   app: Application,
@@ -33,26 +37,55 @@ export default async (
 
   updateStatus("Click to populate targets");
   targetAdder(app);
-  consumerPopulator(app);
-  consumerToTarget(app);
+  addWorkers(app);
+  assignJobs(app);
 };
 
-const consumerToTarget = (app: Application) => {
-  app.ticker.add(({ deltaTime }) => {
-    if (targets.length == 0) {
-      // wait if there are not targets
-      return;
-    }
-    const t = targets[0];
-    consumers.forEach((c) => {
-      moveTowardsTarget(c, t, SPEED * deltaTime);
-      if (checkCircleCollision(c, t)) {
-        app.stage.removeChild(t);
-        targets.length = 0;
+const assignJobs = (app: Application) => {
+  app.ticker.add(() => {
+    while(!workers.isEmpty) {
+      // if not jobs wait for it
+      if(jobs.isEmpty) {
+        break;
       }
-    });
+
+      const w = workers.pop();
+      const j = jobs.pop();
+      
+      doWork(w!,j!, app);
+    }
   });
 };
+
+
+function doWork(w: Worker, j: Graphics, app: Application) {
+  const work = ({deltaTime}: { deltaTime: number }) => {
+    console.log(`Worker-${w.id}: working...`)
+    const c = w.object;
+    moveTowardsTarget(c, j, SPEED * deltaTime);
+
+    if (checkCircleCollision(c, j)) {
+      app.stage.removeChild(j);
+      app.ticker.remove(work, w);
+      console.log(`Worker-${w.id}: ...done`);
+
+      /**
+        * NOTE:
+        * here we are not reusing the above worker
+        * to test the app.ticker.remove is working
+        * by printing the worker id which we are expecting
+        * to be different.
+        *
+        * Think about the potentially reusing the workers
+        * by adding them back in the queue. Look into the
+        * benefits of re-using vs creating new workers!
+        */
+      addNewWorker();
+    }
+  };
+
+  app.ticker.add(work, w);
+}
 
 function checkCircleCollision(circle1: Graphics, circle2: Graphics) {
   // Calculate the distance between the centers of the circles
@@ -88,21 +121,22 @@ function moveTowardsTarget(object: any, target: any, speed: number) {
   object.y += moveY;
 }
 
-const consumerPopulator = (app: Application) => {
+const addWorkers = (app: Application) => {
   const { x: left, y: top, width, height } = app.screen;
   const [right, bottom] = [left + width, top + height];
   const edges = { top, left, right, bottom };
   // populate a consumer randomly on the edges
-  generateRandomConsumers(edges, app);
+  generateRandomWorkers(edges, app);
 };
 
-const generateRandomConsumers = (edges: Edges, app: Application) => {
-  const targetSize = 15;
-  const ammount = 1;
-  for (let i = 0; i < ammount; i++) {
-    consumers.push(makeTarget(randomPositionTopSide(edges), targetSize));
+const generateRandomWorkers = (edges: Edges, app: Application) => {
+  const amount = 1;
+  for (let i = 0; i < amount; i++) {
+    // consumers.push(makeTarget(randomPositionTopSide(edges), targetSize));
+    addNewWorker();
+
   }
-  app.stage.addChild(...consumers);
+  // app.stage.addChild(...consumers);
 };
 
 const randomPositionTopSide = ({ top, right, left }: Edges) => {
@@ -137,22 +171,3 @@ const targetAdder = (app: Application) => {
   });
 };
 
-function generateRandomColorHex(): string {
-  const components = ["r", "g", "b"];
-  const colorHex = "#" + components.map(() => {
-    return Math.floor(Math.random() * 256).toString(16).padStart(2, "0");
-  }).join("");
-
-  return colorHex;
-}
-
-const makeTarget = (
-  { x, y }: Point | { x: number; y: number },
-  radius?: number,
-): Graphics => {
-  const target = new Graphics().circle(0, 0, radius || 20).fill({
-    color: generateRandomColorHex(),
-  }).stroke({ color: 0x111111, alpha: 0.87, width: 1 });
-  target.position.set(x, y);
-  return target;
-};
