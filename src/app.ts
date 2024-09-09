@@ -12,16 +12,17 @@ import { makeTarget } from "./lib/utils";
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
 const SPEED = 1;
-const EDGES = { top: 0, left: 0, right: 640, bottom:360 };
+// right and bottom are dynamically set by app.screen
+const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 
 // const consumers: Graphics[] = [];
 const jobs: Queue<Graphics> = new Queue();
 const workers: Queue<Worker> = new Queue();
 
-export default async (
-  app: Application,
-  updateStatus: (status: string) => void,
-) => {
+export default async (app: Application) => {
+  EDGES.right = app.screen.width;
+  EDGES.bottom = app.screen.height;
+
   // make whole screen interactable
   app.stage.eventMode = "static";
   app.stage.hitArea = app.screen;
@@ -30,7 +31,6 @@ export default async (
   //   console.log(e.global);
   // });
 
-  updateStatus("Click to populate targets");
   targetAdder(app);
   addWorkers(app);
   assignJobs(app);
@@ -38,24 +38,23 @@ export default async (
 
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
-    while(!workers.isEmpty) {
+    while (!workers.isEmpty) {
       // if not jobs wait for it
-      if(jobs.isEmpty) {
+      if (jobs.isEmpty) {
         break;
       }
 
       const w = workers.pop();
       const j = jobs.pop();
-      
-      doWork(w!,j!, app);
+
+      doWork(w!, j!, app);
     }
   });
 };
 
-
 function doWork(w: Worker, j: Graphics, app: Application) {
-  const work = ({deltaTime}: { deltaTime: number }) => {
-    console.log(`Worker-${w.id}: working...`)
+  const work = ({ deltaTime }: { deltaTime: number }) => {
+    console.log(`Worker-${w.id}: working...`);
     const c = w.view;
     moveTowardsTarget(c, j, SPEED * deltaTime);
 
@@ -65,16 +64,16 @@ function doWork(w: Worker, j: Graphics, app: Application) {
       console.log(`Worker-${w.id}: ...done`);
 
       /**
-        * NOTE:
-        * here we are not reusing the above worker
-        * to test the app.ticker.remove is working
-        * by printing the worker id which we are expecting
-        * to be different.
-        *
-        * Think about the potentially reusing the workers
-        * by adding them back in the queue. Look into the
-        * benefits of re-using vs creating new workers!
-        */
+       * NOTE:
+       * here we are not reusing the above worker
+       * to test the app.ticker.remove is working
+       * by printing the worker id which we are expecting
+       * to be different.
+       *
+       * Think about the potentially reusing the workers
+       * by adding them back in the queue. Look into the
+       * benefits of re-using vs creating new workers!
+       */
       app.stage.removeChild(c);
       addNewWorker(app);
     }
@@ -82,7 +81,6 @@ function doWork(w: Worker, j: Graphics, app: Application) {
 
   app.ticker.add(work, w);
 }
-
 
 function checkCircleCollision(circle1: Graphics, circle2: Graphics) {
   // Calculate the distance between the centers of the circles
@@ -123,7 +121,6 @@ const addWorkers = (app: Application) => {
   const amount = 5;
   for (let i = 0; i < amount; i++) {
     addNewWorker(app);
-
   }
 };
 
@@ -162,4 +159,3 @@ const targetAdder = (app: Application) => {
     jobs.push(t);
   });
 };
-
