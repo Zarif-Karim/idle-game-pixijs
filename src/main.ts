@@ -3,13 +3,15 @@ import { Application } from "pixi.js";
 import start from "./app"
 
 // Maintain an aspect ration of 9:16 to be mobile friendly
-const BASE_SIZE = 60;
-const WIDTH = BASE_SIZE * 9;
-const HEIGHT = BASE_SIZE * 16;
+function getScreenSize() {
+  const height = window.innerHeight;
+  const width = height * 9 / 16;
+  return { width, height };
+}
 
 (async () => {
   const app = new Application();
-  await app.init({ width: WIDTH, height: HEIGHT });
+  await app.init(getScreenSize());
   const root = document.querySelector<HTMLDivElement>("#app")!;
   root.appendChild(app.canvas);
   start(app);
