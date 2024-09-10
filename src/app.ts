@@ -58,28 +58,17 @@ const assignJobs = (app: Application) => {
 
 function doWork(w: Worker, j: Graphics, app: Application) {
   const work = ({ deltaTime }: { deltaTime: number }) => {
-    console.log(`Worker-${w.id}: working...`);
     const c = w.view;
     moveTowardsTarget(c, j, SPEED * deltaTime);
 
     if (checkCircleCollision(c, j)) {
+      // eat the target
       app.stage.removeChild(j);
+      // stop working
       app.ticker.remove(work, w);
       console.log(`Worker-${w.id}: ...done`);
-
-      /**
-       * NOTE:
-       * here we are not reusing the above worker
-       * to test the app.ticker.remove is working
-       * by printing the worker id which we are expecting
-       * to be different.
-       *
-       * Think about the potentially reusing the workers
-       * by adding them back in the queue. Look into the
-       * benefits of re-using vs creating new workers!
-       */
-      app.stage.removeChild(c);
-      addNewWorker(app);
+      // join the queue again to find more work
+      workers.push(w);
     }
   };
 
