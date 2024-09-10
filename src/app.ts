@@ -8,6 +8,7 @@ import {
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
 import { makeTarget } from "./lib/utils";
+import { Status } from "./lib/status";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -18,10 +19,13 @@ const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 // const consumers: Graphics[] = [];
 const jobs: Queue<Graphics> = new Queue();
 const workers: Queue<Worker> = new Queue();
+const status = new Status('Initialising');
 
 export default async (app: Application) => {
   EDGES.right = app.screen.width;
   EDGES.bottom = app.screen.height;
+
+  app.stage.addChild(status.text);
 
   // make whole screen interactable
   app.stage.eventMode = "static";
@@ -155,6 +159,8 @@ const randomPoint = (a: Point, b: Point) => {
 
 const targetAdder = (app: Application) => {
   app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
+    const { x, y } = e.global;
+    status.update(`Target at: { x: ${x}, y: ${y}}`);
     const t = app.stage.addChild(makeTarget(e.global, 10));
     jobs.push(t);
   });
