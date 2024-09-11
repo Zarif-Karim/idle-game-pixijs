@@ -1,12 +1,10 @@
-import { type Application, Point } from "pixi.js";
+import { type Application } from "pixi.js";
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Status } from "./lib/status";
-import { Rectangle } from "./lib/rectangle";
 import { Station } from "./lib/stations";
-import { Product } from "./lib/product";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -39,19 +37,9 @@ export default async (app: Application) => {
   // add stations
   createStations(app);
 
-  jobAdderInterval(1500);
+  jobAdderInterval(1500, 15);
   addWorkers(app);
   assignJobs(app);
-
-  // bottom of the screen for debug purposes
-  const rect = new Rectangle(
-    EDGES.left,
-    EDGES.bottom - 1,
-    EDGES.right,
-    1,
-  );
-
-  app.stage.addChild(rect.view);
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
@@ -143,7 +131,14 @@ function doWork(w: Worker, jn: number, app: Application) {
         // deliver product
         w.moveTo(dl, speed);
         if (w.isAt(dl)) {
-          // TODO: move product from hand to table
+          // move product from hand to table
+          const p = w.leaveProduct(dl);
+
+          // TODO: these products should be deliverd by FE workers
+          app.stage.addChild(p);
+          setTimeout(() => {
+            app.stage.removeChild(p);
+          }, 3000);
           // console.log("deliver done");
           state = "done";
         }
@@ -166,7 +161,7 @@ function doWork(w: Worker, jn: number, app: Application) {
 
 const addWorkers = (app: Application) => {
   // populate a consumer randomly on the edges
-  const amount = 1;
+  const amount = 5;
   for (let i = 0; i < amount; i++) {
     addNewWorker(app);
   }
@@ -183,11 +178,11 @@ function addNewWorker(app: Application) {
   app.stage.addChild(w);
 }
 
-const jobAdderInterval = (duration: number) => {
+const jobAdderInterval = (duration: number, maxLength = 15) => {
   setInterval(() => {
-    if (jobs.length < 10) {
+    if (jobs.length < maxLength) {
       const randomJob = getRandomInt(0, stations.length - 1);
       jobs.push(randomJob);
-    } 
+    }
   }, duration);
 };

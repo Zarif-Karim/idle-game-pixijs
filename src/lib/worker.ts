@@ -43,6 +43,20 @@ export class Worker extends Circle {
     this.addChild(this.hold);
   }
 
+  leaveProduct(s: Station) {
+    if (!this.hold) throw new Error("Leave Product called but no product held");
+
+    this.removeChild(this.hold!);
+    const c = s.centre;
+    const p = this.hold;
+    this.hold = null;
+
+    p.position.x = c.x;
+    p.position.y = c.y;
+
+    return p;
+  }
+
   makeProduct(s: Station) {
     return s.createProduct();
   }

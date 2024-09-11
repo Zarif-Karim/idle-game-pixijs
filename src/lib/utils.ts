@@ -1,5 +1,12 @@
 import { Graphics, Point } from "pixi.js";
 
+interface Edges {
+  top: number;
+  bottom: number;
+  right: number;
+  left: number;
+}
+
 export function generateRandomColorHex(): string {
   const components = ["r", "g", "b"];
   const colorHex = "#" + components.map(() => {
@@ -26,7 +33,7 @@ export function getRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max-min+1)) + min;
 }
 
-export const randomPositionMiddle = (edges) => {
+export const randomPositionMiddle = (edges: Edges) => {
   const { top, right, left, bottom } = edges;
   const middle = (bottom - top) / 2;
   const midLeft = new Point(left, middle);
