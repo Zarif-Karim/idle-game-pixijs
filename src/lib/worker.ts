@@ -1,14 +1,13 @@
-import { makeTarget } from "./utils";
-import { Graphics } from "pixi.js";
+import { Circle } from "./circle";
+import { generateRandomColorHex } from "./utils";
 
-export class Worker {
+export class Worker extends Circle {
   static identifier = 0;
   static defaultSize = 15;
-  public view: Graphics;
   public readonly id: number;
 
-  constructor(position: { x: number, y: number }, size?: number) {
-    this.view = makeTarget(position, size || Worker.defaultSize);
+  constructor(x: number, y: number, size?: number, color?: string) {
+    super(x, y, size || Worker.defaultSize, { color: color || generateRandomColorHex()})
     Worker.identifier += 1;
     this.id = Worker.identifier;
   }
