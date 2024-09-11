@@ -1,6 +1,5 @@
 import {
   type Application,
-  type FederatedPointerEvent,
   Graphics,
   Point,
 } from "pixi.js";
@@ -14,7 +13,7 @@ import { Station } from "./lib/stations";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
-const SPEED = 1;
+const SPEED = 2;
 // right and bottom are dynamically set by app.screen
 const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 
@@ -39,7 +38,7 @@ export default async (app: Application) => {
   // add stations
   createStations(app);
 
-  jobAdder(app);
+  jobAdderInterval(1000);
   addWorkers(app);
   assignJobs(app);
 
@@ -60,11 +59,11 @@ export default async (app: Application) => {
 function createStations(app: Application) {
   stations.push(...[
     new Station(EDGES.left + 40, 500, "blue"),
-    new Station(EDGES.left + 40, 720, 'green'),
-    new Station(180, 830, 'orange'),
-    new Station(180, 630, 'pink'),
-    new Station(EDGES.right - Station.SIZE - 40, 500, 'yellow'),
-    new Station(EDGES.right - Station.SIZE - 40, 720, 'purple'),
+    new Station(EDGES.left + 40, 720, "green"),
+    new Station(180, 830, "orange"),
+    new Station(180, 630, "pink"),
+    new Station(EDGES.right - Station.SIZE - 40, 500, "yellow"),
+    new Station(EDGES.right - Station.SIZE - 40, 720, "purple"),
   ]);
   app.stage.addChild(...stations.map((r) => r.view));
 }
@@ -81,7 +80,7 @@ const assignJobs = (app: Application) => {
       const j = jobs.pop();
 
       // @ts-ignore debuging purposes
-      console.log(jobs.elements, '->', j);
+      console.log(jobs.elements, "->", j);
 
       doWork(w!, j!, app);
     }
@@ -90,22 +89,69 @@ const assignJobs = (app: Application) => {
 
 function doWork(w: Worker, jn: number, app: Application) {
   const context = { w, jn, st: Date.now() };
+  const c = w.view;
+  const { view: j, workDuration: wd } = stations[jn];
 
-  const work = ({ deltaTime }: { deltaTime: number }) => {
-    const c = w.view;
-    const j = stations[jn].view;
-    moveTowardsTarget(c, j, SPEED * deltaTime);
+  let state = "station";
+  let workStartTime = -1;
+  let dt = 0;
+  let dl: Station;
+  let atDeliverPoint = false;
 
-    if (checkCollision(c, j)) {
-      // moving to station finished
-      app.ticker.remove(work, context);
+  const work = (
+    { deltaTime }: { deltaTime: number },
+  ) => {
+    switch (state) {
+      case "station":
+        // go to the right station
+        moveTowardsTarget(c, j, SPEED * deltaTime);
+        if (checkCollision(c, j)) {
+          console.log("reached station");
+          state = "work";
+          workStartTime = Date.now();
+        }
+        break;
 
-      // when target reached do work for 1 sec
-      setTimeout(() => {
-        status.update(`Worker-${w.id}: ...done`);
-        // join the queue again to find more work
+      case "work":
+        dt = Date.now() - workStartTime;
+        // wait for the required time
+        if (dt >= wd) {
+          state = "deliver";
+          // TODO: product pickup
+          // choose the delivery location
+          const { x, y } = randomPositionMiddle();
+          dl = new Station(x, y, "black");
+          console.log("work done -> delivering");
+        } // else {
+        // update wait loading bar
+        // eg. loadbar(dt/wd);
+        // }
+        break;
+
+      case "deliver":
+        // deliver product
+        !atDeliverPoint && moveTowardsTarget(c, dl.view, SPEED * deltaTime);
+        if (!atDeliverPoint && checkCollision(c, dl.view)) {
+          // only add atDeliverPoint to wait a bit at delivery point
+          // until visual of product delivery added i.e the below comment
+          atDeliverPoint = true;
+          setTimeout(() => {
+            console.log("deliver done");
+            state = "done";
+          }, 200);
+          // TODO: move product from hand to table
+        }
+        break;
+      case "done":
+        console.log("work finished");
+        // work done
+        app.ticker.remove(work, context);
+        // join back into queue
         workers.push(w);
-      }, 1000);
+        break;
+      default:
+        console.log("should never reach default");
+        throw new Error("Work fell in default case!");
     }
   };
 
@@ -155,7 +201,7 @@ function moveTowardsTarget(object: any, target: any, speed: number) {
 
 const addWorkers = (app: Application) => {
   // populate a consumer randomly on the edges
-  const amount = 5;
+  const amount = 3;
   for (let i = 0; i < amount; i++) {
     addNewWorker(app);
   }
@@ -191,12 +237,17 @@ const randomPoint = (a: Point, b: Point) => {
   return new Point(minX + dx * randomFraction, minY + dy * randomFraction);
 };
 
-const jobAdder = (app: Application) => {
-  app.stage.on("pointerdown", (_e: FederatedPointerEvent) => {
-    const randomJob = getRandomInt(0, stations.length - 1);
+const jobAdderInterval = (duration: number) => {
+  // app.stage.on("pointerdown", (_e: FederatedPointerEvent) => {
+  setInterval(() => {
+    if (jobs.length < 10) {
+      const randomJob = getRandomInt(0, stations.length - 1);
 
-    // @ts-ignore debuging purposes
-    console.log(randomJob, '->', jobs.elements);
-    jobs.push(randomJob);
-  });
+      // @ts-ignore debuging purposes
+      console.log("addingJob:", randomJob, "->", jobs.elements);
+      jobs.push(randomJob);
+    } else {
+      console.log("skipping addingJob");
+    }
+  }, duration);
 };
