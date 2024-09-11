@@ -25,3 +25,23 @@ export function getRandomInt(min: number, max: number) {
   max = Math.ceil(max);
   return Math.floor(Math.random() * (max-min+1)) + min;
 }
+
+export const randomPositionMiddle = (edges) => {
+  const { top, right, left, bottom } = edges;
+  const middle = (bottom - top) / 2;
+  const midLeft = new Point(left, middle);
+  const midRight = new Point(right, middle);
+  return randomPoint(midLeft, midRight);
+};
+
+export const randomPoint = (a: Point, b: Point) => {
+  const [minX, maxX] = [Math.min(a.x, b.x), Math.max(a.x, b.x)];
+  const dx = maxX - minX;
+
+  const [minY, maxY] = [Math.min(a.y, b.y), Math.max(a.y, b.y)];
+  const dy = maxY - minY;
+
+  const randomFraction = Math.random();
+  return new Point(minX + dx * randomFraction, minY + dy * randomFraction);
+};
+

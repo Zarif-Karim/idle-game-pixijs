@@ -1,4 +1,5 @@
 import { Circle } from "./circle";
+import { Product } from "./product";
 import { Station } from "./stations";
 import { generateRandomColorHex } from "./utils";
 
@@ -6,6 +7,8 @@ export class Worker extends Circle {
   static identifier = 0;
   static defaultSize = 30;
   public readonly id: number;
+
+  public hold: Product | null = null;
 
   constructor(x: number, y: number, size?: number, color?: string) {
     super(x, y, size || Worker.defaultSize, {
@@ -33,5 +36,30 @@ export class Worker extends Circle {
     // Update the object's position
     this.x += moveX;
     this.y += moveY;
+  }
+
+  takeProduct(p: Product) {
+    this.hold = p;
+    this.addChild(this.hold);
+  }
+
+  makeProduct(s: Station) {
+    return s.createProduct();
+  }
+
+  isAt(station: Station) {
+    const stCentre = station.centre;
+
+    // Calculate the distance between the objects
+    const dx = this.x - stCentre.x;
+    const dy = this.y - stCentre.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const radius = this.radius;
+    const halfWidth = station.width / 2;
+
+    // Check if the distance is less than or equal to the sum of the radii
+    // Minus 10 as we want to have some overlap
+    return distance <= radius + halfWidth - 10;
   }
 }
