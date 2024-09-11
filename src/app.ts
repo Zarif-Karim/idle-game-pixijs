@@ -9,6 +9,7 @@ import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
 import { makeTarget } from "./lib/utils";
 import { Status } from "./lib/status";
+import { Rectangle } from "./lib/rectangle";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -38,6 +39,16 @@ export default async (app: Application) => {
   targetAdder(app);
   addWorkers(app);
   assignJobs(app);
+
+  // bottom of the screen for debug purposes
+  const rect = new Rectangle(
+    EDGES.left,
+    EDGES.bottom - 1,
+    EDGES.right,
+    1
+  );
+
+  app.stage.addChild(rect.view);
 };
 
 const assignJobs = (app: Application) => {
