@@ -10,6 +10,7 @@ import { Worker } from "./lib/worker";
 import { makeTarget } from "./lib/utils";
 import { Status } from "./lib/status";
 import { Rectangle } from "./lib/rectangle";
+import { Station } from "./lib/stations";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -21,12 +22,12 @@ const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 const jobs: Queue<Graphics> = new Queue();
 const workers: Queue<Worker> = new Queue();
 const status = new Status('Initialising');
+const stations: Station[] = [];
+
 
 export default async (app: Application) => {
   EDGES.right = app.screen.width;
   EDGES.bottom = app.screen.height;
-
-  app.stage.addChild(status.text);
 
   // make whole screen interactable
   app.stage.eventMode = "static";
@@ -36,7 +37,15 @@ export default async (app: Application) => {
   //   console.log(e.global);
   // });
 
-  targetAdder(app);
+  app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
+    const { x, y } = e.global;
+    status.update(JSON.stringify({ x, y }));
+  });
+
+  // add stations
+  createStations(app);
+
+  //targetAdder(app);
   addWorkers(app);
   assignJobs(app);
 
@@ -49,7 +58,22 @@ export default async (app: Application) => {
   );
 
   app.stage.addChild(rect.view);
+
+  // add the status last so its always visible
+  app.stage.addChild(status.text);
 };
+
+function createStations(app: Application) {
+  stations.push(...[
+    new Station(EDGES.left + 40, 500, 'blue'),
+    new Station(EDGES.left + 40, 720, 'green'),
+    new Station(180, 830, 'orange'),
+    new Station(180, 630, 'pink'),
+    new Station(EDGES.right - Station.SIZE - 40, 500, 'yellow'),
+    new Station(EDGES.right - Station.SIZE - 40, 720, 'purple'),
+  ]);
+  app.stage.addChild(...stations.map(r => r.view));
+}
 
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
