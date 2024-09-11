@@ -1,8 +1,4 @@
-import {
-  type Application,
-  Graphics,
-  Point,
-} from "pixi.js";
+import { type Application, Graphics, Point } from "pixi.js";
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
@@ -22,6 +18,7 @@ const jobs: Queue<number> = new Queue();
 const workers: Queue<Worker> = new Queue();
 const status = new Status("Initialising");
 const stations: Station[] = [];
+const deliveryLocations: Station[] = [];
 
 export default async (app: Application) => {
   EDGES.right = app.screen.width;
@@ -35,10 +32,13 @@ export default async (app: Application) => {
   //   console.log(e.global);
   // });
 
+  // create delivery destinations
+  createMiddlePointHorizontalDeliveryTable(app);
+
   // add stations
   createStations(app);
 
-  jobAdderInterval(1000);
+  jobAdderInterval(1500);
   addWorkers(app);
   assignJobs(app);
 
@@ -55,6 +55,20 @@ export default async (app: Application) => {
   // add the status last so its always visible
   app.stage.addChild(status.text);
 };
+
+function createMiddlePointHorizontalDeliveryTable(app: Application) {
+  const h = Station.SIZE;
+  const count = EDGES.right / h;
+  const middlePoint = EDGES.bottom / 2;
+  for (let i = 0; i < count; i++) {
+    const loc = new Station(h * i, middlePoint - h / 2, "brown");
+    console.log(loc.view.position);
+    deliveryLocations.push(loc);
+    app.stage.addChild(loc.view);
+  }
+
+  console.log(deliveryLocations.map(d => d.view.position));
+}
 
 function createStations(app: Application) {
   stations.push(...[
@@ -119,8 +133,7 @@ function doWork(w: Worker, jn: number, app: Application) {
           state = "deliver";
           // TODO: product pickup
           // choose the delivery location
-          const { x, y } = randomPositionMiddle();
-          dl = new Station(x, y, "black");
+          dl = deliveryLocations[getRandomInt(0,deliveryLocations.length - 1)];
           console.log("work done -> delivering");
         } // else {
         // update wait loading bar
