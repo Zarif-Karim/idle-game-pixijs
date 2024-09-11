@@ -7,7 +7,7 @@ import {
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
-import { makeTarget } from "./lib/utils";
+import { getRandomInt } from "./lib/utils";
 import { Status } from "./lib/status";
 import { Rectangle } from "./lib/rectangle";
 import { Station } from "./lib/stations";
@@ -19,11 +19,10 @@ const SPEED = 1;
 const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 
 // const consumers: Graphics[] = [];
-const jobs: Queue<Graphics> = new Queue();
+const jobs: Queue<number> = new Queue();
 const workers: Queue<Worker> = new Queue();
-const status = new Status('Initialising');
+const status = new Status("Initialising");
 const stations: Station[] = [];
-
 
 export default async (app: Application) => {
   EDGES.right = app.screen.width;
@@ -37,15 +36,10 @@ export default async (app: Application) => {
   //   console.log(e.global);
   // });
 
-  app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
-    const { x, y } = e.global;
-    status.update(JSON.stringify({ x, y }));
-  });
-
   // add stations
   createStations(app);
 
-  //targetAdder(app);
+  jobAdder(app);
   addWorkers(app);
   assignJobs(app);
 
@@ -54,7 +48,7 @@ export default async (app: Application) => {
     EDGES.left,
     EDGES.bottom - 1,
     EDGES.right,
-    1
+    1,
   );
 
   app.stage.addChild(rect.view);
@@ -65,14 +59,14 @@ export default async (app: Application) => {
 
 function createStations(app: Application) {
   stations.push(...[
-    new Station(EDGES.left + 40, 500, 'blue'),
+    new Station(EDGES.left + 40, 500, "blue"),
     new Station(EDGES.left + 40, 720, 'green'),
     new Station(180, 830, 'orange'),
     new Station(180, 630, 'pink'),
     new Station(EDGES.right - Station.SIZE - 40, 500, 'yellow'),
     new Station(EDGES.right - Station.SIZE - 40, 720, 'purple'),
   ]);
-  app.stage.addChild(...stations.map(r => r.view));
+  app.stage.addChild(...stations.map((r) => r.view));
 }
 
 const assignJobs = (app: Application) => {
@@ -86,38 +80,54 @@ const assignJobs = (app: Application) => {
       const w = workers.pop();
       const j = jobs.pop();
 
+      // @ts-ignore debuging purposes
+      console.log(jobs.elements, '->', j);
+
       doWork(w!, j!, app);
     }
   });
 };
 
-function doWork(w: Worker, j: Graphics, app: Application) {
+function doWork(w: Worker, jn: number, app: Application) {
+  const context = { w, jn, st: Date.now() };
+
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const c = w.view;
+    const j = stations[jn].view;
     moveTowardsTarget(c, j, SPEED * deltaTime);
 
-    if (checkCircleCollision(c, j)) {
-      // eat the target
-      app.stage.removeChild(j);
-      // stop working
-      app.ticker.remove(work, w);
-      console.log(`Worker-${w.id}: ...done`);
-      // join the queue again to find more work
-      workers.push(w);
+    if (checkCollision(c, j)) {
+      // moving to station finished
+      app.ticker.remove(work, context);
+
+      // when target reached do work for 1 sec
+      setTimeout(() => {
+        status.update(`Worker-${w.id}: ...done`);
+        // join the queue again to find more work
+        workers.push(w);
+      }, 1000);
     }
   };
 
-  app.ticker.add(work, w);
+  app.ticker.add(work, context);
 }
 
-function checkCircleCollision(circle1: Graphics, circle2: Graphics) {
-  // Calculate the distance between the centers of the circles
-  const dx = circle1.x - circle2.x;
-  const dy = circle1.y - circle2.y;
+function checkCollision(circle1: Graphics, rectangle: Graphics) {
+  const rectCenter = new Point(
+    rectangle.x + rectangle.width / 2,
+    rectangle.y + rectangle.height / 2,
+  );
+
+  // Calculate the distance between the objects
+  const dx = circle1.x - rectCenter.x;
+  const dy = circle1.y - rectCenter.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
+  const radius = getRadius(circle1);
+  const halfWidth = rectangle.width / 2;
+
   // Check if the distance is less than or equal to the sum of the radii
-  return distance <= getRadius(circle1) + getRadius(circle2);
+  return distance <= radius + halfWidth;
 }
 
 function getRadius(circle: Graphics) {
@@ -130,7 +140,6 @@ function moveTowardsTarget(object: any, target: any, speed: number) {
   const dx = target.x - object.x;
   const dy = target.y - object.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
-  if (distance < 5) return;
   // Calculate the normalized direction vector
   const directionX = dx / distance;
   const directionY = dy / distance;
@@ -153,7 +162,7 @@ const addWorkers = (app: Application) => {
 };
 
 function addNewWorker(app: Application) {
-  const randomPos = randomPositionTopSide();
+  const randomPos = randomPositionMiddle();
   const w = new Worker(randomPos);
 
   // add to queue
@@ -163,11 +172,12 @@ function addNewWorker(app: Application) {
   app.stage.addChild(w.view);
 }
 
-const randomPositionTopSide = () => {
-  const { top, right, left } = EDGES;
-  const topLeft = new Point(left, top);
-  const topRight = new Point(right, top);
-  return randomPoint(topLeft, topRight);
+const randomPositionMiddle = () => {
+  const { top, right, left, bottom } = EDGES;
+  const middle = (bottom - top) / 2;
+  const midLeft = new Point(left, middle);
+  const midRight = new Point(right, middle);
+  return randomPoint(midLeft, midRight);
 };
 
 const randomPoint = (a: Point, b: Point) => {
@@ -181,11 +191,12 @@ const randomPoint = (a: Point, b: Point) => {
   return new Point(minX + dx * randomFraction, minY + dy * randomFraction);
 };
 
-const targetAdder = (app: Application) => {
-  app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
-    const { x, y } = e.global;
-    status.update(`Target at: { x: ${x}, y: ${y}}`);
-    const t = app.stage.addChild(makeTarget(e.global, 10));
-    jobs.push(t);
+const jobAdder = (app: Application) => {
+  app.stage.on("pointerdown", (_e: FederatedPointerEvent) => {
+    const randomJob = getRandomInt(0, stations.length - 1);
+
+    // @ts-ignore debuging purposes
+    console.log(randomJob, '->', jobs.elements);
+    jobs.push(randomJob);
   });
 };

@@ -19,3 +19,9 @@ export const makeTarget = (
   target.position.set(x, y);
   return target;
 };
+
+export function getRandomInt(min: number, max: number) {
+  min = Math.floor(min);
+  max = Math.ceil(max);
+  return Math.floor(Math.random() * (max-min+1)) + min;
+}
