@@ -17,9 +17,11 @@ export class Worker extends Circle {
 
   moveTo(station: Station, speed: number) {
     // Calculate the distance between the object and the target
-    const dx = station.view.x - this.view.x;
-    const dy = station.view.y - this.view.y;
+    const dx = station.view.x - this.x;
+    const dy = station.view.y - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // if(distance < 0.05*this.radius) return;
     // Calculate the normalized direction vector
     const directionX = dx / distance;
     const directionY = dy / distance;
@@ -29,7 +31,7 @@ export class Worker extends Circle {
     const moveY = directionY * speed;
 
     // Update the object's position
-    this.view.x += moveX;
-    this.view.y += moveY;
+    this.x += moveX;
+    this.y += moveY;
   }
 }

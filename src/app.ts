@@ -6,6 +6,7 @@ import { getRandomInt } from "./lib/utils";
 import { Status } from "./lib/status";
 import { Rectangle } from "./lib/rectangle";
 import { Station } from "./lib/stations";
+import { Product } from "./lib/product";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -67,7 +68,7 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
     app.stage.addChild(loc.view);
   }
 
-  console.log(deliveryLocations.map(d => d.view.position));
+  console.log(deliveryLocations.map((d) => d.view.position));
 }
 
 function createStations(app: Application) {
@@ -103,7 +104,6 @@ const assignJobs = (app: Application) => {
 
 function doWork(w: Worker, jn: number, app: Application) {
   const context = { w, jn, st: Date.now() };
-  const c = w.view;
   const st = stations[jn];
   const { view: j, workDuration: wd } = st;
 
@@ -111,7 +111,6 @@ function doWork(w: Worker, jn: number, app: Application) {
   let workStartTime = -1;
   let dt = 0;
   let dl: Station;
-  let atDeliverPoint = false;
 
   const work = (
     { deltaTime }: { deltaTime: number },
@@ -121,7 +120,7 @@ function doWork(w: Worker, jn: number, app: Application) {
       case "station":
         // go to the right station
         w.moveTo(st, speed);
-        if (checkCollision(c, j)) {
+        if (checkCollision(w, st)) {
           console.log("reached station");
           state = "work";
           workStartTime = Date.now();
@@ -133,9 +132,13 @@ function doWork(w: Worker, jn: number, app: Application) {
         // wait for the required time
         if (dt >= wd) {
           state = "deliver";
-          // TODO: product pickup
+          // product pickup
+          const p = new Product(w.view.x, w.view.y, st.color);
+          app.stage.addChild(p.view);
+          // w.addChild(p.view);
+
           // choose the delivery location
-          dl = deliveryLocations[getRandomInt(0,deliveryLocations.length - 1)];
+          dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
           console.log("work done -> delivering");
         } // else {
         // update wait loading bar
@@ -145,16 +148,11 @@ function doWork(w: Worker, jn: number, app: Application) {
 
       case "deliver":
         // deliver product
-        !atDeliverPoint && w.moveTo(dl, speed);
-        if (!atDeliverPoint && checkCollision(c, dl.view)) {
-          // only add atDeliverPoint to wait a bit at delivery point
-          // until visual of product delivery added i.e the below comment
-          atDeliverPoint = true;
-          setTimeout(() => {
-            console.log("deliver done");
-            state = "done";
-          }, 200);
+        w.moveTo(dl, speed);
+        if (checkCollision(w, dl)) {
           // TODO: move product from hand to table
+          console.log("deliver done");
+          state = "done";
         }
         break;
       case "done":
@@ -173,32 +171,25 @@ function doWork(w: Worker, jn: number, app: Application) {
   app.ticker.add(work, context);
 }
 
-function checkCollision(circle1: Graphics, rectangle: Graphics) {
-  const rectCenter = new Point(
-    rectangle.x + rectangle.width / 2,
-    rectangle.y + rectangle.height / 2,
-  );
+function checkCollision(worker: Worker, station: Station) {
+  const stCentre = station.centre;
 
   // Calculate the distance between the objects
-  const dx = circle1.x - rectCenter.x;
-  const dy = circle1.y - rectCenter.y;
+  const dx = worker.x - stCentre.x;
+  const dy = worker.y - stCentre.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  const radius = getRadius(circle1);
-  const halfWidth = rectangle.width / 2;
+  const radius = worker.radius;
+  const halfWidth = station.width / 2;
 
   // Check if the distance is less than or equal to the sum of the radii
-  return distance <= radius + halfWidth;
-}
-
-function getRadius(circle: Graphics) {
-  const boundingBox = circle.getBounds();
-  return Math.max(boundingBox.width, boundingBox.height) / 2;
+  // Minus 10 as we want to have some overlap
+  return distance <= radius + halfWidth - 10;
 }
 
 const addWorkers = (app: Application) => {
   // populate a consumer randomly on the edges
-  const amount = 3;
+  const amount = 1;
   for (let i = 0; i < amount; i++) {
     addNewWorker(app);
   }
@@ -212,7 +203,7 @@ function addNewWorker(app: Application) {
   workers.push(w);
 
   // add to screen
-  app.stage.addChild(w.view);
+  app.stage.addChild(w);
 }
 
 const randomPositionMiddle = () => {
