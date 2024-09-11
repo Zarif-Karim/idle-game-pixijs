@@ -104,7 +104,8 @@ const assignJobs = (app: Application) => {
 function doWork(w: Worker, jn: number, app: Application) {
   const context = { w, jn, st: Date.now() };
   const c = w.view;
-  const { view: j, workDuration: wd } = stations[jn];
+  const st = stations[jn];
+  const { view: j, workDuration: wd } = st;
 
   let state = "station";
   let workStartTime = -1;
@@ -115,10 +116,11 @@ function doWork(w: Worker, jn: number, app: Application) {
   const work = (
     { deltaTime }: { deltaTime: number },
   ) => {
+    const speed = SPEED * deltaTime;
     switch (state) {
       case "station":
         // go to the right station
-        moveTowardsTarget(c, j, SPEED * deltaTime);
+        w.moveTo(st, speed);
         if (checkCollision(c, j)) {
           console.log("reached station");
           state = "work";
@@ -143,7 +145,7 @@ function doWork(w: Worker, jn: number, app: Application) {
 
       case "deliver":
         // deliver product
-        !atDeliverPoint && moveTowardsTarget(c, dl.view, SPEED * deltaTime);
+        !atDeliverPoint && w.moveTo(dl, speed);
         if (!atDeliverPoint && checkCollision(c, dl.view)) {
           // only add atDeliverPoint to wait a bit at delivery point
           // until visual of product delivery added i.e the below comment
@@ -192,24 +194,6 @@ function checkCollision(circle1: Graphics, rectangle: Graphics) {
 function getRadius(circle: Graphics) {
   const boundingBox = circle.getBounds();
   return Math.max(boundingBox.width, boundingBox.height) / 2;
-}
-
-function moveTowardsTarget(object: any, target: any, speed: number) {
-  // Calculate the distance between the object and the target
-  const dx = target.x - object.x;
-  const dy = target.y - object.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  // Calculate the normalized direction vector
-  const directionX = dx / distance;
-  const directionY = dy / distance;
-
-  // Calculate the movement amount for this frame
-  const moveX = directionX * speed;
-  const moveY = directionY * speed;
-
-  // Update the object's position
-  object.x += moveX;
-  object.y += moveY;
 }
 
 const addWorkers = (app: Application) => {
