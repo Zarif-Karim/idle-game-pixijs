@@ -1,10 +1,11 @@
-import { FederatedPointerEvent, Point, type Application } from "pixi.js";
+import { type Application, FederatedPointerEvent, Point } from "pixi.js";
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Status } from "./lib/status";
 import { Station } from "./lib/stations";
+import { Product } from "./lib/product";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -15,13 +16,15 @@ const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 const status = new Status("Initialising");
 
 // const consumers: Graphics[] = [];
-const jobs: Queue<number> = new Queue();
-const workers: Queue<Worker> = new Queue();
+const jobsBack: Queue<number> = new Queue();
+const workersBack: Queue<Worker> = new Queue();
 const backStations: Station[] = [];
 
 const deliveryLocations: Station[] = [];
-const waitingArea: Station[] = [];
 
+const jobsFront: Queue<Product> = new Queue();
+const workersFront: Queue<Worker> = new Queue();
+const waitingArea: Station[] = [];
 
 export default async (app: Application) => {
   EDGES.right = app.screen.width;
@@ -78,13 +81,13 @@ function createCustomerWaitingArea(app: Application) {
       new Station(x + 84, y, color),
     ];
     waitingArea.push(...wa);
-    app.stage.addChild(...wa.map(w => w.view));
-  }
+    app.stage.addChild(...wa.map((w) => w.view));
+  };
 
   [
     new Point(30, 85),
     new Point(280, 170),
-    new Point(120, 275)
+    new Point(120, 275),
   ].forEach(adder);
 }
 
@@ -110,21 +113,21 @@ function createBackStations(app: Application) {
 
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
-    while (!workers.isEmpty) {
+    while (!workersBack.isEmpty) {
       // if not jobs wait for it
-      if (jobs.isEmpty) {
+      if (jobsBack.isEmpty) {
         break;
       }
 
-      const w = workers.pop();
-      const j = jobs.pop();
+      const w = workersBack.pop();
+      const j = jobsBack.pop();
 
-      doWork(w!, j!, app);
+      doBackWork(w!, j!, app);
     }
   });
 };
 
-function doWork(w: Worker, jn: number, app: Application) {
+function doBackWork(w: Worker, jn: number, app: Application) {
   const context = { w, jn, st: Date.now() };
   const st = backStations[jn];
   const { workDuration: wd } = st;
@@ -143,7 +146,6 @@ function doWork(w: Worker, jn: number, app: Application) {
         // go to the right station
         w.moveTo(st, speed);
         if (w.isAt(st)) {
-          // console.log("reached station");
           state = "work";
           workStartTime = Date.now();
         }
@@ -160,7 +162,6 @@ function doWork(w: Worker, jn: number, app: Application) {
 
           // choose the delivery location
           dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
-          // console.log("work done -> delivering");
         } // else {
         // update wait loading bar
         // eg. loadbar(dt/wd);
@@ -173,22 +174,18 @@ function doWork(w: Worker, jn: number, app: Application) {
         if (w.isAt(dl)) {
           // move product from hand to table
           const p = w.leaveProduct(dl);
-
-          // TODO: these products should be deliverd by FE workers
           app.stage.addChild(p);
-          setTimeout(() => {
-            app.stage.removeChild(p);
-          }, 3000);
-          // console.log("deliver done");
+
+          // these products should be deliverd by FE workers
+          jobsFront.push(p);
           state = "done";
         }
         break;
       case "done":
-        // console.log("work finished");
         // work done
         app.ticker.remove(work, context);
         // join back into queue
-        workers.push(w);
+        workersBack.push(w);
         break;
       default:
         console.log("should never reach default");
@@ -200,19 +197,27 @@ function doWork(w: Worker, jn: number, app: Application) {
 }
 
 const addWorkers = (app: Application) => {
-  // populate a consumer randomly on the edges
-  const amount = 5;
-  for (let i = 0; i < amount; i++) {
-    addNewWorker(app);
+  // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
+  
+  // back workers
+  const amountBack = 5;
+  for (let i = 0; i < amountBack; i++) {
+    addNewWorker(app, workersBack);
+  }
+
+  // front workers
+  const amountFront = 2;
+  for (let i = 0; i < amountFront; i++) {
+    addNewWorker(app, workersFront);
   }
 };
 
-function addNewWorker(app: Application) {
+function addNewWorker(app: Application, group: Queue<Worker>) {
   const { x, y } = randomPositionMiddle(EDGES);
   const w = new Worker(x, y, 30);
 
   // add to queue
-  workers.push(w);
+  group.push(w);
 
   // add to screen
   app.stage.addChild(w);
@@ -220,9 +225,9 @@ function addNewWorker(app: Application) {
 
 const jobAdderInterval = (duration: number, maxLength = 15) => {
   setInterval(() => {
-    if (jobs.length < maxLength) {
+    if (jobsBack.length < maxLength) {
       const randomJob = getRandomInt(0, backStations.length - 1);
-      jobs.push(randomJob);
+      jobsBack.push(randomJob);
     }
   }, duration);
 };
