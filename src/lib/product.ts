@@ -1,3 +1,4 @@
+import { Point } from "pixi.js";
 import { Circle } from "./circle";
 
 export class Product extends Circle {
@@ -7,10 +8,15 @@ export class Product extends Circle {
 
   setPos(x: number, y: number) {
     this.x = x;
-    // this.view.x = x;
     
     this.y = y;
-    // this.view.y = y;
+  }
 
+  get centre() {
+    return new Point(this.x, this.y);
+  }
+
+  get size() {
+    return this.radius * 2;
   }
 }

@@ -18,11 +18,13 @@ export class Worker extends Circle {
     this.id = Worker.identifier;
   }
 
-  moveTo(station: Station | Product, speed: number) {
+  moveTo(obj: Station | Product, speed: number) {
+    const { x, y } = obj instanceof Station ? obj.view : obj;
     // Calculate the distance between the object and the target
-    const dx = station.view.x - this.x;
-    const dy = station.view.y - this.y;
+    const dx = x - this.x;
+    const dy = y - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < 3) return;
 
     // if(distance < 0.05*this.radius) return;
     // Calculate the normalized direction vector
@@ -40,6 +42,7 @@ export class Worker extends Circle {
 
   takeProduct(p: Product) {
     this.hold = p;
+    p.setPos(0,0);
     this.addChild(this.hold);
   }
 
@@ -60,8 +63,8 @@ export class Worker extends Circle {
     return s.createProduct();
   }
 
-  isAt(station: Station) {
-    const stCentre = station.centre;
+  isAt(object: Station | Product) {
+    const stCentre = object.centre;
 
     // Calculate the distance between the objects
     const dx = this.x - stCentre.x;
@@ -69,7 +72,7 @@ export class Worker extends Circle {
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     const radius = this.radius;
-    const halfWidth = station.size / 2;
+    const halfWidth = object.size / 2;
 
     // Check if the distance is less than or equal to the sum of the radii
     // Minus 10 as we want to have some overlap

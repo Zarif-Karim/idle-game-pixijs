@@ -95,7 +95,7 @@ function createBackStations(app: Application) {
   backStations.push(...[
     new Station(EDGES.right * 0.0795, EDGES.bottom * 0.559, "blue"),
     new Station(EDGES.right * 0.0795, EDGES.bottom * 0.805, "green"),
-    new Station(EDGES.right * 0.356, EDGES.bottom * 0.927, "orange"),
+    new Station(EDGES.right * 0.356, EDGES.bottom * 0.927, "red"),
     new Station(EDGES.right * 0.356, EDGES.bottom * 0.704, "pink"),
     new Station(
       EDGES.right - Station.SIZE - 40,
@@ -143,13 +143,47 @@ const assignJobs = (app: Application) => {
 
 function doFrontWork(w: Worker, p: Product, app: Application) {
   const context = { w, p, st: Date.now() };
-  const state = 'pick';
+  let state = 'pick';
+  // pick a random station to deliver to for now
+  // TODO: do delivery to right customer
+  const st = waitingArea[getRandomInt(0, waitingArea.length - 1)];
 
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;
     switch(state) {
       case 'pick':
         w.moveTo(p, speed);
+        if(w.isAt(p)) {
+          // pick product
+          app.stage.removeChild(p);
+          w.takeProduct(p);
+          state = 'deliver';
+        }
+        break;
+      case 'deliver':
+        w.moveTo(st, speed);
+        if(w.isAt(st)) {
+          const _p  = w.leaveProduct(st);
+          app.stage.addChild(_p);
+          console.log(_p);
+          state = 'done';
+
+          // TODO: customer take the product and leave
+          // just a timeout for now
+          setTimeout(() => {
+            app.stage.removeChild(_p);
+          }, 5_000);
+        }
+        break;
+      case "done":
+        // work done
+        app.ticker.remove(work, context);
+        // join back into queue
+        workersFront.push(w);
+        break;
+      default:
+        console.log("should never reach default");
+        throw new Error("Work fell in default case!");
     }
   };
 
