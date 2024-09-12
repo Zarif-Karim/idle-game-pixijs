@@ -125,7 +125,36 @@ const assignJobs = (app: Application) => {
       doBackWork(w!, j!, app);
     }
   });
+
+  app.ticker.add(() => {
+    while (!workersFront.isEmpty) {
+      // if not jobs wait for it
+      if (jobsFront.isEmpty) {
+        break;
+      }
+
+      const w = workersFront.pop();
+      const j = jobsFront.pop();
+
+      doFrontWork(w!, j!, app);
+    }
+  });
 };
+
+function doFrontWork(w: Worker, p: Product, app: Application) {
+  const context = { w, p, st: Date.now() };
+  const state = 'pick';
+
+  const work = ({ deltaTime }: { deltaTime: number }) => {
+    const speed = SPEED * deltaTime;
+    switch(state) {
+      case 'pick':
+        w.moveTo(p, speed);
+    }
+  };
+
+  app.ticker.add(work, context);
+}
 
 function doBackWork(w: Worker, jn: number, app: Application) {
   const context = { w, jn, st: Date.now() };
@@ -137,9 +166,7 @@ function doBackWork(w: Worker, jn: number, app: Application) {
   let dt = 0;
   let dl: Station;
 
-  const work = (
-    { deltaTime }: { deltaTime: number },
-  ) => {
+  const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;
     switch (state) {
       case "station":
@@ -198,7 +225,7 @@ function doBackWork(w: Worker, jn: number, app: Application) {
 
 const addWorkers = (app: Application) => {
   // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
-  
+
   // back workers
   const amountBack = 5;
   for (let i = 0; i < amountBack; i++) {

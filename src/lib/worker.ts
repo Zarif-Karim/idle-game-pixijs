@@ -18,7 +18,7 @@ export class Worker extends Circle {
     this.id = Worker.identifier;
   }
 
-  moveTo(station: Station, speed: number) {
+  moveTo(station: Station | Product, speed: number) {
     // Calculate the distance between the object and the target
     const dx = station.view.x - this.x;
     const dy = station.view.y - this.y;
@@ -51,8 +51,7 @@ export class Worker extends Circle {
     const p = this.hold;
     this.hold = null;
 
-    p.position.x = c.x;
-    p.position.y = c.y;
+    p.setPos(c.x, c.y);
 
     return p;
   }
