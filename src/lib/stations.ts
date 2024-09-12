@@ -21,7 +21,7 @@ export class Station extends Rectangle {
     );
   }
 
-  get width() {
+  get size() {
     return this.view.width;
   }
 

@@ -70,7 +70,7 @@ export class Worker extends Circle {
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     const radius = this.radius;
-    const halfWidth = station.width / 2;
+    const halfWidth = station.size / 2;
 
     // Check if the distance is less than or equal to the sum of the radii
     // Minus 10 as we want to have some overlap
