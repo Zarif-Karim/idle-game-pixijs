@@ -18,6 +18,9 @@ Workers will continously pick up jobs from a queue to execute.
 Back workers create product and leave in the middle.
 Front workers take the product and deliver it to the waiting area.
 
+## TODO
+
+Fix touch/click locations on screen resize/change
 
 ## How to run locally
 

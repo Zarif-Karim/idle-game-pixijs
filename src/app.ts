@@ -19,6 +19,7 @@ import { Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Station } from "./lib/stations";
 import { Product } from "./lib/product";
+import { addFullScreenButton } from "./screen-resize";
 
 export default async (app: Application) => {
   // make whole screen interactable
@@ -42,6 +43,7 @@ export default async (app: Application) => {
   jobAdderInterval(1500, 15);
   addWorkers(app);
   assignJobs(app);
+  await addFullScreenButton(app);
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
