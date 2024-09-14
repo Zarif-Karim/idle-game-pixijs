@@ -1,9 +1,10 @@
-import { Application, Assets, Graphics, Rectangle, Sprite } from "pixi.js";
+import { Application, Assets, Sprite } from "pixi.js";
 import { x } from "./globals";
 
 let IS_FULLSCREEN = false;
 
 export function isMobile() {
+  // @ts-ignore this exists! not sure why its complaining
   const userAgentData = navigator.userAgentData;
   return !!(userAgentData && userAgentData.mobile);
 }
@@ -18,7 +19,6 @@ export async function toggleFullscreen(app: Application) {
 }
 
 export function addFullScreenToggle(app: Application) {
-  console.log(isMobile());
   window.addEventListener("keypress", (e: KeyboardEvent) => {
     if (e.key === "f" || e.key === "F") {
       toggleFullscreen(app);

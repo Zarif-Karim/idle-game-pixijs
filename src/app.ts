@@ -19,7 +19,6 @@ import { Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Station } from "./lib/stations";
 import { Product } from "./lib/product";
-import { addFullScreenButton } from "./screen-resize";
 
 export default async (app: Application) => {
   // make whole screen interactable
