@@ -1,4 +1,4 @@
-import { type Application, FederatedPointerEvent, Point } from "pixi.js";
+import { type Application, boundsPool, FederatedPointerEvent, Point } from "pixi.js";
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
@@ -31,9 +31,6 @@ export default async (app: Application) => {
   status = new Status("Initialising", app);
   EDGES.right = app.screen.width;
   EDGES.bottom = app.screen.height;
-
-  const { agent } = isMobile();
-  status.update(JSON.stringify(agent));
 
   // make whole screen interactable
   app.stage.eventMode = "static";
@@ -90,9 +87,9 @@ function createCustomerWaitingArea(app: Application) {
   };
 
   [
-    new Point(30, 85),
-    new Point(280, 170),
-    new Point(120, 275),
+    new Point(EDGES.right * 0.06, EDGES.bottom * 0.095),
+    new Point(EDGES.right * 0.56, EDGES.bottom * 0.19),
+    new Point(EDGES.right * 0.24, EDGES.bottom * 0.31),
   ].forEach(adder);
 }
 
@@ -148,30 +145,29 @@ const assignJobs = (app: Application) => {
 
 function doFrontWork(w: Worker, p: Product, app: Application) {
   const context = { w, p, st: Date.now() };
-  let state = 'pick';
+  let state = "pick";
   // pick a random station to deliver to for now
   // TODO: do delivery to right customer
   const st = waitingArea[getRandomInt(0, waitingArea.length - 1)];
 
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;
-    switch(state) {
-      case 'pick':
+    switch (state) {
+      case "pick":
         w.moveTo(p, speed);
-        if(w.isAt(p)) {
+        if (w.isAt(p)) {
           // pick product
           app.stage.removeChild(p);
           w.takeProduct(p);
-          state = 'deliver';
+          state = "deliver";
         }
         break;
-      case 'deliver':
+      case "deliver":
         w.moveTo(st, speed);
-        if(w.isAt(st)) {
-          const _p  = w.leaveProduct(st);
+        if (w.isAt(st)) {
+          const _p = w.leaveProduct(st);
           app.stage.addChild(_p);
-          console.log(_p);
-          state = 'done';
+          state = "done";
 
           // TODO: customer take the product and leave
           // just a timeout for now

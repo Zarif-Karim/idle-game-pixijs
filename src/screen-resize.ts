@@ -4,8 +4,7 @@ let IS_FULLSCREEN = false;
 
 export function isMobile() {
   const userAgentData = navigator.userAgentData;
-  // return !!(userAgentData && userAgentData.isMobile);
-  return { agent: userAgentData };
+  return !!(userAgentData && userAgentData.mobile);
 }
 
 export function toggleFullscreen(app: Application) {
