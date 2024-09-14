@@ -1,5 +1,5 @@
-import { Application, Assets, Graphics } from "pixi.js";
-import { EDGES, x } from "./globals";
+import { Application, Assets, Graphics, Rectangle, Sprite } from "pixi.js";
+import { x } from "./globals";
 
 let IS_FULLSCREEN = false;
 
@@ -8,11 +8,11 @@ export function isMobile() {
   return !!(userAgentData && userAgentData.mobile);
 }
 
-export function toggleFullscreen(app: Application) {
+export async function toggleFullscreen(app: Application) {
   if (IS_FULLSCREEN) {
-    document.exitFullscreen();
+    await document.exitFullscreen();
   } else {
-    app.canvas.requestFullscreen();
+    await app.canvas.requestFullscreen();
   }
   IS_FULLSCREEN = !IS_FULLSCREEN;
 }
@@ -27,40 +27,28 @@ export function addFullScreenToggle(app: Application) {
 }
 
 export async function addFullScreenButton(app: Application) {
-  const svgFullscreenButton = await Assets.load({
-    src: "full-screen-button.svg",
-    data: {
-      parseAsGraphicsContext: true,
-    },
+  const imgFullScreenBtn = await Assets.load("full-screen-button.png");
+
+  const btn = new Sprite(imgFullScreenBtn);
+
+  btn.width = x(5);
+  btn.height = x(5);
+
+  btn.position.set(app.canvas.width - btn.width - x(1), x(1));
+  btn.eventMode = "static";
+  btn.cursor = "pointer";
+
+  btn.on("pointerdown", async () => {
+    await toggleFullscreen(app);
   });
 
-  const graphics = new Graphics(svgFullscreenButton);
-  const bounds = graphics.getLocalBounds();
-
-  graphics.pivot.set(bounds.x, bounds.y);
-
-  graphics.width = x(5);
-  graphics.height = x(5);
-
-  graphics.position.set(app.canvas.width - graphics.width - x(1), x(1));
-  graphics.eventMode = "static";
-  graphics.cursor = "pointer";
-  // graphics.hitArea = 
-  graphics.on("pointerdown", () => {
-    toggleFullscreen(app);
-    graphics.fill({ color: "red" });
+  btn.on("pointerover", () => {
+    btn.tint = 0x666666;
+  });
+  btn.on("pointerout", () => {
+    btn.tint = 0xffffff;
   });
 
-  graphics.on("pointerover", () => {
-    graphics.tint = 0x666666;
-  });
-  graphics.on("pointerout", () => {
-    graphics.tint = 0xffffff;
-  });
-
-  app.stage.addChild(graphics);
+  app.stage.addChild(btn);
 }
-//
-// function onPointerOver() {
-//   this.tint = 0x666666;
-// }
+

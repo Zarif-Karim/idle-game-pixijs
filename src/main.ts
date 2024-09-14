@@ -12,5 +12,10 @@ import { EDGES } from "./globals";
   root.appendChild(app.canvas);
 
   addFullScreenToggle(app);
+
+  window.addEventListener("resize", () => {
+    app.resize();
+  });
+
   start(app);
 })();
