@@ -259,7 +259,7 @@ const addWorkers = (app: Application) => {
 
 function addNewWorker(app: Application, group: Queue<Worker>) {
   const { x, y } = randomPositionMiddle(EDGES);
-  const w = new Worker(x, y, 30);
+  const w = new Worker(x, y);
 
   // add to queue
   group.push(w);

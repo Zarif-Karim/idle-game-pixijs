@@ -1,3 +1,4 @@
+import { x } from "../globals";
 import { Circle } from "./circle";
 import { Product } from "./product";
 import { Station } from "./stations";
@@ -5,7 +6,7 @@ import { generateRandomColorHex } from "./utils";
 
 export class Worker extends Circle {
   static identifier = 0;
-  static defaultSize = 30;
+  static defaultSize = x(6);
   public readonly id: number;
 
   public hold: Product | null = null;
