@@ -1,11 +1,11 @@
-import { Text, TextStyle } from "pixi.js";
+import { Application, Text, TextStyle } from "pixi.js";
 
 export class Status {
   private style: TextStyle;
   private onScreenText: Text;
 
 
-  constructor(msg: string) {
+  constructor(msg: string, app?: Application) {
     this.style = new TextStyle({
       fontFamily: 'Arial',
       fontSize: 15,
@@ -15,9 +15,12 @@ export class Status {
       align: 'center',
       //x: 20,
       //y: 20,
+      wordWrap: true,
+      wordWrapWidth: app ? app.canvas.width : 200,
+      breakWords: true,
     });
 
-    this.onScreenText = new Text(msg, this.style);
+    this.onScreenText = new Text({ text: msg, style: this.style });
 
     this.onScreenText.x = 20;
     this.onScreenText.y = 20;

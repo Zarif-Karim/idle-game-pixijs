@@ -6,6 +6,7 @@ import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Status } from "./lib/status";
 import { Station } from "./lib/stations";
 import { Product } from "./lib/product";
+import { isMobile } from "./screen-resize";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
@@ -13,7 +14,7 @@ const SPEED = 4;
 // right and bottom are dynamically set by app.screen
 const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
 
-const status = new Status("Initialising");
+let status: Status;
 
 // const consumers: Graphics[] = [];
 const jobsBack: Queue<number> = new Queue();
@@ -27,8 +28,12 @@ const workersFront: Queue<Worker> = new Queue();
 const waitingArea: Station[] = [];
 
 export default async (app: Application) => {
+  status = new Status("Initialising", app);
   EDGES.right = app.screen.width;
   EDGES.bottom = app.screen.height;
+
+  const { agent } = isMobile();
+  status.update(JSON.stringify(agent));
 
   // make whole screen interactable
   app.stage.eventMode = "static";
