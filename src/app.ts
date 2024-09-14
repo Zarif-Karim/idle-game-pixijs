@@ -1,4 +1,4 @@
-import { type Application, boundsPool, FederatedPointerEvent, Point } from "pixi.js";
+import { type Application, FederatedPointerEvent, Point } from "pixi.js";
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
@@ -6,13 +6,30 @@ import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Status } from "./lib/status";
 import { Station } from "./lib/stations";
 import { Product } from "./lib/product";
-import { isMobile } from "./screen-resize";
 
 // the rate at which the objects move in the screen
 // always multiply this with the deltaTIme
 const SPEED = 4;
 // right and bottom are dynamically set by app.screen
 const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
+
+/**
+ * Take a number between 0 - 100 (including fractions)
+ * the above number is used as a percentage to
+ * return the on screen X coordinate
+ */
+function x(percentage: number) {
+  return EDGES.right * (percentage / 100);
+}
+
+/**
+ * Take a number between 0 - 100 (including fractions)
+ * the above number is used as a percentage to
+ * return the on screen Y coordinate
+ */
+function y(percentage: number) {
+  return EDGES.bottom * (percentage / 100);
+}
 
 let status: Status;
 
@@ -87,28 +104,20 @@ function createCustomerWaitingArea(app: Application) {
   };
 
   [
-    new Point(EDGES.right * 0.06, EDGES.bottom * 0.095),
-    new Point(EDGES.right * 0.56, EDGES.bottom * 0.19),
-    new Point(EDGES.right * 0.24, EDGES.bottom * 0.31),
+    new Point(x(6), y(9.5)),
+    new Point(x(56), y(19)),
+    new Point(x(24), y(31)),
   ].forEach(adder);
 }
 
 function createBackStations(app: Application) {
   backStations.push(...[
-    new Station(EDGES.right * 0.0795, EDGES.bottom * 0.559, "blue"),
-    new Station(EDGES.right * 0.0795, EDGES.bottom * 0.805, "green"),
-    new Station(EDGES.right * 0.356, EDGES.bottom * 0.927, "red"),
-    new Station(EDGES.right * 0.356, EDGES.bottom * 0.704, "pink"),
-    new Station(
-      EDGES.right - Station.SIZE - 40,
-      EDGES.bottom * 0.559,
-      "yellow",
-    ),
-    new Station(
-      EDGES.right - Station.SIZE - 40,
-      EDGES.bottom * 0.805,
-      "purple",
-    ),
+    new Station(x(7.95), y(55.9), "blue"),
+    new Station(x(7.95), y(80.5), "green"),
+    new Station(x(35.6), y(92.7), "red"),
+    new Station(x(35.6), y(70.4), "pink"),
+    new Station(x(92.04) - Station.SIZE, y(55.9), "yellow"),
+    new Station(x(92.04) - Station.SIZE, y(80.5), "purple"),
   ]);
   app.stage.addChild(...backStations.map((r) => r.view));
 }
