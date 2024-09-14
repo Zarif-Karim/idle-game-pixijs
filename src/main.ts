@@ -5,8 +5,14 @@ import { addFullScreenToggle } from "./screen-resize";
 
 // Maintain an aspect ration of 9:16 to be mobile friendly
 function getScreenSize() {
-  const height = window.innerHeight;
-  const width = height * 9 / 16;
+  const { innerHeight, innerWidth } = window;
+  let height = innerHeight;
+  let width = height * 9 / 16;
+
+  if( width > innerWidth) {
+    width = innerWidth;
+    height = width * 16 / 9;
+  }
   return { width, height };
 }
 
