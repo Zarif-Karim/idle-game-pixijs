@@ -2,8 +2,8 @@ import { Graphics, Point } from "pixi.js";
 
 interface Edges {
   top: number;
-  bottom: number;
-  right: number;
+  height: number;
+  width: number;
   left: number;
 }
 
@@ -34,10 +34,10 @@ export function getRandomInt(min: number, max: number) {
 }
 
 export const randomPositionMiddle = (edges: Edges) => {
-  const { top, right, left, bottom } = edges;
-  const middle = (bottom - top) / 2;
+  const { top, width, left, height } = edges;
+  const middle = (height - top) / 2;
   const midLeft = new Point(left, middle);
-  const midRight = new Point(right, middle);
+  const midRight = new Point(width, middle);
   return randomPoint(midLeft, midRight);
 };
 

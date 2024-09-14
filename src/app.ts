@@ -1,54 +1,26 @@
 import { type Application, FederatedPointerEvent, Point } from "pixi.js";
+import {
+  backStations,
+  deliveryLocations,
+  EDGES,
+  jobsBack,
+  jobsFront,
+  SPEED,
+  waitingArea,
+  workersBack,
+  workersFront,
+  x,
+  y,
+  status,
+} from "./globals";
 
 import { Queue } from "./lib/queue";
 import { Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
-import { Status } from "./lib/status";
 import { Station } from "./lib/stations";
 import { Product } from "./lib/product";
 
-// the rate at which the objects move in the screen
-// always multiply this with the deltaTIme
-const SPEED = 4;
-// right and bottom are dynamically set by app.screen
-const EDGES = { top: 0, left: 0, right: -1, bottom: -1 };
-
-/**
- * Take a number between 0 - 100 (including fractions)
- * the above number is used as a percentage to
- * return the on screen X coordinate
- */
-function x(percentage: number) {
-  return EDGES.right * (percentage / 100);
-}
-
-/**
- * Take a number between 0 - 100 (including fractions)
- * the above number is used as a percentage to
- * return the on screen Y coordinate
- */
-function y(percentage: number) {
-  return EDGES.bottom * (percentage / 100);
-}
-
-let status: Status;
-
-// const consumers: Graphics[] = [];
-const jobsBack: Queue<number> = new Queue();
-const workersBack: Queue<Worker> = new Queue();
-const backStations: Station[] = [];
-
-const deliveryLocations: Station[] = [];
-
-const jobsFront: Queue<Product> = new Queue();
-const workersFront: Queue<Worker> = new Queue();
-const waitingArea: Station[] = [];
-
 export default async (app: Application) => {
-  status = new Status("Initialising", app);
-  EDGES.right = app.screen.width;
-  EDGES.bottom = app.screen.height;
-
   // make whole screen interactable
   app.stage.eventMode = "static";
   app.stage.hitArea = app.screen;
@@ -82,8 +54,8 @@ export default async (app: Application) => {
 
 function createMiddlePointHorizontalDeliveryTable(app: Application) {
   const h = Station.SIZE;
-  const count = EDGES.right / h;
-  const middlePoint = EDGES.bottom / 2;
+  const count = EDGES.width / h;
+  const middlePoint = EDGES.height / 2;
   for (let i = 0; i < count; i++) {
     const loc = new Station(h * i, middlePoint - h / 2, "grey");
     deliveryLocations.push(loc);
@@ -93,11 +65,13 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
 
 function createCustomerWaitingArea(app: Application) {
   const color = "orange";
+  // station size with gap
+  const stsg = Station.SIZE * 0.1;
   const adder = ({ x, y }: Point) => {
     const wa = [
       new Station(x, y, color),
-      new Station(x + 42, y, color),
-      new Station(x + 84, y, color),
+      new Station(x + Station.SIZE + stsg, y, color),
+      new Station(x + (Station.SIZE + stsg) * 2, y, color),
     ];
     waitingArea.push(...wa);
     app.stage.addChild(...wa.map((w) => w.view));

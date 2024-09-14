@@ -1,25 +1,13 @@
 import "./style.css";
 import { Application } from "pixi.js";
-import start from "./app"
+import start from "./app";
 import { addFullScreenToggle } from "./screen-resize";
-
-// Maintain an aspect ration of 9:16 to be mobile friendly
-function getScreenSize() {
-  const { innerHeight, innerWidth } = window;
-  let height = innerHeight;
-  let width = height * 9 / 16;
-
-  if( width > innerWidth) {
-    width = innerWidth;
-    height = width * 16 / 9;
-  }
-  return { width, height };
-}
-
+import { EDGES } from "./globals";
 
 (async () => {
   const app = new Application();
-  await app.init(getScreenSize());
+  const { width, height } = EDGES;
+  await app.init({ width, height });
   const root = document.querySelector<HTMLDivElement>("#app")!;
   root.appendChild(app.canvas);
 

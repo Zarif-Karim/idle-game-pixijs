@@ -16,7 +16,7 @@ export class Status {
       //x: 20,
       //y: 20,
       wordWrap: true,
-      wordWrapWidth: app ? app.canvas.width : 200,
+      wordWrapWidth: app ? app.canvas.width : window.innerHeight,
       breakWords: true,
     });
 

@@ -1,11 +1,12 @@
 import { Point } from "pixi.js";
 import { Rectangle } from "./rectangle";
 import { Product } from "./product";
+import { x } from "../globals";
 
 const ONE_MS = 1_000; // 1000 ms aka 1 s
 
 export class Station extends Rectangle {
-  public static readonly SIZE = 40;
+  public static readonly SIZE = x(8);
   public workDuration = ONE_MS * 1.5;
   public color: string;
 
