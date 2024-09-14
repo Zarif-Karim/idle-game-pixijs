@@ -43,7 +43,6 @@ export default async (app: Application) => {
   jobAdderInterval(1500, 15);
   addWorkers(app);
   assignJobs(app);
-  await addFullScreenButton(app);
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
