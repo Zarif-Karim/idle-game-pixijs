@@ -3,7 +3,9 @@ import { Circle } from "./circle";
 import { x } from "../globals";
 
 export class Product extends Circle {
-  constructor(color: string) {
+  public type: number;
+
+  constructor(type: number, color: string) {
     super(0, 0, x(3), { color });
   }
 
