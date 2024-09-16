@@ -1,6 +1,7 @@
 import { type Application, FederatedPointerEvent, Point } from "pixi.js";
 import {
   backStations,
+  CUSTOMERS,
   deliveryLocations,
   EDGES,
   jobsBack,
@@ -115,6 +116,7 @@ function createBackStations(app: Application) {
 
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
+    console.log(app.ticker.count);
     while (!workersBack.isEmpty) {
       // if not jobs wait for it
       if (jobsBack.isEmpty) {
@@ -171,31 +173,26 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
 }
 
 function addCustomers(app: Application) {
+  for (let i = 0; i < CUSTOMERS.maxCount; i++) {
+    setTimeout(() => {
+      createCustomer(app);
+    }, Math.random() * 2000);
+  }
+}
+
+function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const generationPoints: Point[] = [
     new Point(-100, 20),
     new Point(EDGES.width / 2, -100),
     new Point(EDGES.width + 100, 100),
   ];
 
-  setInterval(() => {
-    if (prioritizedWaitingArea.size > 9) {
-      console.error("prioritizedWaitingArea size is greater than expected");
-    }
-    if(Math.random() < 0.05) {
-      console.log('trimming pq')
-      prioritizedWaitingArea.trim();
-    }
-    const r = getRandomInt(0, generationPoints.length - 1);
-    createCustomer(app, generationPoints[r]);
-  }, 1000);
-}
+  const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
+  if (prioritizedWaitingArea.size > 9) {
+    console.error("prioritizedWaitingArea size is greater than expected");
+  }
 
-function createCustomer(
-  app: Application,
-  generationPoint: Point,
-  /*, _group: Queue<Worker> */
-) {
-  const { x, y } = generationPoint;
+  const { x, y } = gp;
   const w = new Worker(x, y, { color: "white" });
 
   if (prioritizedWaitingArea.size <= 0) {
@@ -205,10 +202,19 @@ function createCustomer(
   // add to screen
   app.stage.addChild(w);
 
+  // console.time("pq access");
   // get waiting station
   const { s, u } = prioritizedWaitingArea.poll()!;
   status.update(`${w.id}: ${u}`);
   prioritizedWaitingArea.add({ s, u: u + 1 });
+
+  if (u % 20 === 0) {
+    console.time("trim");
+    prioritizedWaitingArea.trim();
+    console.timeEnd("trim");
+  }
+  // console.timeEnd("pq access");
+  const context = { s, u, st: Date.now() };
 
   // add to queue
   // group.push(w);
@@ -216,27 +222,16 @@ function createCustomer(
   const work = ({ deltaTime }: any) => {
     const speed = SPEED * deltaTime;
     if (w.moveTo(s.getDockingPoint(DockPoint.TOP), speed)) {
+      app.ticker.remove(work, context);
       setTimeout(() => {
         // work done
         app.stage.removeChild(w);
-        app.ticker.remove(work, { w, s });
-
-        // const rs = prioritizedWaitingArea.removeOne((a) => {
-        //   return a.s === s;
-        // });
-        //
-        // if (rs) {
-        //   if (rs.u === 0) {
-        //   prioritizedWaitingArea.add({ s: rs.s, u: Math.max(rs.u - 1, 0) });
-        //     console.log(rs);
-        //     throw new Error("Waiting Area use count is already zero");
-        //   }
-        // }
-      }, 3000);
+        createCustomer(app);
+      }, 1000);
     }
   };
 
-  app.ticker.add(work, { w, s });
+  app.ticker.add(work, context);
 }
 
 const jobAdderInterval = (duration: number, maxLength = 15) => {

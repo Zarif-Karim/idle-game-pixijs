@@ -5,6 +5,10 @@ import { Station } from "./lib/stations";
 import { Status } from "./lib/status";
 import { Worker } from "./lib/worker";
 
+export const CUSTOMERS = {
+  maxCount: 3,
+};
+
 // Maintain an aspect ration of 9:16 to be mobile friendly
 export function getScreenSize() {
   const { innerHeight, innerWidth } = window;
