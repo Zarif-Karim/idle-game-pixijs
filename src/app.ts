@@ -20,6 +20,7 @@ import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Station } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
+import { Product } from "./lib/product";
 
 export default async (app: Application) => {
   // add a screen border for debugging

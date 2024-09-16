@@ -28,6 +28,11 @@ export class Worker extends Circle {
 
   public hold: Product | null = null;
 
+  // customer specific TODO: make new class for customers
+  private makeOrderTime = 500; // 500 ms
+  public orderQuantityRemaining = 1;
+  public requiredProductType = -1;
+
   constructor(x: number, y: number, options?: WorkerOptions) {
     super(x, y, options?.size || Worker.defaultSize, {
       color: options?.color || generateRandomColorHex(),
@@ -116,15 +121,38 @@ export class Worker extends Circle {
     // Minus 10 as we want to have some overlap
     return distance <= radius + halfWidth - 10;
   }
+
+  // TODO: customer specific method, move to its own class
+  makeOrder(startTime: number) {
+    const dt = Date.now() - startTime;
+    let completion = dt / this.makeOrderTime;
+    completion = completion > 1 ? 1 : completion;
+
+    const productType = getRandomInt(0, backStations.length - 1);
+    this.requiredProductType = productType;
+    const quantity = getRandomInt(0, 3);
+    this.orderQuantityRemaining = quantity;
+    const orders = Array(quantity).fill(productType);
+
+    return { completion, orders };
+  }
+
+  recieveProduct() {
+
+  } 
 }
 
 export function doFrontWork(
   w: Worker,
-  { st: pst, p }: { st: Station; p: Product },
+  { st: pst, j }: { st: Station; j: Product | Worker },
   app: Application,
 ) {
-  const context = { w, p, st: Date.now() };
-  let state = "pick";
+  const context = { w, job: j, st: Date.now() };
+  let state = j instanceof Product ? "pick" : "customer";
+  if(state === "customer") throw new Error('state is customer in front worker')
+
+  let takeOrderStartTime: number;
+
   // pick a random station to deliver to for now
   // TODO: do delivery to right customer
   const wst = waitingArea.pop();
@@ -136,8 +164,8 @@ export function doFrontWork(
       case "pick":
         if (w.moveTo(pst.getDockingPoint(DockPoint.TOP), speed)) {
           // pick product
-          app.stage.removeChild(p);
-          w.takeProduct(p);
+          app.stage.removeChild(j);
+          w.takeProduct(j as Product);
           state = "deliver";
         }
         break;
@@ -153,6 +181,25 @@ export function doFrontWork(
             app.stage.removeChild(_p);
           }, 5_000);
         }
+        break;
+
+      case "customer":
+        if (w.moveTo(pst.getDockingPoint(DockPoint.BOTTOM), speed)) {
+          // Take Order
+          state = "takeOrder";
+          takeOrderStartTime = Date.now();
+        }
+        break;
+      case "takeOrder":
+        const c = j as Worker; // this is the customer
+        const progress = c.makeOrder(takeOrderStartTime);
+        if (progress.completion === 1) {
+          // progress.orders.forEach((j) => jobsBack.push({ j, c, st: pst }));
+          state = "done";
+        } else {
+          // update progress bar
+        }
+
         break;
       case "done":
         // work done
@@ -215,7 +262,7 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
           app.stage.addChild(p);
 
           // these products should be deliverd by FE workers
-          jobsFrontDelivery.push({ st: dl, p });
+          jobsFrontDelivery.push({ st: dl, j: p });
           state = "done";
         }
         break;
@@ -243,9 +290,6 @@ export function doCustomerWork(
 ) {
   const context = { s: st, c, st: Date.now() };
   state = "waitArea";
-  let waitStartTime: number;
-  let dt: number;
-  const wt = 2000; // wait time 2s
 
   const work = ({ deltaTime }: any) => {
     const speed = SPEED * deltaTime;
@@ -253,16 +297,13 @@ export function doCustomerWork(
       case "waitArea":
         if (c.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
           // wait for order taking
-          jobsFrontTakeOrder.push({ st, c });
+          jobsFrontTakeOrder.push({ st, j: c });
           state = "wait";
-          waitStartTime = Date.now();
         }
         break;
       case "wait":
         // TODO: check if order is fullfilled
-        // waiting 2 sec for now
-        dt = Date.now() - waitStartTime;
-        if (dt >= wt) {
+        if (c.orderQuantityRemaining === 0) {
           state = "leave";
         }
         break;
