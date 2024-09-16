@@ -7,10 +7,11 @@ interface Edges {
   left: number;
 }
 
+// generation random hex avoiding too much black
 export function generateRandomColorHex(): string {
   const components = ["r", "g", "b"];
   const colorHex = "#" + components.map(() => {
-    return Math.floor(Math.random() * 256).toString(16).padStart(2, "0");
+    return (Math.floor(Math.random() * 256 - 10) + 10).toString(16).padStart(2, "0");
   }).join("");
 
   return colorHex;
