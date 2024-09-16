@@ -111,18 +111,22 @@ export class Worker extends Circle {
   }
 }
 
-export function doFrontWork(w: Worker, p: Product, app: Application) {
+export function doFrontWork(
+  w: Worker,
+  { st: pst, p }: { st: Station; p: Product },
+  app: Application,
+) {
   const context = { w, p, st: Date.now() };
   let state = "pick";
   // pick a random station to deliver to for now
   // TODO: do delivery to right customer
-  const st = waitingArea[getRandomInt(0, waitingArea.length - 1)];
+  const wst = waitingArea[getRandomInt(0, waitingArea.length - 1)];
 
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;
     switch (state) {
       case "pick":
-        if (w.moveTo(p, speed)) {
+        if (w.moveTo(pst.getDockingPoint(DockPoint.TOP), speed)) {
           // pick product
           app.stage.removeChild(p);
           w.takeProduct(p);
@@ -130,8 +134,8 @@ export function doFrontWork(w: Worker, p: Product, app: Application) {
         }
         break;
       case "deliver":
-        if (w.moveTo(st.getDockingPoint(DockPoint.BOTTOM), speed)) {
-          const _p = w.leaveProduct(st);
+        if (w.moveTo(wst.getDockingPoint(DockPoint.BOTTOM), speed)) {
+          const _p = w.leaveProduct(wst);
           app.stage.addChild(_p);
           state = "done";
 
@@ -203,7 +207,7 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
           app.stage.addChild(p);
 
           // these products should be deliverd by FE workers
-          jobsFront.push(p);
+          jobsFront.push({ st: dl, p });
           state = "done";
         }
         break;

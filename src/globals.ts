@@ -50,6 +50,6 @@ export const backStations: Station[] = [];
 
 export const deliveryLocations: Station[] = [];
 
-export const jobsFront: Queue<Product> = new Queue();
+export const jobsFront: Queue<{ st: Station, p: Product }> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
 export const waitingArea: Station[] = [];
