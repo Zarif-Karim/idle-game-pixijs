@@ -83,6 +83,9 @@ export class Worker extends Circle {
     return s.createProduct();
   }
 
+  /**
+  * @deprecated use Worker.moveTo(...) instead
+  */
   isAt(object: Station | Product) {
     const stCentre = object.centre;
 
