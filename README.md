@@ -8,19 +8,15 @@ This is a hobby project with a hope to eventually make a idle clicker game.
 
 ## Current State
 
-Currently we are adding 5 "back workers" and 2 "front workers" (added to the middle of the screen, random position).
+Currently we are adding 5 "back workers" and 3 "front workers" and 6 "customers".
 
-Random jobs are added every 1.5s
-Jobs are X seconds wait at the choosen station (square)
-
+Customers go to the waiting area and and wait for their orders to be taken.
+Front Facing workers take customer orders and relay them to Back workers
 Workers will continously pick up jobs from a queue to execute.
-
-Back workers create product and leave in the middle.
-Front workers take the product and deliver it to the waiting area.
-
-## TODO
-
-Fix touch/click locations on screen resize/change
+Back Workers then create the requested product and places it in the delivery area.
+Front workers then pick them up and delivery to the customers
+Customers leave when orders are fulfilled.
+New Customers come in when old ones leave or spaces empties up!
 
 ## How to run locally
 
