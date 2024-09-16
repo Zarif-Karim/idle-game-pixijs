@@ -54,7 +54,7 @@ export class Worker extends Circle {
       this.y += moveY;
     }
 
-    if (x - this.x <= 0.01 && y - this.y <= 0.01) {
+    if (Math.abs(x - this.x) === 0 && Math.abs(y - this.y) === 0) {
       return true;
     }
     return false;
