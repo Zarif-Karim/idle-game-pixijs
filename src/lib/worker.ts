@@ -19,31 +19,50 @@ export class Worker extends Circle {
     this.id = Worker.identifier;
   }
 
+  /**
+   * Move to obj per tick at the given speed
+   * @param obj the object to move towards
+   * @param speed the speed at which to move per tick
+   * @returns true if already reached object, false othewise
+   */
   moveTo(obj: Station | Product, speed: number) {
     const { x, y } = obj instanceof Station ? obj.view : obj;
+
     // Calculate the distance between the object and the target
     const dx = x - this.x;
     const dy = y - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance < 3) return;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist === 0) return true;
 
-    // if(distance < 0.05*this.radius) return;
     // Calculate the normalized direction vector
-    const directionX = dx / distance;
-    const directionY = dy / distance;
+    const directionX = dx / dist;
+    const directionY = dy / dist;
 
     // Calculate the movement amount for this frame
-    const moveX = directionX * speed;
-    const moveY = directionY * speed;
+    let moveX = directionX * speed;
+    let moveY = directionY * speed;
 
     // Update the object's position
-    this.x += moveX;
-    this.y += moveY;
+    if (Math.abs(moveX) > Math.abs(dx)) {
+      this.x = x;
+    } else {
+      this.x += moveX;
+    }
+    if (Math.abs(moveY) > Math.abs(dy)) {
+      this.y = y;
+    } else {
+      this.y += moveY;
+    }
+
+    if (x - this.x <= 0.01 && y - this.y <= 0.01) {
+      return true;
+    }
+    return false;
   }
 
   takeProduct(p: Product) {
     this.hold = p;
-    p.setPos(0,0);
+    p.setPos(0, 0);
     this.addChild(this.hold);
   }
 

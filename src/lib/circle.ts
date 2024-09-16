@@ -13,8 +13,7 @@ export class Circle extends Container {
     this.view = new Graphics().circle(0,0, radius).fill({ color: options?.color || 'pink' });
     this.addChild(this.view);
 
-    this.position.x = x;
-    this.position.y = y;
+    this.position.set(x, y);
     this.setSize(radius, radius);
 
     this.radius = radius;

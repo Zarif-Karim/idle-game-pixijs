@@ -203,7 +203,8 @@ function doBackWork(w: Worker, jn: number, app: Application) {
     switch (state) {
       case "station":
         // go to the right station
-        w.moveTo(st, speed);
+        // TODO: use moveTo as the if condition
+        w.moveTo(st, speed)
         if (w.isAt(st)) {
           state = "work";
           workStartTime = Date.now();

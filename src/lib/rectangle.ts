@@ -38,4 +38,8 @@ export class Rectangle {
       this.view.tint = "white";
     });
   }
+
+  get position() {
+    return this.view.position;
+  }
 }
