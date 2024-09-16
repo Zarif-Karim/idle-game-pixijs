@@ -6,12 +6,12 @@ import {
   jobsBack,
   jobsFront,
   SPEED,
+  status,
   waitingArea,
   workersBack,
   workersFront,
   x,
   y,
-  status,
 } from "./globals";
 
 import { Queue } from "./lib/queue";
@@ -19,8 +19,12 @@ import { Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Station } from "./lib/stations";
 import { Product } from "./lib/product";
+import { Rectangle } from "./lib/rectangle";
 
 export default async (app: Application) => {
+  // add a screen border for debugging
+  addScreenBorder(app);
+
   // make whole screen interactable
   app.stage.eventMode = "static";
   app.stage.hitArea = app.screen;
@@ -51,6 +55,15 @@ export default async (app: Application) => {
     status.update(`${x}, ${y}`);
   });
 };
+
+function addScreenBorder(app: Application) {
+  const top = new Rectangle(0,0,EDGES.width, 2);
+  const bottom = new Rectangle(0,EDGES.height-2,EDGES.width, 2);
+  const left = new Rectangle(0,0,2, EDGES.height);
+  const right = new Rectangle(EDGES.width-2,0,2, EDGES.height);
+
+  app.stage.addChild(...[top,bottom,left,right].map(r=>r.view));
+}
 
 function createMiddlePointHorizontalDeliveryTable(app: Application) {
   const h = Station.SIZE;
