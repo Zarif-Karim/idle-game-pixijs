@@ -39,6 +39,14 @@ export class Rectangle {
     });
   }
 
+  get x() {
+    return this.view.x;
+  }
+
+  get y() {
+    return this.view.y;
+  }
+
   get position() {
     return this.view.position;
   }

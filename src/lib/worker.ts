@@ -1,3 +1,4 @@
+import { Point } from "pixi.js";
 import { x } from "../globals";
 import { Circle } from "./circle";
 import { Product } from "./product";
@@ -25,9 +26,7 @@ export class Worker extends Circle {
    * @param speed the speed at which to move per tick
    * @returns true if already reached object, false othewise
    */
-  moveTo(obj: Station | Product, speed: number) {
-    const { x, y } = obj instanceof Station ? obj.view : obj;
-
+  moveTo({x, y}: Station | Product | Point, speed: number) {
     // Calculate the distance between the object and the target
     const dx = x - this.x;
     const dy = y - this.y;
