@@ -34,7 +34,7 @@ export async function addFullScreenButton(app: Application) {
   btn.width = x(5);
   btn.height = x(5);
 
-  btn.position.set(app.canvas.width - btn.width - x(1), x(1));
+  btn.position.set(x(94), x(1));
   btn.eventMode = "static";
   btn.cursor = "pointer";
 
