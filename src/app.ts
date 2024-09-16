@@ -151,8 +151,7 @@ function doFrontWork(w: Worker, p: Product, app: Application) {
     const speed = SPEED * deltaTime;
     switch (state) {
       case "pick":
-        w.moveTo(p, speed);
-        if (w.isAt(p)) {
+        if (w.moveTo(p, speed)) {
           // pick product
           app.stage.removeChild(p);
           w.takeProduct(p);
@@ -160,8 +159,7 @@ function doFrontWork(w: Worker, p: Product, app: Application) {
         }
         break;
       case "deliver":
-        w.moveTo(st, speed);
-        if (w.isAt(st)) {
+        if (w.moveTo(st, speed)) {
           const _p = w.leaveProduct(st);
           app.stage.addChild(_p);
           state = "done";
@@ -203,9 +201,7 @@ function doBackWork(w: Worker, jn: number, app: Application) {
     switch (state) {
       case "station":
         // go to the right station
-        // TODO: use moveTo as the if condition
-        w.moveTo(st, speed)
-        if (w.isAt(st)) {
+        if (w.moveTo(st, speed)) {
           state = "work";
           workStartTime = Date.now();
         }
@@ -230,8 +226,7 @@ function doBackWork(w: Worker, jn: number, app: Application) {
 
       case "deliver":
         // deliver product
-        w.moveTo(dl, speed);
-        if (w.isAt(dl)) {
+        if (w.moveTo(dl, speed)) {
           // move product from hand to table
           const p = w.leaveProduct(dl);
           app.stage.addChild(p);
