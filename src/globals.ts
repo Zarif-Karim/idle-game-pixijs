@@ -47,15 +47,25 @@ export function y(percentage: number) {
   return EDGES.height * (percentage / 100);
 }
 
-// const consumers: Graphics[] = [];
-export const jobsBack: Queue<number> = new Queue();
+export type FrontTakeOrder = {
+  from: Station;
+  customer: Worker;
+};
+
+export type FrontDelivery = FrontTakeOrder & {
+  to: Station;
+  product: Product;
+};
+
+export const jobsBack: Queue<{ type: number; customer: Worker; at: Station }> =
+  new Queue();
 export const workersBack: Queue<Worker> = new Queue();
 export const backStations: Station[] = [];
 
 export const deliveryLocations: Station[] = [];
 
-export const jobsFrontDelivery: Queue<{ st: Station; j: Product }> = new Queue();
-export const jobsFrontTakeOrder: Queue<{ st: Station; j: Worker }> = new Queue();
+export const jobsFrontDelivery: Queue<FrontDelivery> = new Queue();
+export const jobsFrontTakeOrder: Queue<FrontTakeOrder> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
 export const waitingArea: Queue<Station> = new Queue();
 
