@@ -1,3 +1,4 @@
+import FastPriorityQueue from "fastpriorityqueue";
 import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { Station } from "./lib/stations";
@@ -50,6 +51,18 @@ export const backStations: Station[] = [];
 
 export const deliveryLocations: Station[] = [];
 
-export const jobsFront: Queue<{ st: Station, p: Product }> = new Queue();
+export const jobsFront: Queue<{ st: Station; p: Product }> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
 export const waitingArea: Station[] = [];
+
+type PWA = {
+  s: Station;
+  u: number; // number of current concurrent uses
+};
+
+export const prioritizedWaitingArea = new FastPriorityQueue<PWA>(
+  (a, b) => {
+    return a.u < b.u;
+  },
+);
+
