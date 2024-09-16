@@ -3,8 +3,8 @@ import {
   backStations,
   deliveryLocations,
   jobsFront,
-  SPEED,
   waitingArea,
+  SPEED,
   workersBack,
   workersFront,
   x,
@@ -125,7 +125,8 @@ export function doFrontWork(
   let state = "pick";
   // pick a random station to deliver to for now
   // TODO: do delivery to right customer
-  const wst = waitingArea[getRandomInt(0, waitingArea.length - 1)];
+  const wst = waitingArea.pop();
+  waitingArea.push(wst);
 
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;

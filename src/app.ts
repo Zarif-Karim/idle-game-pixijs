@@ -6,10 +6,9 @@ import {
   EDGES,
   jobsBack,
   jobsFront,
-  prioritizedWaitingArea,
+  waitingArea,
   SPEED,
   status,
-  waitingArea,
   workersBack,
   workersFront,
   x,
@@ -90,7 +89,6 @@ function createCustomerWaitingArea(app: Application) {
       new Station(x + (Station.SIZE + stsg) * 2, y, color),
     ].forEach((s) => {
       waitingArea.push(s);
-      prioritizedWaitingArea.add({ s, u: 0 });
       app.stage.addChild(s.view);
     });
   };
@@ -116,7 +114,7 @@ function createBackStations(app: Application) {
 
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
-    console.log(app.ticker.count);
+    // console.log(app.ticker.count);
     while (!workersBack.isEmpty) {
       // if not jobs wait for it
       if (jobsBack.isEmpty) {
@@ -188,33 +186,20 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   ];
 
   const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
-  if (prioritizedWaitingArea.size > 9) {
-    console.error("prioritizedWaitingArea size is greater than expected");
-  }
 
   const { x, y } = gp;
   const w = new Worker(x, y, { color: "white" });
-
-  if (prioritizedWaitingArea.size <= 0) {
-    throw new Error("Waiting Area Queue is Empty");
-  }
 
   // add to screen
   app.stage.addChild(w);
 
   // console.time("pq access");
   // get waiting station
-  const { s, u } = prioritizedWaitingArea.poll()!;
-  status.update(`${w.id}: ${u}`);
-  prioritizedWaitingArea.add({ s, u: u + 1 });
+  const s = waitingArea.pop()!;
+  waitingArea.push(s);
 
-  if (u % 20 === 0) {
-    console.time("trim");
-    prioritizedWaitingArea.trim();
-    console.timeEnd("trim");
-  }
   // console.timeEnd("pq access");
-  const context = { s, u, st: Date.now() };
+  const context = { s, st: Date.now() };
 
   // add to queue
   // group.push(w);
@@ -222,9 +207,9 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const work = ({ deltaTime }: any) => {
     const speed = SPEED * deltaTime;
     if (w.moveTo(s.getDockingPoint(DockPoint.TOP), speed)) {
+      // work done
       app.ticker.remove(work, context);
       setTimeout(() => {
-        // work done
         app.stage.removeChild(w);
         createCustomer(app);
       }, 1000);
