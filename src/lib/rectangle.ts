@@ -42,4 +42,12 @@ export class Rectangle {
   get position() {
     return this.view.position;
   }
+
+  get width() {
+    return this.view.width;
+  }
+
+  get height() {
+    return this.view.height;
+  }
 }
