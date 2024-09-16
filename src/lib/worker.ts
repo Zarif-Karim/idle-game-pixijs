@@ -2,9 +2,11 @@ import { Application, Point } from "pixi.js";
 import {
   backStations,
   deliveryLocations,
-  jobsFront,
-  waitingArea,
+  EDGES,
+  jobsFrontDelivery,
+  jobsFrontTakeOrder,
   SPEED,
+  waitingArea,
   workersBack,
   workersFront,
   x,
@@ -213,7 +215,7 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
           app.stage.addChild(p);
 
           // these products should be deliverd by FE workers
-          jobsFront.push({ st: dl, p });
+          jobsFrontDelivery.push({ st: dl, p });
           state = "done";
         }
         break;
@@ -232,18 +234,49 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
   app.ticker.add(work, context);
 }
 
-export function doCustomerWork(w: Worker, s: Station, createCustomer: Function, app: Application) {
-  const context = { s, st: Date.now() };
+export function doCustomerWork(
+  c: Worker,
+  st: Station,
+  createCustomer: Function,
+  app: Application,
+  state = "waitArea",
+) {
+  const context = { s: st, c, st: Date.now() };
+  state = "waitArea";
+  let waitStartTime: number;
+  let dt: number;
+  const wt = 2000; // wait time 2s
 
   const work = ({ deltaTime }: any) => {
     const speed = SPEED * deltaTime;
-    if (w.moveTo(s.getDockingPoint(DockPoint.TOP), speed)) {
-      // work done
-      app.ticker.remove(work, context);
-      setTimeout(() => {
-        app.stage.removeChild(w);
+    switch (state) {
+      case "waitArea":
+        if (c.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
+          // wait for order taking
+          jobsFrontTakeOrder.push({ st, c });
+          state = "wait";
+          waitStartTime = Date.now();
+        }
+        break;
+      case "wait":
+        // TODO: check if order is fullfilled
+        // waiting 2 sec for now
+        dt = Date.now() - waitStartTime;
+        if (dt >= wt) {
+          state = "leave";
+        }
+        break;
+      case "leave":
+        const exitPoint = new Point(EDGES.width + 100, 150);
+        if (c.moveTo(exitPoint, speed)) {
+          state = "done";
+        }
+        break;
+      case "done":
+        app.ticker.remove(work, context);
+        app.stage.removeChild(c);
         createCustomer(app);
-      }, 1000);
+        break;
     }
   };
 

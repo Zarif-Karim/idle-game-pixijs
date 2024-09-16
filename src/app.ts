@@ -6,7 +6,7 @@ import {
   deliveryLocations,
   EDGES,
   jobsBack,
-  jobsFront,
+  jobsFrontDelivery,
   status,
   waitingArea,
   workersBack,
@@ -126,12 +126,12 @@ const assignJobs = (app: Application) => {
   app.ticker.add(() => {
     while (!workersFront.isEmpty) {
       // if not jobs wait for it
-      if (jobsFront.isEmpty) {
+      if (jobsFrontDelivery.isEmpty) {
         break;
       }
 
       const w = workersFront.pop();
-      const j = jobsFront.pop();
+      const j = jobsFrontDelivery.pop();
 
       doFrontWork(w!, j!, app);
     }
