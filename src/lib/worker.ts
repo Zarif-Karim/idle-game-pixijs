@@ -127,19 +127,36 @@ export class Worker extends Circle {
     const dt = Date.now() - startTime;
     let completion = dt / this.makeOrderTime;
     completion = completion > 1 ? 1 : completion;
+    let orders: number[] = [];
 
-    const productType = getRandomInt(0, backStations.length - 1);
-    this.requiredProductType = productType;
-    const quantity = getRandomInt(0, 3);
-    this.orderQuantityRemaining = quantity;
-    const orders = Array(quantity).fill(productType);
+    if (completion === 1) {
+      const productType = getRandomInt(0, backStations.length - 1);
+      this.requiredProductType = productType;
+      const quantity = getRandomInt(0, 3);
+      this.orderQuantityRemaining = quantity;
+      orders = Array(quantity).fill(productType);
+
+      // TODO: this is temp code to show which order customer wants
+      // should later be changed to a pop up with image and number
+      const p = this.makeProduct(backStations[productType]);
+      this.takeProduct(p);
+    }
 
     return { completion, orders };
   }
 
   recieveProduct() {
+  }
 
-  } 
+  isOrderCompleted() {
+    if (this.orderQuantityRemaining !== 0) {
+      return false;
+    }
+
+    if (!this.hold) throw new Error("OrderComplete true but no product held");
+    this.removeChild(this.hold);
+    return true;
+  }
 }
 
 export function doFrontWork(
@@ -149,7 +166,6 @@ export function doFrontWork(
 ) {
   const context = { w, job: j, st: Date.now() };
   let state = j instanceof Product ? "pick" : "customer";
-  if(state === "customer") throw new Error('state is customer in front worker')
 
   let takeOrderStartTime: number;
 
@@ -194,7 +210,6 @@ export function doFrontWork(
         const c = j as Worker; // this is the customer
         const progress = c.makeOrder(takeOrderStartTime);
         if (progress.completion === 1) {
-          // progress.orders.forEach((j) => jobsBack.push({ j, c, st: pst }));
           state = "done";
         } else {
           // update progress bar
@@ -302,8 +317,7 @@ export function doCustomerWork(
         }
         break;
       case "wait":
-        // TODO: check if order is fullfilled
-        if (c.orderQuantityRemaining === 0) {
+        if (c.isOrderCompleted()) {
           state = "leave";
         }
         break;
