@@ -55,9 +55,9 @@ export const jobsFront: Queue<{ st: Station; p: Product }> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
 export const waitingArea: Station[] = [];
 
-type PWA = {
-  s: Station;
-  u: number; // number of current concurrent uses
+interface PWA {
+  s: Station,
+  u: number, // number of current concurrent uses
 };
 
 export const prioritizedWaitingArea = new FastPriorityQueue<PWA>(
