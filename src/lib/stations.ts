@@ -6,7 +6,7 @@ import { x } from "../globals";
 const ONE_MS = 1_000; // 1000 ms aka 1 s
 
 // NOTE: can extend later to add corners etc
-enum DockPointKeys {
+export enum DockPoint {
   TOP = 0,
   BOTTOM = 1,
   LEFT = 2,
@@ -50,7 +50,7 @@ export class Station extends Rectangle {
     return new Product(this.color);
   }
 
-  getDockingPoint(side: DockPointKeys) {
+  getDockingPoint(side: DockPoint) {
     return this.dockingPoints[side];
   }
 }

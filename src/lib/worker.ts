@@ -11,7 +11,7 @@ import {
 } from "../globals";
 import { Circle } from "./circle";
 import { Product } from "./product";
-import { Station } from "./stations";
+import { DockPoint, Station } from "./stations";
 import { generateRandomColorHex, getRandomInt } from "./utils";
 
 export class Worker extends Circle {
@@ -130,7 +130,7 @@ export function doFrontWork(w: Worker, p: Product, app: Application) {
         }
         break;
       case "deliver":
-        if (w.moveTo(st, speed)) {
+        if (w.moveTo(st.getDockingPoint(DockPoint.BOTTOM), speed)) {
           const _p = w.leaveProduct(st);
           app.stage.addChild(_p);
           state = "done";
@@ -172,7 +172,7 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
     switch (state) {
       case "station":
         // go to the right station
-        if (w.moveTo(st, speed)) {
+        if (w.moveTo(st.getDockingPoint(DockPoint.RIGHT), speed)) {
           state = "work";
           workStartTime = Date.now();
         }
@@ -197,7 +197,7 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
 
       case "deliver":
         // deliver product
-        if (w.moveTo(dl, speed)) {
+        if (w.moveTo(dl.getDockingPoint(DockPoint.BOTTOM), speed)) {
           // move product from hand to table
           const p = w.leaveProduct(dl);
           app.stage.addChild(p);
