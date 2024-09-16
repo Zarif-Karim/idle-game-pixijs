@@ -5,6 +5,7 @@ import {
   EDGES,
   jobsBack,
   jobsFront,
+  SPEED,
   status,
   waitingArea,
   workersBack,
@@ -16,7 +17,7 @@ import {
 import { Queue } from "./lib/queue";
 import { doBackWork, doFrontWork, Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
-import { Station } from "./lib/stations";
+import { DockPoint, Station } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 
 export default async (app: Application) => {
@@ -43,6 +44,7 @@ export default async (app: Application) => {
 
   jobAdderInterval(1500, 15);
   addWorkers(app);
+  addCustomers(app);
   assignJobs(app);
 
   // add the status last so its always visible
@@ -144,25 +146,62 @@ const addWorkers = (app: Application) => {
   // back workers
   const amountBack = 5;
   for (let i = 0; i < amountBack; i++) {
-    addNewWorker(app, workersBack);
+    addNewWorker(app, workersBack, "green");
   }
 
   // front workers
   const amountFront = 2;
   for (let i = 0; i < amountFront; i++) {
-    addNewWorker(app, workersFront);
+    addNewWorker(app, workersFront, "blue");
   }
 };
 
-function addNewWorker(app: Application, group: Queue<Worker>) {
+function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   const { x, y } = randomPositionMiddle(EDGES);
-  const w = new Worker(x, y);
+  const w = new Worker(x, y, { color });
 
   // add to queue
   group.push(w);
 
   // add to screen
   app.stage.addChild(w);
+}
+
+function addCustomers(app: Application) {
+  setInterval(() => {
+    createCustomer(app);
+  }, 1000);
+}
+
+function createCustomer(app: Application /*, _group: Queue<Worker> */) {
+  const generationPoints: Point[] = [
+    new Point(-100, 20),
+    new Point(EDGES.width/2, -100),
+    new Point(EDGES.width + 100, 100),
+  ];
+
+  const { x, y } =
+    generationPoints[getRandomInt(0, generationPoints.length - 1)];
+  const w = new Worker(x, y, { color: "white" });
+  const rwa = waitingArea[getRandomInt(0, waitingArea.length - 1)];
+
+  // add to queue
+  // group.push(w);
+
+  // add to screen
+  app.stage.addChild(w);
+
+  const work = ({ deltaTime }: any) => {
+    const speed = SPEED * deltaTime;
+    if (w.moveTo(rwa.getDockingPoint(DockPoint.TOP), speed)) {
+      setTimeout(() => {
+        app.stage.removeChild(w);
+        app.ticker.remove(work, { w, rwa });
+      }, 2000);
+    }
+  };
+
+  app.ticker.add(work, { w, rwa });
 }
 
 const jobAdderInterval = (duration: number, maxLength = 15) => {

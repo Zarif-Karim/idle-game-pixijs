@@ -14,6 +14,11 @@ import { Product } from "./product";
 import { DockPoint, Station } from "./stations";
 import { generateRandomColorHex, getRandomInt } from "./utils";
 
+type WorkerOptions = {
+  size?: number;
+  color?: string;
+};
+
 export class Worker extends Circle {
   static identifier = 0;
   static defaultSize = x(6);
@@ -21,9 +26,9 @@ export class Worker extends Circle {
 
   public hold: Product | null = null;
 
-  constructor(x: number, y: number, size?: number, color?: string) {
-    super(x, y, size || Worker.defaultSize, {
-      color: color || generateRandomColorHex(),
+  constructor(x: number, y: number, options?: WorkerOptions) {
+    super(x, y, options?.size || Worker.defaultSize, {
+      color: options?.color || generateRandomColorHex(),
     });
     Worker.identifier += 1;
     this.id = Worker.identifier;
