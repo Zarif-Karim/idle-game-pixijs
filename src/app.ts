@@ -5,7 +5,6 @@ import {
   EDGES,
   jobsBack,
   jobsFront,
-  SPEED,
   status,
   waitingArea,
   workersBack,
@@ -15,10 +14,9 @@ import {
 } from "./globals";
 
 import { Queue } from "./lib/queue";
-import { Worker } from "./lib/worker";
+import { doBackWork, doFrontWork, Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Station } from "./lib/stations";
-import { Product } from "./lib/product";
 import { Rectangle } from "./lib/rectangle";
 
 export default async (app: Application) => {
@@ -139,117 +137,6 @@ const assignJobs = (app: Application) => {
     }
   });
 };
-
-function doFrontWork(w: Worker, p: Product, app: Application) {
-  const context = { w, p, st: Date.now() };
-  let state = "pick";
-  // pick a random station to deliver to for now
-  // TODO: do delivery to right customer
-  const st = waitingArea[getRandomInt(0, waitingArea.length - 1)];
-
-  const work = ({ deltaTime }: { deltaTime: number }) => {
-    const speed = SPEED * deltaTime;
-    switch (state) {
-      case "pick":
-        if (w.moveTo(p, speed)) {
-          // pick product
-          app.stage.removeChild(p);
-          w.takeProduct(p);
-          state = "deliver";
-        }
-        break;
-      case "deliver":
-        if (w.moveTo(st, speed)) {
-          const _p = w.leaveProduct(st);
-          app.stage.addChild(_p);
-          state = "done";
-
-          // TODO: customer take the product and leave
-          // just a timeout for now
-          setTimeout(() => {
-            app.stage.removeChild(_p);
-          }, 5_000);
-        }
-        break;
-      case "done":
-        // work done
-        app.ticker.remove(work, context);
-        // join back into queue
-        workersFront.push(w);
-        break;
-      default:
-        console.log("should never reach default");
-        throw new Error("Work fell in default case!");
-    }
-  };
-
-  app.ticker.add(work, context);
-}
-
-function doBackWork(w: Worker, jn: number, app: Application) {
-  const context = { w, jn, st: Date.now() };
-  const st = backStations[jn];
-  const { workDuration: wd } = st;
-
-  let state = "station";
-  let workStartTime = -1;
-  let dt = 0;
-  let dl: Station;
-
-  const work = ({ deltaTime }: { deltaTime: number }) => {
-    const speed = SPEED * deltaTime;
-    switch (state) {
-      case "station":
-        // go to the right station
-        if (w.moveTo(st, speed)) {
-          state = "work";
-          workStartTime = Date.now();
-        }
-        break;
-
-      case "work":
-        dt = Date.now() - workStartTime;
-        // wait for the required time
-        if (dt >= wd) {
-          state = "deliver";
-          // product pickup
-          const product = w.makeProduct(st);
-          w.takeProduct(product);
-
-          // choose the delivery location
-          dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
-        } // else {
-        // update wait loading bar
-        // eg. loadbar(dt/wd);
-        // }
-        break;
-
-      case "deliver":
-        // deliver product
-        if (w.moveTo(dl, speed)) {
-          // move product from hand to table
-          const p = w.leaveProduct(dl);
-          app.stage.addChild(p);
-
-          // these products should be deliverd by FE workers
-          jobsFront.push(p);
-          state = "done";
-        }
-        break;
-      case "done":
-        // work done
-        app.ticker.remove(work, context);
-        // join back into queue
-        workersBack.push(w);
-        break;
-      default:
-        console.log("should never reach default");
-        throw new Error("Work fell in default case!");
-    }
-  };
-
-  app.ticker.add(work, context);
-}
 
 const addWorkers = (app: Application) => {
   // TODO: populate a consumer randomly on the edges and move to waiting waitingArea

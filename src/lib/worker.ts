@@ -1,9 +1,18 @@
-import { Point } from "pixi.js";
-import { x } from "../globals";
+import { Application, Point } from "pixi.js";
+import {
+  backStations,
+  deliveryLocations,
+  jobsFront,
+  SPEED,
+  waitingArea,
+  workersBack,
+  workersFront,
+  x,
+} from "../globals";
 import { Circle } from "./circle";
 import { Product } from "./product";
 import { Station } from "./stations";
-import { generateRandomColorHex } from "./utils";
+import { generateRandomColorHex, getRandomInt } from "./utils";
 
 export class Worker extends Circle {
   static identifier = 0;
@@ -26,7 +35,7 @@ export class Worker extends Circle {
    * @param speed the speed at which to move per tick
    * @returns true if already reached object, false othewise
    */
-  moveTo({x, y}: Station | Product | Point, speed: number) {
+  moveTo({ x, y }: Station | Product | Point, speed: number) {
     // Calculate the distance between the object and the target
     const dx = x - this.x;
     const dy = y - this.y;
@@ -83,8 +92,8 @@ export class Worker extends Circle {
   }
 
   /**
-  * @deprecated use Worker.moveTo(...) instead
-  */
+   * @deprecated use Worker.moveTo(...) instead
+   */
   isAt(object: Station | Product) {
     const stCentre = object.centre;
 
@@ -100,4 +109,115 @@ export class Worker extends Circle {
     // Minus 10 as we want to have some overlap
     return distance <= radius + halfWidth - 10;
   }
+}
+
+export function doFrontWork(w: Worker, p: Product, app: Application) {
+  const context = { w, p, st: Date.now() };
+  let state = "pick";
+  // pick a random station to deliver to for now
+  // TODO: do delivery to right customer
+  const st = waitingArea[getRandomInt(0, waitingArea.length - 1)];
+
+  const work = ({ deltaTime }: { deltaTime: number }) => {
+    const speed = SPEED * deltaTime;
+    switch (state) {
+      case "pick":
+        if (w.moveTo(p, speed)) {
+          // pick product
+          app.stage.removeChild(p);
+          w.takeProduct(p);
+          state = "deliver";
+        }
+        break;
+      case "deliver":
+        if (w.moveTo(st, speed)) {
+          const _p = w.leaveProduct(st);
+          app.stage.addChild(_p);
+          state = "done";
+
+          // TODO: customer take the product and leave
+          // just a timeout for now
+          setTimeout(() => {
+            app.stage.removeChild(_p);
+          }, 5_000);
+        }
+        break;
+      case "done":
+        // work done
+        app.ticker.remove(work, context);
+        // join back into queue
+        workersFront.push(w);
+        break;
+      default:
+        console.log("should never reach default");
+        throw new Error("Work fell in default case!");
+    }
+  };
+
+  app.ticker.add(work, context);
+}
+
+export function doBackWork(w: Worker, jn: number, app: Application) {
+  const context = { w, jn, st: Date.now() };
+  const st = backStations[jn];
+  const { workDuration: wd } = st;
+
+  let state = "station";
+  let workStartTime = -1;
+  let dt = 0;
+  let dl: Station;
+
+  const work = ({ deltaTime }: { deltaTime: number }) => {
+    const speed = SPEED * deltaTime;
+    switch (state) {
+      case "station":
+        // go to the right station
+        if (w.moveTo(st, speed)) {
+          state = "work";
+          workStartTime = Date.now();
+        }
+        break;
+
+      case "work":
+        dt = Date.now() - workStartTime;
+        // wait for the required time
+        if (dt >= wd) {
+          state = "deliver";
+          // product pickup
+          const product = w.makeProduct(st);
+          w.takeProduct(product);
+
+          // choose the delivery location
+          dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
+        } // else {
+        // update wait loading bar
+        // eg. loadbar(dt/wd);
+        // }
+        break;
+
+      case "deliver":
+        // deliver product
+        if (w.moveTo(dl, speed)) {
+          // move product from hand to table
+          const p = w.leaveProduct(dl);
+          app.stage.addChild(p);
+
+          // these products should be deliverd by FE workers
+          jobsFront.push(p);
+          state = "done";
+        }
+        break;
+      case "done":
+        // work done
+        app.ticker.remove(work, context);
+        // join back into queue
+        workersBack.push(w);
+        break;
+      default:
+        console.log("should never reach default");
+        throw new Error("Work fell in default case!");
+    }
+  };
+
+  app.ticker.add(work, context);
 }
