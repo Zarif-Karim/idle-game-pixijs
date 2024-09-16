@@ -1,5 +1,5 @@
-import { Application, Assets, Sprite } from "pixi.js";
-import { x } from "./globals";
+import { Application, Assets, Point, Sprite } from "pixi.js";
+import { x, y } from "./globals";
 
 let IS_FULLSCREEN = false;
 
@@ -26,29 +26,42 @@ export function addFullScreenToggle(app: Application) {
   });
 }
 
+export class FullscreenButton extends Sprite {
+  constructor(img: any, app: Application) {
+    super(img);
+
+    this.width = x(5);
+    this.height = x(5);
+
+    this.position.set(x(94), x(1));
+    this.eventMode = "static";
+    this.cursor = "pointer";
+
+    this.on("pointerdown", async () => {
+      await toggleFullscreen(app);
+    });
+
+    this.on("pointerover", () => {
+      this.tint = 0x666666;
+    });
+    this.on("pointerout", () => {
+      this.tint = 0xffffff;
+    });
+  }
+
+  reset() {
+    this.width = x(5);
+    this.height = x(5);
+
+    // this.position.set(x(94), y(1));
+    this.parent.toLocal(new Point(x(94), y(1)), undefined, this.position)
+  }
+}
+
 export async function addFullScreenButton(app: Application) {
   const imgFullScreenBtn = await Assets.load("full-screen-button.png");
-
-  const btn = new Sprite(imgFullScreenBtn);
-
-  btn.width = x(5);
-  btn.height = x(5);
-
-  btn.position.set(x(94), x(1));
-  btn.eventMode = "static";
-  btn.cursor = "pointer";
-
-  btn.on("pointerdown", async () => {
-    await toggleFullscreen(app);
-  });
-
-  btn.on("pointerover", () => {
-    btn.tint = 0x666666;
-  });
-  btn.on("pointerout", () => {
-    btn.tint = 0xffffff;
-  });
-
+  const btn = new FullscreenButton(imgFullScreenBtn, app);
   app.stage.addChild(btn);
+  return btn;
 }
 

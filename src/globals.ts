@@ -4,14 +4,13 @@ import { Station } from "./lib/stations";
 import { Status } from "./lib/status";
 import { Worker } from "./lib/worker";
 
-
 // Maintain an aspect ration of 9:16 to be mobile friendly
-function getScreenSize() {
+export function getScreenSize() {
   const { innerHeight, innerWidth } = window;
   let height = innerHeight;
   let width = height * 9 / 16;
 
-  if( width > innerWidth) {
+  if (width > innerWidth) {
     width = innerWidth;
     height = width * 16 / 9;
   }
@@ -54,4 +53,3 @@ export const deliveryLocations: Station[] = [];
 export const jobsFront: Queue<Product> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
 export const waitingArea: Station[] = [];
-

@@ -57,20 +57,21 @@ export default async (app: Application) => {
 };
 
 function addScreenBorder(app: Application) {
-  const top = new Rectangle(0,0,EDGES.width, 2);
-  const bottom = new Rectangle(0,EDGES.height-2,EDGES.width, 2);
-  const left = new Rectangle(0,0,2, EDGES.height);
-  const right = new Rectangle(EDGES.width-2,0,2, EDGES.height);
+  const top = new Rectangle(0, 0, EDGES.width, 2);
+  const bottom = new Rectangle(0, EDGES.height - 2, EDGES.width, 2);
+  const left = new Rectangle(0, 0, 2, EDGES.height);
+  const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height);
 
-  app.stage.addChild(...[top,bottom,left,right].map(r=>r.view));
+  app.stage.addChild(...[top, bottom, left, right].map((r) => r.view));
 }
 
 function createMiddlePointHorizontalDeliveryTable(app: Application) {
   const h = Station.SIZE;
-  const count = EDGES.width / h;
+  const count = Math.floor(EDGES.width / h);
   const middlePoint = EDGES.height / 2;
+  const offset = (EDGES.width - (count * h)) / 2;
   for (let i = 0; i < count; i++) {
-    const loc = new Station(h * i, middlePoint - h / 2, "grey");
+    const loc = new Station(offset + h * i, middlePoint - h / 2, "grey");
     deliveryLocations.push(loc);
     app.stage.addChild(loc.view);
   }
