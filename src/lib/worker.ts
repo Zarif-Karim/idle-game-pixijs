@@ -3,10 +3,12 @@ import {
   backStations,
   deliveryLocations,
   EDGES,
+  FrontDelivery,
+  FrontTakeOrder,
+  jobsBack,
   jobsFrontDelivery,
   jobsFrontTakeOrder,
   SPEED,
-  waitingArea,
   workersBack,
   workersFront,
   x,
@@ -132,7 +134,8 @@ export class Worker extends Circle {
     if (completion === 1) {
       const productType = getRandomInt(0, backStations.length - 1);
       this.requiredProductType = productType;
-      const quantity = getRandomInt(0, 3);
+      const quantity = getRandomInt(1, 3);
+
       this.orderQuantityRemaining = quantity;
       orders = Array(quantity).fill(productType);
 
@@ -145,7 +148,15 @@ export class Worker extends Circle {
     return { completion, orders };
   }
 
-  recieveProduct() {
+  recieveProduct(p: Product) {
+    if (p.category === this.requiredProductType) {
+      if (this.orderQuantityRemaining === 0) {
+        throw new Error("Recieve called but quantity needed is zero");
+      }
+      this.orderQuantityRemaining -= 1;
+    } else {
+      throw new Error("Recieve called with type mismatch");
+    }
   }
 
   isOrderCompleted() {
@@ -161,55 +172,61 @@ export class Worker extends Circle {
 
 export function doFrontWork(
   w: Worker,
-  { st: pst, j }: { st: Station; j: Product | Worker },
+  job: FrontTakeOrder | FrontDelivery,
   app: Application,
 ) {
-  const context = { w, job: j, st: Date.now() };
-  let state = j instanceof Product ? "pick" : "customer";
+  const context = { w, job, st: Date.now() };
+  const jobType = "product" in job ? "FD" : "FTO";
+  let state = jobType === "FD" ? "pick" : "customer";
+  const jobFD = job as FrontDelivery;
+  const jobFTO = job as FrontTakeOrder;
 
   let takeOrderStartTime: number;
-
-  // pick a random station to deliver to for now
-  // TODO: do delivery to right customer
-  const wst = waitingArea.pop();
-  waitingArea.push(wst);
 
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;
     switch (state) {
       case "pick":
-        if (w.moveTo(pst.getDockingPoint(DockPoint.TOP), speed)) {
+        if (w.moveTo(jobFD.from.getDockingPoint(DockPoint.TOP), speed)) {
           // pick product
-          app.stage.removeChild(j);
-          w.takeProduct(j as Product);
+          app.stage.removeChild(jobFD.product);
+          w.takeProduct(jobFD.product);
           state = "deliver";
         }
         break;
       case "deliver":
-        if (w.moveTo(wst.getDockingPoint(DockPoint.BOTTOM), speed)) {
-          const _p = w.leaveProduct(wst);
-          app.stage.addChild(_p);
+        if (w.moveTo(jobFD.to.getDockingPoint(DockPoint.BOTTOM), speed)) {
+          const p = w.leaveProduct(jobFD.to);
+          app.stage.addChild(p);
+          jobFD.customer.recieveProduct(p);
+          app.stage.removeChild(p);
           state = "done";
 
           // TODO: customer take the product and leave
           // just a timeout for now
-          setTimeout(() => {
-            app.stage.removeChild(_p);
-          }, 5_000);
+          // setTimeout(() => {
+          //   app.stage.removeChild(_p);
+          // }, 5_000);
         }
         break;
 
       case "customer":
-        if (w.moveTo(pst.getDockingPoint(DockPoint.BOTTOM), speed)) {
+        if (w.moveTo(jobFTO.from.getDockingPoint(DockPoint.BOTTOM), speed)) {
           // Take Order
           state = "takeOrder";
           takeOrderStartTime = Date.now();
         }
         break;
       case "takeOrder":
-        const c = j as Worker; // this is the customer
-        const progress = c.makeOrder(takeOrderStartTime);
+        const progress = jobFTO.customer.makeOrder(takeOrderStartTime);
         if (progress.completion === 1) {
+          progress.orders.forEach((o) => {
+            jobsBack.push({
+              type: o,
+              customer: jobFTO.customer,
+              at: jobFTO.from,
+            });
+          });
           state = "done";
         } else {
           // update progress bar
@@ -223,7 +240,6 @@ export function doFrontWork(
         workersFront.push(w);
         break;
       default:
-        console.log("should never reach default");
         throw new Error("Work fell in default case!");
     }
   };
@@ -231,9 +247,13 @@ export function doFrontWork(
   app.ticker.add(work, context);
 }
 
-export function doBackWork(w: Worker, jn: number, app: Application) {
-  const context = { w, jn, st: Date.now() };
-  const st = backStations[jn];
+export function doBackWork(
+  w: Worker,
+  { type, customer, at }: { type: number; customer: Worker; at: Station },
+  app: Application,
+) {
+  const context = { w, type, st: Date.now() };
+  const st = backStations[type];
   const { workDuration: wd } = st;
 
   let state = "station";
@@ -277,7 +297,7 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
           app.stage.addChild(p);
 
           // these products should be deliverd by FE workers
-          jobsFrontDelivery.push({ st: dl, j: p });
+          jobsFrontDelivery.push({ from: dl, to: at, product: p, customer });
           state = "done";
         }
         break;
@@ -288,7 +308,6 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
         workersBack.push(w);
         break;
       default:
-        console.log("should never reach default");
         throw new Error("Work fell in default case!");
     }
   };
@@ -312,7 +331,7 @@ export function doCustomerWork(
       case "waitArea":
         if (c.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
           // wait for order taking
-          jobsFrontTakeOrder.push({ st, j: c });
+          jobsFrontTakeOrder.push({ from: st, customer: c });
           state = "wait";
         }
         break;
@@ -322,7 +341,7 @@ export function doCustomerWork(
         }
         break;
       case "leave":
-        const exitPoint = new Point(EDGES.width + 100, 150);
+        const exitPoint = new Point(EDGES.width + 100, 50);
         if (c.moveTo(exitPoint, speed)) {
           state = "done";
         }

@@ -1,7 +1,7 @@
 import { type Application, FederatedPointerEvent, Point } from "pixi.js";
 import {
   backStations,
-  CUSTOMERS,
+  // CUSTOMERS,
   customers,
   deliveryLocations,
   EDGES,
@@ -21,7 +21,6 @@ import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { Station } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
-import { Product } from "./lib/product";
 
 export default async (app: Application) => {
   // add a screen border for debugging
@@ -40,9 +39,12 @@ export default async (app: Application) => {
   // add stations
   createBackStations(app);
 
-  jobAdderInterval(1500, 15);
-  addWorkers(app);
-  addCustomers(app);
+  addWorkers({
+    back: 5,
+    front: 3,
+    customer: 6,
+  }, app);
+  // addCustomers(app);
   assignJobs(app);
 
   // add the status last so its always visible
@@ -69,7 +71,7 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
   const middlePoint = EDGES.height / 2;
   const offset = (EDGES.width - (count * h)) / 2;
   for (let i = 0; i < count; i++) {
-    const loc = new Station(offset + h * i, middlePoint - h / 2, "grey");
+    const loc = new Station(offset + h * i, middlePoint - h / 2, 50, "grey");
     deliveryLocations.push(loc);
     app.stage.addChild(loc.view);
   }
@@ -81,9 +83,9 @@ function createCustomerWaitingArea(app: Application) {
   const stsg = Station.SIZE * 0.1;
   const adder = ({ x, y }: Point) => {
     [
-      new Station(x, y, color),
-      new Station(x + Station.SIZE + stsg, y, color),
-      new Station(x + (Station.SIZE + stsg) * 2, y, color),
+      new Station(x, y, 90, color),
+      new Station(x + Station.SIZE + stsg, y, 90, color),
+      new Station(x + (Station.SIZE + stsg) * 2, y, 90, color),
     ].forEach((s) => {
       waitingArea.push(s);
       app.stage.addChild(s.view);
@@ -99,12 +101,12 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   backStations.push(...[
-    new Station(x(7.95), y(55.9), "blue"),
-    new Station(x(7.95), y(80.5), "green"),
-    new Station(x(35.6), y(92.7), "red"),
-    new Station(x(35.6), y(70.4), "pink"),
-    new Station(x(92.04) - Station.SIZE, y(55.9), "yellow"),
-    new Station(x(92.04) - Station.SIZE, y(80.5), "purple"),
+    new Station(x(7.95), y(55.9), 0, "blue"),
+    new Station(x(7.95), y(80.5), 1, "green"),
+    new Station(x(35.6), y(92.7), 2, "red"),
+    new Station(x(35.6), y(70.4), 3, "pink"),
+    new Station(x(92.04) - Station.SIZE, y(55.9), 4, "yellow"),
+    new Station(x(92.04) - Station.SIZE, y(80.5), 5, "purple"),
   ]);
   app.stage.addChild(...backStations.map((r) => r.view));
 }
@@ -127,19 +129,20 @@ const assignJobs = (app: Application) => {
 
   app.ticker.add(() => {
     while (!workersFront.isEmpty) {
-      let j: { st: Station; j: Product | Worker };
-
       if (!jobsFrontTakeOrder.isEmpty) {
-        j = jobsFrontTakeOrder.pop();
+        const w = workersFront.pop();
+        const j = jobsFrontTakeOrder.pop();
+
+        doFrontWork(w!, j!, app);
       } else if (!jobsFrontDelivery.isEmpty) {
-        j = jobsFrontDelivery.pop();
+        const w = workersFront.pop();
+        const j = jobsFrontDelivery.pop();
+
+        doFrontWork(w!, j!, app);
       } else {
         // if no jobs, wait for it
         break;
       }
-
-      const w = workersFront.pop();
-      doFrontWork(w!, j!, app);
     }
   });
 
@@ -155,19 +158,27 @@ const assignJobs = (app: Application) => {
   });
 };
 
-const addWorkers = (app: Application) => {
+const addWorkers = (
+  options: { back: number; front: number; customer: number },
+  app: Application,
+) => {
   // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
 
   // back workers
-  const amountBack = 5;
+  const amountBack = options.back;
   for (let i = 0; i < amountBack; i++) {
     addNewWorker(app, workersBack, "green");
   }
 
   // front workers
-  const amountFront = 2;
+  const amountFront = options.front;
   for (let i = 0; i < amountFront; i++) {
     addNewWorker(app, workersFront, "blue");
+  }
+
+  const amountCustomer = options.customer;
+  for (let i = 0; i < amountCustomer; i++) {
+    createCustomer(app);
   }
 };
 
@@ -182,11 +193,11 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   app.stage.addChild(w);
 }
 
-function addCustomers(app: Application) {
-  for (let i = customers.length; i < CUSTOMERS.maxCount; i++) {
-    createCustomer(app);
-  }
-}
+// function addCustomers(app: Application) {
+//   for (let i = customers.length; i < CUSTOMERS.maxCount; i++) {
+//     createCustomer(app);
+//   }
+// }
 
 function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const generationPoints: Point[] = [
@@ -205,12 +216,3 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   // add to queue
   customers.push(w);
 }
-
-const jobAdderInterval = (duration: number, maxLength = 15) => {
-  setInterval(() => {
-    if (jobsBack.length < maxLength) {
-      const randomJob = getRandomInt(0, backStations.length - 1);
-      jobsBack.push(randomJob);
-    }
-  }, duration);
-};
