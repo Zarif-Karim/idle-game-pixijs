@@ -58,3 +58,4 @@ export const jobsFront: Queue<{ st: Station; p: Product }> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
 export const waitingArea: Queue<Station> = new Queue();
 
+export const customers: Queue<Worker> = new Queue();

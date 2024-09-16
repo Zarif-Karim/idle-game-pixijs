@@ -2,13 +2,13 @@ import { type Application, FederatedPointerEvent, Point } from "pixi.js";
 import {
   backStations,
   CUSTOMERS,
+  customers,
   deliveryLocations,
   EDGES,
   jobsBack,
   jobsFront,
-  waitingArea,
-  SPEED,
   status,
+  waitingArea,
   workersBack,
   workersFront,
   x,
@@ -16,9 +16,9 @@ import {
 } from "./globals";
 
 import { Queue } from "./lib/queue";
-import { doBackWork, doFrontWork, Worker } from "./lib/worker";
+import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
-import { DockPoint, Station } from "./lib/stations";
+import { Station } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 
 export default async (app: Application) => {
@@ -28,11 +28,6 @@ export default async (app: Application) => {
   // make whole screen interactable
   app.stage.eventMode = "static";
   app.stage.hitArea = app.screen;
-
-  //app.stage.on("pointermove", (e: FederatedPointerEvent) => {
-  //  const { x, y } = e.global;
-  //  console.log({x,y});
-  //});
 
   // create delivery destinations
   createMiddlePointHorizontalDeliveryTable(app);
@@ -141,6 +136,17 @@ const assignJobs = (app: Application) => {
       doFrontWork(w!, j!, app);
     }
   });
+
+  app.ticker.add(() => {
+    while (!customers.isEmpty) {
+      const c = customers.pop();
+
+      const wa = waitingArea.pop();
+      waitingArea.push(wa);
+
+      doCustomerWork(c!, wa!, createCustomer, app);
+    }
+  });
 };
 
 const addWorkers = (app: Application) => {
@@ -171,10 +177,8 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
 }
 
 function addCustomers(app: Application) {
-  for (let i = 0; i < CUSTOMERS.maxCount; i++) {
-    setTimeout(() => {
-      createCustomer(app);
-    }, Math.random() * 2000);
+  for (let i = customers.length; i < CUSTOMERS.maxCount; i++) {
+    createCustomer(app);
   }
 }
 
@@ -192,31 +196,8 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
 
   // add to screen
   app.stage.addChild(w);
-
-  // console.time("pq access");
-  // get waiting station
-  const s = waitingArea.pop()!;
-  waitingArea.push(s);
-
-  // console.timeEnd("pq access");
-  const context = { s, st: Date.now() };
-
   // add to queue
-  // group.push(w);
-
-  const work = ({ deltaTime }: any) => {
-    const speed = SPEED * deltaTime;
-    if (w.moveTo(s.getDockingPoint(DockPoint.TOP), speed)) {
-      // work done
-      app.ticker.remove(work, context);
-      setTimeout(() => {
-        app.stage.removeChild(w);
-        createCustomer(app);
-      }, 1000);
-    }
-  };
-
-  app.ticker.add(work, context);
+  customers.push(w);
 }
 
 const jobAdderInterval = (duration: number, maxLength = 15) => {

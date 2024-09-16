@@ -231,3 +231,21 @@ export function doBackWork(w: Worker, jn: number, app: Application) {
 
   app.ticker.add(work, context);
 }
+
+export function doCustomerWork(w: Worker, s: Station, createCustomer: Function, app: Application) {
+  const context = { s, st: Date.now() };
+
+  const work = ({ deltaTime }: any) => {
+    const speed = SPEED * deltaTime;
+    if (w.moveTo(s.getDockingPoint(DockPoint.TOP), speed)) {
+      // work done
+      app.ticker.remove(work, context);
+      setTimeout(() => {
+        app.stage.removeChild(w);
+        createCustomer(app);
+      }, 1000);
+    }
+  };
+
+  app.ticker.add(work, context);
+}
