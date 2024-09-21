@@ -101,8 +101,8 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   backStations.push(...[
-    new Station(x(7.95), y(55.9), 0, "blue"),
-    new Station(x(7.95), y(80.5), 1, "green"),
+    new Station(x(7.95), y(55.9), 0, "cyan"),
+    new Station(x(7.95), y(80.5), 1, "hotpink"),
     new Station(x(35.6), y(92.7), 2, "red"),
     new Station(x(35.6), y(70.4), 3, "pink"),
     new Station(x(92.04) - Station.SIZE, y(55.9), 4, "yellow"),
