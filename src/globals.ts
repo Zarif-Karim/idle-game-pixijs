@@ -8,6 +8,11 @@ import { Worker } from "./lib/worker";
 //   maxCount: 5,
 // };
 
+
+export const StageData = {
+  coins: 0,
+};
+
 // Maintain an aspect ration of 9:16 to be mobile friendly
 export function getScreenSize() {
   const { innerHeight, innerWidth } = window;

@@ -9,6 +9,8 @@ import {
   jobsFrontDelivery,
   jobsFrontTakeOrder,
   SPEED,
+  StageData,
+  status,
   workersBack,
   workersFront,
   x,
@@ -200,13 +202,11 @@ export function doFrontWork(
           app.stage.addChild(p);
           jobFD.customer.recieveProduct(p);
           app.stage.removeChild(p);
-          state = "done";
 
-          // TODO: customer take the product and leave
-          // just a timeout for now
-          // setTimeout(() => {
-          //   app.stage.removeChild(_p);
-          // }, 5_000);
+          StageData.coins += p.price; 
+          status.update(`Coins: ${StageData.coins}`);
+
+          state = "done";
         }
         break;
 

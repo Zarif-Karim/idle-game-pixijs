@@ -8,6 +8,7 @@ import {
   jobsBack,
   jobsFrontDelivery,
   jobsFrontTakeOrder,
+  StageData,
   status,
   waitingArea,
   workersBack,
@@ -54,6 +55,8 @@ export default async (app: Application) => {
     const { x, y } = e.global;
     status.update(`${x}, ${y}`);
   });
+
+  status.update(`Coins: ${StageData.coins}`);
 };
 
 function addScreenBorder(app: Application) {
@@ -101,12 +104,12 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   backStations.push(...[
-    new Station(x(7.95), y(55.9), 0, "cyan"),
-    new Station(x(7.95), y(80.5), 1, "hotpink"),
-    new Station(x(35.6), y(92.7), 2, "red"),
-    new Station(x(35.6), y(70.4), 3, "pink"),
-    new Station(x(92.04) - Station.SIZE, y(55.9), 4, "yellow"),
-    new Station(x(92.04) - Station.SIZE, y(80.5), 5, "purple"),
+    new Station(x(7.95), y(55.9), 0, "cyan", 1),
+    new Station(x(7.95), y(80.5), 1, "hotpink", 15),
+    new Station(x(35.6), y(92.7), 2, "red", 110),
+    new Station(x(35.6), y(70.4), 3, "pink", 890),
+    new Station(x(92.04) - Station.SIZE, y(55.9), 4, "yellow", 5250),
+    new Station(x(92.04) - Station.SIZE, y(80.5), 5, "purple", 70_505),
   ]);
   app.stage.addChild(...backStations.map((r) => r.view));
 }

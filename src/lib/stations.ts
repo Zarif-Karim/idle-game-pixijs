@@ -18,13 +18,15 @@ export class Station extends Rectangle {
   public workDuration = ONE_MS * 1.5;
   public color: string;
   public category: number;
+  public price: number;
 
   private dockingPoints: Point[] = [];
 
-  constructor(x: number, y: number, category: number, color: string) {
+  constructor(x: number, y: number, category: number, color: string, price = 0) {
     super(x, y, Station.SIZE, Station.SIZE, { color });
     this.color = color;
     this.category = category;
+    this.price = price;
 
     const hs = Station.SIZE / 2;
 
@@ -49,7 +51,7 @@ export class Station extends Rectangle {
   }
 
   createProduct() {
-    return new Product(this.category, this.color);
+    return new Product(this.category, this.color, this.price);
   }
 
   getDockingPoint(side: DockPoint) {
