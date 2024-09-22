@@ -45,7 +45,7 @@ export class Station extends Rectangle {
     return this.view.width;
   }
 
-  getDockingPoint(side: DockPoint) {
+  getDockingPoint(side: DockPoint): Point {
     return this.dockingPoints[side];
   }
 }
