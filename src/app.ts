@@ -1,4 +1,9 @@
-import { type Application, FederatedPointerEvent, Graphics, Point } from "pixi.js";
+import {
+  type Application,
+  FederatedPointerEvent,
+  Graphics,
+  Point,
+} from "pixi.js";
 import {
   backStations,
   // CUSTOMERS,
@@ -57,38 +62,8 @@ export default async (app: Application) => {
   });
 
   status.update(`Coins: ${StageData.coins}`);
-  loadingBar(300, 250, 25, app);
+  // loadingBar(300, 250, 15, app);
 };
-
-function loadingBar(x: number, y: number, size: number, app: Application) {
-  const circleBg = new Graphics().circle(x, y, size).fill({ color: 'white' }).stroke({ width: 2, color: 'lightgrey' });
-  app.stage.addChild(circleBg);
-
-
-  const circleFill = new Graphics().arc(0, 0, 0.9 * size, 0, 2).fill({ color: 'lightblue' });
-  const radius = 0.9 * size;
-  const startAngle = -Math.PI/2;
-  const lbp = (percentage: number) => {
-    circleFill.clear();
-    const endAngle = startAngle + (percentage * 2 * Math.PI);
-    circleFill.arc(0, 0, radius, startAngle, endAngle).fill({ color: 'lightblue' });
-  }
-  circleFill.position.set(x, y);
-  app.stage.addChild(circleFill);
-  circleFill.arcTo
-
-  const mask = new Graphics().circle(0,0, 0.8 * size).fill({ color: 'white' });
-  mask.position.set(x,y);
-  app.stage.addChild(mask)
-
-  let percentage = 0;
-  const rate = 0.001;
-
-  app.ticker.add(() => {
-    percentage += rate;
-    lbp(percentage);
-  });
-}
 
 function addScreenBorder(app: Application) {
   const top = new Rectangle(0, 0, EDGES.width, 2);
