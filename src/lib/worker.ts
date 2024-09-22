@@ -35,7 +35,7 @@ export class Worker extends Circle {
   public progressBar: RoundProgressBar;
 
   // customer specific TODO: make new class for customers
-  private makeOrderTime = 500; // 500 ms
+  private makeOrderTime = 1_000; // 1 second
   public orderQuantityRemaining = 1;
   public requiredProductType = -1;
 
@@ -233,9 +233,11 @@ export function doFrontWork(
               at: jobFTO.from,
             });
           });
+          w.progressBar.reset();
           state = "done";
         } else {
           // update progress bar
+          w.progressBar.update(progress.completion);
         }
 
         break;
