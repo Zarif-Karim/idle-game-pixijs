@@ -38,5 +38,8 @@ export class RoundProgressBar extends ProgressBar {
       .arc(0, 0, this.fillRadius, this.startAngle, endAngle, false)
       .lineTo(0, 0)
       .fill("#a8c3ed");
+
+    if(percentage === 0) this.visible = false;
+    else this.visible = true;
   }
 }

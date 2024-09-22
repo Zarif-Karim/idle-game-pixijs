@@ -47,7 +47,7 @@ export class Worker extends Circle {
     Worker.identifier += 1;
     this.id = Worker.identifier;
     this.progressBar = new RoundProgressBar(size, -size, size/2);
-    this.progressBar.visible = false;
+    this.progressBar.reset();
     this.addChild(this.progressBar);
   }
 
@@ -283,16 +283,18 @@ export function doBackWork(
         // wait for the required time
         if (dt >= wd) {
           state = "deliver";
+          w.progressBar.reset();
+
           // product pickup
           const product = w.makeProduct(st);
           w.takeProduct(product);
 
           // choose the delivery location
           dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
-        } // else {
-        // update wait loading bar
-        // eg. loadbar(dt/wd);
-        // }
+        } else {
+          // update wait loading bar
+          w.progressBar.update(dt/wd);
+        }
         break;
 
       case "deliver":
