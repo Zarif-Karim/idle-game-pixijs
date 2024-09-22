@@ -1,5 +1,6 @@
 import { x } from "../../globals";
 import { Product } from "../product";
+import { BackStationSlot } from "./back-station-slot";
 import { Station, type StationOptions } from "./stations";
 
 const ONE_MS = 1_000; // 1000 ms aka 1 s
@@ -25,7 +26,7 @@ export class BackStation extends Station {
   // TODO: make stations locked by default
   public isUnlocked = true;
 
-  private slots: Station[] = [];
+  private slots: BackStationSlot[] = [];
   // TODO: temp var for dev (assess)
   private slotGrowDirection: string;
 
@@ -42,7 +43,7 @@ export class BackStation extends Station {
 
     this.slotGrowDirection = slotGrowDirection;
     // Since stations are unlocked by default for now
-    // add a slot to get started
+    // add slots to get started
     // slots are also taken as a query
     this.addSlot();
     this.addSlot();
@@ -62,7 +63,7 @@ export class BackStation extends Station {
 
     const _x = lastSlot.x + (d ? 0 : BackStation.SIZE + x(1));
     const _y = lastSlot.y + (d ? BackStation.SIZE + x(1) : 0);
-    const newSlot = new Station(_x, _y, { color: this.color });
+    const newSlot = new BackStationSlot(_x, _y, { color: this.color });
     newSlot.view.alpha = 0.5;
 
     this.slots.push(newSlot);
