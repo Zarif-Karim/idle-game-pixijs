@@ -1,7 +1,7 @@
-import { Container, Graphics } from "pixi.js";
+import { Color, Container, Graphics } from "pixi.js";
 
 type CircleOptions = {
-  color?: string,
+  color?: Color | string,
 }
 
 export class Circle extends Container {

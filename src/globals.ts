@@ -39,7 +39,7 @@ export const status: Status = new Status("Initialising");
  * the above number is used as a percentage to
  * return the on screen X coordinate
  */
-export function x(percentage: number) {
+export function x(percentage: number): number {
   return EDGES.width * (percentage / 100);
 }
 
@@ -48,7 +48,7 @@ export function x(percentage: number) {
  * the above number is used as a percentage to
  * return the on screen Y coordinate
  */
-export function y(percentage: number) {
+export function y(percentage: number): number {
   return EDGES.height * (percentage / 100);
 }
 

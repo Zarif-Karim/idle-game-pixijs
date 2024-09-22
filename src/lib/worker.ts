@@ -1,4 +1,4 @@
-import { Application, Point } from "pixi.js";
+import { Application, Color, Point } from "pixi.js";
 import {
   backStations,
   deliveryLocations,
@@ -23,7 +23,7 @@ import { RoundProgressBar } from "./progress-bar";
 
 type WorkerOptions = {
   size?: number;
-  color?: string;
+  color?: Color | string;
 };
 
 export class Worker extends Circle {

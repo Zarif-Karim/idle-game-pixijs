@@ -1,10 +1,6 @@
-import {
-  type Application,
-  Point,
-} from "pixi.js";
+import { type Application, Point } from "pixi.js";
 import {
   backStations,
-  // CUSTOMERS,
   customers,
   deliveryLocations,
   EDGES,
@@ -72,21 +68,27 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
   const middlePoint = EDGES.height / 2;
   const offset = (EDGES.width - (count * h)) / 2;
   for (let i = 0; i < count; i++) {
-    const loc = new Station(offset + h * i, middlePoint - h / 2, 50, "grey");
+    const loc = new Station(offset + h * i, middlePoint - h / 2, {
+      category: 50,
+      color: "grey",
+    });
     deliveryLocations.push(loc);
     app.stage.addChild(loc.view);
   }
 }
 
 function createCustomerWaitingArea(app: Application) {
-  const color = "orange";
+  const options = {
+    color: "orange",
+    category: 90,
+  };
   // station size with gap
   const stsg = Station.SIZE * 0.1;
   const adder = ({ x, y }: Point) => {
     [
-      new Station(x, y, 90, color),
-      new Station(x + Station.SIZE + stsg, y, 90, color),
-      new Station(x + (Station.SIZE + stsg) * 2, y, 90, color),
+      new Station(x, y, options),
+      new Station(x + Station.SIZE + stsg, y, options),
+      new Station(x + (Station.SIZE + stsg) * 2, y, options),
     ].forEach((s) => {
       waitingArea.push(s);
       app.stage.addChild(s.view);
@@ -101,14 +103,18 @@ function createCustomerWaitingArea(app: Application) {
 }
 
 function createBackStations(app: Application) {
-  backStations.push(...[
-    new Station(x(7.95), y(55.9), 0, "cyan", 1),
-    new Station(x(7.95), y(80.5), 1, "hotpink", 15),
-    new Station(x(35.6), y(92.7), 2, "red", 110),
-    new Station(x(35.6), y(70.4), 3, "pink", 890),
-    new Station(x(92.04) - Station.SIZE, y(55.9), 4, "yellow", 5250),
-    new Station(x(92.04) - Station.SIZE, y(80.5), 5, "purple", 70_505),
-  ]);
+  const stationsParams: Array<[Array<number>, string]> = [
+    [[x(7.95), y(55.9), 0, 1, 2_000], "cyan"],
+    [[x(7.95), y(80.5), 1, 15, 3_000], "hotpink"],
+    [[x(35.6), y(92.7), 2, 110, 5_000], "red"],
+    [[x(35.6), y(70.4), 3, 890, 6_000], "pink"],
+    [[x(92.04) - Station.SIZE, y(55.9), 4, 5250, 9_000], "yellow"],
+    [[x(92.04) - Station.SIZE, y(80.5), 5, 70_505, 13_000], "purple"],
+  ];
+
+  backStations.push(...stationsParams.map(([[x,y,category, price, workDuration], color]) => {
+    return new Station(x,y, { category, color, price, workDuration });  
+  }));
   app.stage.addChild(...backStations.map((r) => r.view));
 }
 

@@ -1,7 +1,7 @@
-import { Graphics } from "pixi.js";
+import { Color, Graphics } from "pixi.js";
 
 type RectangleOptions = {
-  color?: string;
+  color?: Color | string;
 };
 
 export class Rectangle {
