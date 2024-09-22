@@ -203,7 +203,7 @@ export function doFrontWork(
           jobFD.customer.recieveProduct(p);
           app.stage.removeChild(p);
 
-          StageData.coins += p.price; 
+          StageData.coins += p.price;
           status.update(`Coins: ${StageData.coins}`);
 
           state = "done";

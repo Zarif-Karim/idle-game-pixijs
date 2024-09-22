@@ -53,35 +53,3 @@ export const randomPoint = (a: Point, b: Point) => {
   return new Point(minX + dx * randomFraction, minY + dy * randomFraction);
 };
 
-export function loadingBar(x: number, y: number, size: number, app: Application) {
-  const circleBg = new Graphics().circle(x, y, size).fill({ color: "white" })
-    .stroke({ width: 2, color: "lightgrey" });
-  app.stage.addChild(circleBg);
-
-  const circleFill = new Graphics();
-  const radius = 0.8 * size;
-  const startAngle = -Math.PI / 2;
-  const lbp = (percentage: number) => {
-    circleFill.clear();
-    const endAngle = startAngle + (percentage * 2 * Math.PI);
-    circleFill.arc(0, 0, radius, startAngle, endAngle, false).lineTo(0, 0).fill(
-      '#a8c3ed',
-    );
-  };
-  circleFill.position.set(x, y);
-  app.stage.addChild(circleFill);
-  circleFill.arcTo;
-
-  const mask = new Graphics().circle(0,0, 0.4 * size).fill({ color: 'white' });
-  mask.position.set(x,y);
-  app.stage.addChild(mask)
-
-  let percentage = 0;
-  const rate = 0.001;
-
-  app.ticker.add(() => {
-    percentage += rate;
-    lbp(percentage);
-  });
-}
-

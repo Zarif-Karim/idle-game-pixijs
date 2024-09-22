@@ -1,7 +1,6 @@
 import {
   type Application,
   FederatedPointerEvent,
-  Graphics,
   Point,
 } from "pixi.js";
 import {
@@ -62,7 +61,6 @@ export default async (app: Application) => {
   });
 
   status.update(`Coins: ${StageData.coins}`);
-  // loadingBar(300, 250, 15, app);
 };
 
 function addScreenBorder(app: Application) {
@@ -201,12 +199,6 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   // add to screen
   app.stage.addChild(w);
 }
-
-// function addCustomers(app: Application) {
-//   for (let i = customers.length; i < CUSTOMERS.maxCount; i++) {
-//     createCustomer(app);
-//   }
-// }
 
 function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const generationPoints: Point[] = [
