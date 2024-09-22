@@ -1,4 +1,7 @@
-import { type Application, FederatedPointerEvent, Point } from "pixi.js";
+import {
+  type Application,
+  Point,
+} from "pixi.js";
 import {
   backStations,
   // CUSTOMERS,
@@ -50,11 +53,6 @@ export default async (app: Application) => {
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-
-  app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
-    const { x, y } = e.global;
-    status.update(`${x}, ${y}`);
-  });
 
   status.update(`Coins: ${StageData.coins}`);
 };
@@ -195,12 +193,6 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   // add to screen
   app.stage.addChild(w);
 }
-
-// function addCustomers(app: Application) {
-//   for (let i = customers.length; i < CUSTOMERS.maxCount; i++) {
-//     createCustomer(app);
-//   }
-// }
 
 function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const generationPoints: Point[] = [

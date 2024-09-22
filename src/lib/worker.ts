@@ -19,6 +19,7 @@ import { Circle } from "./circle";
 import { Product } from "./product";
 import { DockPoint, Station } from "./stations";
 import { generateRandomColorHex, getRandomInt } from "./utils";
+import { RoundProgressBar } from "./progress-bar";
 
 type WorkerOptions = {
   size?: number;
@@ -27,22 +28,27 @@ type WorkerOptions = {
 
 export class Worker extends Circle {
   static identifier = 0;
-  static defaultSize = x(6);
+  static defaultSize = x(8);
   public readonly id: number;
 
   public hold: Product | null = null;
+  public progressBar: RoundProgressBar;
 
   // customer specific TODO: make new class for customers
-  private makeOrderTime = 500; // 500 ms
+  private makeOrderTime = 1_000; // 1 second
   public orderQuantityRemaining = 1;
   public requiredProductType = -1;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
-    super(x, y, options?.size || Worker.defaultSize, {
+    const size = options?.size || Worker.defaultSize;
+    super(x, y, size, {
       color: options?.color || generateRandomColorHex(),
     });
     Worker.identifier += 1;
     this.id = Worker.identifier;
+    this.progressBar = new RoundProgressBar(size, -size, size/2);
+    this.progressBar.reset();
+    this.addChild(this.progressBar);
   }
 
   /**
@@ -203,7 +209,7 @@ export function doFrontWork(
           jobFD.customer.recieveProduct(p);
           app.stage.removeChild(p);
 
-          StageData.coins += p.price; 
+          StageData.coins += p.price;
           status.update(`Coins: ${StageData.coins}`);
 
           state = "done";
@@ -227,9 +233,11 @@ export function doFrontWork(
               at: jobFTO.from,
             });
           });
+          w.progressBar.reset();
           state = "done";
         } else {
           // update progress bar
+          w.progressBar.update(progress.completion);
         }
 
         break;
@@ -277,16 +285,18 @@ export function doBackWork(
         // wait for the required time
         if (dt >= wd) {
           state = "deliver";
+          w.progressBar.reset();
+
           // product pickup
           const product = w.makeProduct(st);
           w.takeProduct(product);
 
           // choose the delivery location
           dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
-        } // else {
-        // update wait loading bar
-        // eg. loadbar(dt/wd);
-        // }
+        } else {
+          // update wait loading bar
+          w.progressBar.update(dt/wd);
+        }
         break;
 
       case "deliver":
