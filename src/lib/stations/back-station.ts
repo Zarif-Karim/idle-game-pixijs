@@ -12,7 +12,7 @@ type BackStationOptions = StationOptions & {
   // starting time in milliseconds for work to complete
   workDuration: number;
   // TODO: temp option for dev, should be extracted from config
-  slotGrowDirection: "left" | "bottom";
+  slotGrowDirection: string;
 };
 
 export class BackStation extends Station {
@@ -48,20 +48,20 @@ export class BackStation extends Station {
   }
 
   getView() {
-    
+    return [this.view, ...this.slots.map((s) => s.view)];
   }
 
   addSlot(): Station | undefined {
     const sl = this.slots.length;
     if (sl === BackStation.MAX_SLOTS) return undefined;
 
-    const lastSlot = sl === 0 ? this.position : this.slots[sl-1].position;
-    const d = this.slotGrowDirection === 'bottom';
+    const lastSlot = sl === 0 ? this.position : this.slots[sl - 1].position;
+    const d = this.slotGrowDirection === "bottom";
 
     const _x = lastSlot.x + (d ? 0 : BackStation.SIZE + x(1));
-    const _y = lastSlot.x + (d ? 0 : BackStation.SIZE + x(1));
+    const _y = lastSlot.y + (d ? BackStation.SIZE + x(1) : 0);
     const newSlot = new Station(_x, _y, { color: this.color });
-    newSlot.view.alpha = 0.9;
+    newSlot.view.alpha = 0.5;
 
     this.slots.push(newSlot);
     return newSlot;

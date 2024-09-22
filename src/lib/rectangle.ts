@@ -58,4 +58,8 @@ export class Rectangle {
   get height() {
     return this.view.height;
   }
+
+  getView() {
+    return [this.view];
+  }
 }

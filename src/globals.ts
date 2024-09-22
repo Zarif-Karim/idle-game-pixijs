@@ -1,13 +1,12 @@
 import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
-import { Station } from "./lib/stations";
+import { BackStation, FrontStation, Station } from "./lib/stations";
 import { Status } from "./lib/status";
 import { Worker } from "./lib/worker";
 
 // export const CUSTOMERS = {
 //   maxCount: 5,
 // };
-
 
 export const StageData = {
   coins: 0,
@@ -65,13 +64,13 @@ export type FrontDelivery = FrontTakeOrder & {
 export const jobsBack: Queue<{ type: number; customer: Worker; at: Station }> =
   new Queue();
 export const workersBack: Queue<Worker> = new Queue();
-export const backStations: Station[] = [];
+export const backStations: BackStation[] = [];
 
-export const deliveryLocations: Station[] = [];
+export const deliveryLocations: FrontStation[] = [];
 
 export const jobsFrontDelivery: Queue<FrontDelivery> = new Queue();
 export const jobsFrontTakeOrder: Queue<FrontTakeOrder> = new Queue();
 export const workersFront: Queue<Worker> = new Queue();
-export const waitingArea: Queue<Station> = new Queue();
+export const waitingArea: Queue<FrontStation> = new Queue();
 
 export const customers: Queue<Worker> = new Queue();
