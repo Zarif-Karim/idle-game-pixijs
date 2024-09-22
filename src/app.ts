@@ -1,6 +1,5 @@
 import {
   type Application,
-  FederatedPointerEvent,
   Point,
 } from "pixi.js";
 import {
@@ -54,11 +53,6 @@ export default async (app: Application) => {
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-
-  app.stage.on("pointerdown", (e: FederatedPointerEvent) => {
-    const { x, y } = e.global;
-    status.update(`${x}, ${y}`);
-  });
 
   status.update(`Coins: ${StageData.coins}`);
 };
