@@ -16,7 +16,7 @@ type BackStationOptions = StationOptions & {
 };
 
 export class BackStation extends Station {
-  static MAX_SLOTS = 4;
+  static MAX_SLOTS = 3;
 
   public category: number;
   public price: number;
@@ -44,6 +44,8 @@ export class BackStation extends Station {
     // Since stations are unlocked by default for now
     // add a slot to get started
     // slots are also taken as a query
+    this.addSlot();
+    this.addSlot();
     this.addSlot();
   }
 
