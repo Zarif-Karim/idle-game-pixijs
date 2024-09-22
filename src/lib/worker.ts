@@ -46,7 +46,7 @@ export class Worker extends Circle {
     });
     Worker.identifier += 1;
     this.id = Worker.identifier;
-    this.progressBar = new RoundProgressBar(size, -size, size/2);
+    this.progressBar = new RoundProgressBar(size, -size, size / 2);
     this.progressBar.reset();
     this.addChild(this.progressBar);
   }
@@ -295,7 +295,7 @@ export function doBackWork(
           dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
         } else {
           // update wait loading bar
-          w.progressBar.update(dt/wd);
+          w.progressBar.update(dt / wd);
         }
         break;
 

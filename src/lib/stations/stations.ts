@@ -1,7 +1,7 @@
 import { Color, Point } from "pixi.js";
-import { Rectangle } from "./rectangle";
-import { Product } from "./product";
-import { x } from "../globals";
+import { Rectangle } from "../rectangle";
+import { Product } from "../product";
+import { x } from "../../globals";
 
 const ONE_MS = 1_000; // 1000 ms aka 1 s
 
