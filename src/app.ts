@@ -19,7 +19,7 @@ import {
 import { Queue } from "./lib/queue";
 import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/worker";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
-import { Station } from "./lib/stations";
+import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 
 export default async (app: Application) => {
@@ -63,13 +63,12 @@ function addScreenBorder(app: Application) {
 }
 
 function createMiddlePointHorizontalDeliveryTable(app: Application) {
-  const h = Station.SIZE;
+  const h = FrontStation.SIZE;
   const count = Math.floor(EDGES.width / h);
   const middlePoint = EDGES.height / 2;
   const offset = (EDGES.width - (count * h)) / 2;
   for (let i = 0; i < count; i++) {
-    const loc = new Station(offset + h * i, middlePoint - h / 2, {
-      category: 50,
+    const loc = new FrontStation(offset + h * i, middlePoint - h / 2, {
       color: "grey",
     });
     deliveryLocations.push(loc);
@@ -78,17 +77,14 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
 }
 
 function createCustomerWaitingArea(app: Application) {
-  const options = {
-    color: "orange",
-    category: 90,
-  };
+  const options = { color: "orange" };
   // station size with gap
-  const stsg = Station.SIZE * 0.1;
+  const stsg = FrontStation.SIZE * 0.1;
   const adder = ({ x, y }: Point) => {
     [
-      new Station(x, y, options),
-      new Station(x + Station.SIZE + stsg, y, options),
-      new Station(x + (Station.SIZE + stsg) * 2, y, options),
+      new FrontStation(x, y, options),
+      new FrontStation(x + FrontStation.SIZE + stsg, y, options),
+      new FrontStation(x + (FrontStation.SIZE + stsg) * 2, y, options),
     ].forEach((s) => {
       waitingArea.push(s);
       app.stage.addChild(s.view);
@@ -108,13 +104,15 @@ function createBackStations(app: Application) {
     [[x(7.95), y(80.5), 1, 15, 3_000], "hotpink"],
     [[x(35.6), y(92.7), 2, 110, 5_000], "red"],
     [[x(35.6), y(70.4), 3, 890, 6_000], "pink"],
-    [[x(92.04) - Station.SIZE, y(55.9), 4, 5250, 9_000], "yellow"],
-    [[x(92.04) - Station.SIZE, y(80.5), 5, 70_505, 13_000], "purple"],
+    [[x(92.04) - BackStation.SIZE, y(55.9), 4, 5250, 9_000], "yellow"],
+    [[x(92.04) - BackStation.SIZE, y(80.5), 5, 70_505, 13_000], "purple"],
   ];
 
-  backStations.push(...stationsParams.map(([[x,y,category, price, workDuration], color]) => {
-    return new Station(x,y, { category, color, price, workDuration });  
-  }));
+  backStations.push(
+    ...stationsParams.map(([[x, y, category, price, workDuration], color]) => {
+      return new BackStation(x, y, { category, color, price, workDuration });
+    }),
+  );
   app.stage.addChild(...backStations.map((r) => r.view));
 }
 
