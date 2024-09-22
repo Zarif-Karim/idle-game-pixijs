@@ -10,17 +10,17 @@ export class RoundProgressBar extends ProgressBar {
   private fillRadius: number;
   private startAngle = -Math.PI / 2;
 
-  constructor(x: number, y: number, size: number) {
+  constructor(x: number, y: number, radius: number) {
     super(x, y);
-    this.outerRadius = size;
-    this.fillRadius = 0.8 * size;
+    this.outerRadius = radius;
+    this.fillRadius = 0.8 * radius;
     this.createView();
   }
 
   createView(): void {
     // setting progressFill as white to start off as empty progress
     this.background.circle(0, 0, this.outerRadius).fill("white");
-    this.progressFill.circle(0, 0, this.outerRadius * 0.8).fill("#a8c3ed");
+    this.progressFill.circle(0, 0, this.outerRadius * 0.8).fill("white");
     this.foregroundCover.circle(0, 0, this.outerRadius * 0.4).fill("white");
 
     this.addChild(...[

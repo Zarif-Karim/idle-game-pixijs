@@ -19,6 +19,7 @@ import { Circle } from "./circle";
 import { Product } from "./product";
 import { DockPoint, Station } from "./stations";
 import { generateRandomColorHex, getRandomInt } from "./utils";
+import { RoundProgressBar } from "./progress-bar";
 
 type WorkerOptions = {
   size?: number;
@@ -27,10 +28,11 @@ type WorkerOptions = {
 
 export class Worker extends Circle {
   static identifier = 0;
-  static defaultSize = x(6);
+  static defaultSize = x(8);
   public readonly id: number;
 
   public hold: Product | null = null;
+  public progressBar: RoundProgressBar;
 
   // customer specific TODO: make new class for customers
   private makeOrderTime = 500; // 500 ms
@@ -38,11 +40,15 @@ export class Worker extends Circle {
   public requiredProductType = -1;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
-    super(x, y, options?.size || Worker.defaultSize, {
+    const size = options?.size || Worker.defaultSize;
+    super(x, y, size, {
       color: options?.color || generateRandomColorHex(),
     });
     Worker.identifier += 1;
     this.id = Worker.identifier;
+    this.progressBar = new RoundProgressBar(size, -size, size/2);
+    this.progressBar.visible = false;
+    this.addChild(this.progressBar);
   }
 
   /**
