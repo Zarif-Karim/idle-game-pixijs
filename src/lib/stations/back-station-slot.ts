@@ -23,7 +23,7 @@ export class BackStationSlot extends Station {
   }
   
   available() {
-    return new Boolean(this.isFree);
+    return this.isFree;
   }
 
   getDock(): Point {

@@ -119,7 +119,8 @@ function createBackStations(app: Application) {
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
     // console.log(app.ticker.count);
-    while (!workersBack.isEmpty) {
+    let count = 0;
+    while (!workersBack.isEmpty && count++ <= workersBack.length) {
       // if not jobs wait for it
       if (jobsBack.isEmpty) {
         break;
@@ -127,8 +128,14 @@ const assignJobs = (app: Application) => {
 
       const w = workersBack.pop();
       const j = jobsBack.pop();
-
-      doBackWork(w!, j!, app);
+      if(!doBackWork(w!, j!, app)) {
+        // TODO: look for a better way to do this
+        // if not done, push back for now
+        workersBack.push(w!);
+        jobsBack.push(j!);
+        console.log("Jobs back", jobsBack.length);
+        break;
+      }
     }
   });
 

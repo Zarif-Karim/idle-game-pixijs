@@ -17,7 +17,7 @@ import {
 } from "../globals";
 import { Circle } from "./circle";
 import { Product } from "./product";
-import { DockPoint, Station } from "./stations";
+import { BackStation, DockPoint, Station } from "./stations";
 import { generateRandomColorHex, getRandomInt } from "./utils";
 import { RoundProgressBar } from "./progress-bar";
 
@@ -109,7 +109,7 @@ export class Worker extends Circle {
     return p;
   }
 
-  makeProduct(s: Station) {
+  makeProduct(s: BackStation) {
     return s.createProduct();
   }
 
@@ -264,6 +264,15 @@ export function doBackWork(
   const st = backStations[type];
   const { workDuration: wd } = st;
 
+  // get a slot from the back station and occupy it
+  const slot = st.getSlot();
+  if(!slot) {
+    return false;
+  }
+  slot.occupy();
+
+
+
   let state = "station";
   let workStartTime = -1;
   let dt = 0;
@@ -274,7 +283,7 @@ export function doBackWork(
     switch (state) {
       case "station":
         // go to the right station
-        if (w.moveTo(st.getDockingPoint(DockPoint.RIGHT), speed)) {
+        if (w.moveTo(slot.getDock(), speed)) {
           state = "work";
           workStartTime = Date.now();
         }
@@ -286,6 +295,7 @@ export function doBackWork(
         if (dt >= wd) {
           state = "deliver";
           w.progressBar.reset();
+          slot.vacate();
 
           // product pickup
           const product = w.makeProduct(st);
@@ -323,6 +333,7 @@ export function doBackWork(
   };
 
   app.ticker.add(work, context);
+  return true;
 }
 
 export function doCustomerWork(

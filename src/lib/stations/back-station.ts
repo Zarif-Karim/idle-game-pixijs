@@ -51,11 +51,14 @@ export class BackStation extends Station {
   }
 
   getSlot(): BackStationSlot | undefined {
-    this.slots.forEach((s) => {
-      if (s.available()) return s;
-    });
-
-    return undefined;
+    let slot: BackStationSlot | undefined = undefined;
+    for(let i = 0; i < this.slots.length; i++) {
+      if (this.slots[i].available()) {
+        slot = this.slots[i];
+        break;
+      }
+    };
+    return slot;
   }
 
   getView() {
