@@ -100,16 +100,16 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
-    [[x(7.95), y(55.9), 0, 1, 2_000], ["cyan", "bottom"]],
-    [[x(7.95), y(78.5), 1, 15, 3_000], ["hotpink", "bottom"]],
-    [[x(35.6), y(92.7), 2, 110, 5_000], ["red", "right"]],
-    [[x(35.6), y(70.4), 3, 890, 6_000], ["pink", "right"]],
-    [[x(92.04) - BackStation.SIZE, y(55.9), 4, 5250, 9_000], ["yellow", "bottom"]],
-    [[x(92.04) - BackStation.SIZE, y(78.5), 5, 70_505, 13_000], ["purple", "bottom"]],
+    [[x(7.95), y(55.9), 1, 2_000], ["cyan", "bottom"]],
+    [[x(7.95), y(78.5), 15, 3_000], ["hotpink", "bottom"]],
+    [[x(35.6), y(92.7), 110, 5_000], ["red", "right"]],
+    [[x(35.6), y(70.4), 890, 6_000], ["pink", "right"]],
+    [[x(92.04) - BackStation.SIZE, y(55.9), 5250, 9_000], ["yellow", "bottom"]],
+    [[x(92.04) - BackStation.SIZE, y(78.5), 70_505, 13_000], ["purple", "bottom"]],
   ];
 
   backStations.push(
-    ...stationsParams.map(([[x, y, category, price, workDuration], [color, slotGrowDirection]]) => {
+    ...stationsParams.map(([[x, y, price, workDuration], [color, slotGrowDirection]], category) => {
       return new BackStation(x, y, { category, color, price, workDuration, slotGrowDirection });
     }),
   );
@@ -119,8 +119,7 @@ function createBackStations(app: Application) {
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
     // console.log(app.ticker.count);
-    let count = 0;
-    while (!workersBack.isEmpty && count++ <= workersBack.length) {
+    while (!workersBack.isEmpty) {
       // if not jobs wait for it
       if (jobsBack.isEmpty) {
         break;
@@ -130,6 +129,7 @@ const assignJobs = (app: Application) => {
       const j = jobsBack.pop();
       if(!doBackWork(w!, j!, app)) {
         // TODO: look for a better way to do this
+        // observer console.log to see concern
         // if not done, push back for now
         workersBack.push(w!);
         jobsBack.push(j!);
