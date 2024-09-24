@@ -119,10 +119,10 @@ function createBackStations(app: Application) {
 const assignJobs = (app: Application) => {
   app.ticker.add(() => {
     // console.log(app.ticker.count);
-    while (!workersBack.isEmpty) {
+    if (!workersBack.isEmpty) {
       // if not jobs wait for it
       if (jobsBack.isEmpty) {
-        break;
+        return;
       }
 
       const w = workersBack.pop();
@@ -134,13 +134,12 @@ const assignJobs = (app: Application) => {
         workersBack.push(w!);
         jobsBack.push(j!);
         console.log("Jobs back", jobsBack.length);
-        break;
       }
     }
   });
 
   app.ticker.add(() => {
-    while (!workersFront.isEmpty) {
+    if (!workersFront.isEmpty) {
       if (!jobsFrontTakeOrder.isEmpty) {
         const w = workersFront.pop();
         const j = jobsFrontTakeOrder.pop();
@@ -151,15 +150,13 @@ const assignJobs = (app: Application) => {
         const j = jobsFrontDelivery.pop();
 
         doFrontWork(w!, j!, app);
-      } else {
-        // if no jobs, wait for it
-        break;
       }
-    }
+      // if no jobs, wait for it
+     }
   });
 
   app.ticker.add(() => {
-    while (!customers.isEmpty) {
+    if (!customers.isEmpty) {
       const c = customers.pop();
 
       const wa = waitingArea.pop();
