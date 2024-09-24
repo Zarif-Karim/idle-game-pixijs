@@ -17,7 +17,7 @@ import {
 } from "../globals";
 import { Circle } from "./circle";
 import { Product } from "./product";
-import { BackStation, DockPoint, Station } from "./stations";
+import { BackStation, DockPoint, FrontStation, Station } from "./stations";
 import { generateRandomColorHex, getRandomInt } from "./utils";
 import { RoundProgressBar } from "./progress-bar";
 
@@ -36,7 +36,7 @@ export class Worker extends Circle {
 
   // customer specific TODO: make new class for customers
   private makeOrderTime = 1_000; // 1 second
-  public orderQuantityRemaining = 1;
+  public orderQuantityRemaining = -1;
   public requiredProductType = -1;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
@@ -96,15 +96,14 @@ export class Worker extends Circle {
     this.addChild(this.hold);
   }
 
-  leaveProduct(s: Station) {
+  leaveProduct(s: FrontStation) {
     if (!this.hold) throw new Error("Leave Product called but no product held");
 
     this.removeChild(this.hold!);
-    const c = s.centre;
     const p = this.hold;
     this.hold = null;
 
-    p.setPos(c.x, c.y);
+    s.putProduct(p);
 
     return p;
   }
@@ -206,8 +205,6 @@ export function doFrontWork(
         if (w.moveTo(jobFD.to.getDockingPoint(DockPoint.BOTTOM), speed)) {
           const p = w.leaveProduct(jobFD.to);
           app.stage.addChild(p);
-          jobFD.customer.recieveProduct(p);
-          app.stage.removeChild(p);
 
           StageData.coins += p.price;
           status.update(`Coins: ${StageData.coins}`);
@@ -257,7 +254,7 @@ export function doFrontWork(
 
 export function doBackWork(
   w: Worker,
-  { type, customer, at }: { type: number; customer: Worker; at: Station },
+  { type, customer, at }: { type: number; customer: Worker; at: FrontStation },
   app: Application,
 ) {
   const context = { w, type, st: Date.now() };
@@ -276,7 +273,7 @@ export function doBackWork(
   let state = "station";
   let workStartTime = -1;
   let dt = 0;
-  let dl: Station;
+  let dl: FrontStation;
 
   const work = ({ deltaTime }: { deltaTime: number }) => {
     const speed = SPEED * deltaTime;
@@ -337,39 +334,60 @@ export function doBackWork(
 }
 
 export function doCustomerWork(
-  c: Worker,
-  st: Station,
+  customer: Worker,
+  st: FrontStation,
   createCustomer: Function,
   app: Application,
   state = "waitArea",
 ) {
-  const context = { s: st, c, st: Date.now() };
+  const context = { s: st, c: customer, st: Date.now() };
   state = "waitArea";
 
   const work = ({ deltaTime }: any) => {
     const speed = SPEED * deltaTime;
     switch (state) {
       case "waitArea":
-        if (c.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
+        if (customer.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
           // wait for order taking
-          jobsFrontTakeOrder.push({ from: st, customer: c });
+          jobsFrontTakeOrder.push({ from: st, customer: customer });
           state = "wait";
         }
         break;
       case "wait":
-        if (c.isOrderCompleted()) {
+        // NOTE:
+        // the Front worker take order from customer. 
+        // this also needs to be updated to decouple the process
+        // so back workers can also do that!
+
+        // wait for order to be taken
+        if(customer.requiredProductType === -1) {
+          // this means the order has not been taken yet
+          // wait for next tick
+          return;
+        }
+
+        // the above check passed i.e order already taken
+        // pick a product from the table if any delivered
+        const rpt = customer.requiredProductType;
+        if(st.has(rpt)) {
+          const p = st.getProduct(rpt);
+          customer.recieveProduct(p);
+          app.stage.removeChild(p);
+        }
+
+        if (customer.isOrderCompleted()) {
           state = "leave";
         }
         break;
       case "leave":
         const exitPoint = new Point(EDGES.width + 100, 50);
-        if (c.moveTo(exitPoint, speed)) {
+        if (customer.moveTo(exitPoint, speed)) {
           state = "done";
         }
         break;
       case "done":
         app.ticker.remove(work, context);
-        app.stage.removeChild(c);
+        app.stage.removeChild(customer);
         createCustomer(app);
         break;
     }

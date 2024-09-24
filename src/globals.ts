@@ -1,6 +1,6 @@
 import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
-import { BackStation, FrontStation, Station } from "./lib/stations";
+import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
 import { Worker } from "./lib/worker";
 
@@ -52,16 +52,16 @@ export function y(percentage: number): number {
 }
 
 export type FrontTakeOrder = {
-  from: Station;
+  from: FrontStation;
   customer: Worker;
 };
 
 export type FrontDelivery = FrontTakeOrder & {
-  to: Station;
+  to: FrontStation;
   product: Product;
 };
 
-export const jobsBack: Queue<{ type: number; customer: Worker; at: Station }> =
+export const jobsBack: Queue<{ type: number; customer: Worker; at: FrontStation }> =
   new Queue();
 export const workersBack: Queue<Worker> = new Queue();
 export const backStations: BackStation[] = [];
