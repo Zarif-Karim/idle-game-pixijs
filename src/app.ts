@@ -132,6 +132,8 @@ function createBackStations(app: Application) {
     }),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));
+  // make the first station unlocked automatically for now!
+  backStations[0].upgrade();
 }
 
 const gameLoop = (app: Application) => {

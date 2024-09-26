@@ -45,15 +45,17 @@ export class BackStation extends Station {
 
     // for now unlocking and upgrading stations on click
     // TODO: Update from pop ups when enough coins available
-    this.view.on("pointertap", () => {
+    this.view.on("pointertap", () => this.upgrade());
+
+    this.slotGrowDirection = slotGrowDirection;
+  }
+  
+  upgrade() {
       this.isUnlocked = true;
       this.view.alpha = 1;
 
       const slot = this.addSlot();
       slot && viewUpdateJob.push({ job: "add", child: slot.view });
-    });
-
-    this.slotGrowDirection = slotGrowDirection;
   }
 
   getSlot(): BackStationSlot | undefined {

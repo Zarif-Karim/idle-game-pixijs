@@ -1,4 +1,4 @@
-import { Application, Color, Point } from "pixi.js";
+import { Application, Color, Point, Text } from "pixi.js";
 import {
   backStations,
   deliveryLocations,
@@ -38,17 +38,28 @@ export class Worker extends Circle {
   private makeOrderTime = 1_000; // 1 second
   public orderQuantityRemaining = -1;
   public choosenProductType = -1;
+  private quantityView: Text;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
     const size = options?.size || Worker.defaultSize;
-    super(x, y, size, {
-      color: options?.color || generateRandomColorHex(),
-    });
+    const color = options?.color || generateRandomColorHex();
+
+    super(x, y, size, { color });
+
     Worker.identifier += 1;
     this.id = Worker.identifier;
+
     this.progressBar = new RoundProgressBar(size, -size, size / 2);
     this.progressBar.reset();
     this.addChild(this.progressBar);
+
+    this.quantityView = new Text({
+      anchor: 1.5,
+      text: this.orderQuantityRemaining,
+      style: { fill: 'white', fontWeight: "bold", fontSize: "40em", padding: 5 },
+    });
+    this.quantityView.visible = false;
+    this.addChild(this.quantityView);
   }
 
   chooseProduct(type: number) {
@@ -102,11 +113,18 @@ export class Worker extends Circle {
     this.hold = p;
     p.setPos(0, 0);
     this.addChild(this.hold);
+    this.hold.scale = 1;
+
+    if (this.isProductChoosen()) {
+      this.quantityView.text = this.orderQuantityRemaining;
+      this.quantityView.visible = true;
+    }
   }
 
   leaveProduct(s: FrontStation) {
     if (!this.hold) throw new Error("Leave Product called but no product held");
 
+    this.hold.scale = 0.5;
     this.removeChild(this.hold!);
     const p = this.hold;
     this.hold = null;
@@ -147,8 +165,8 @@ export class Worker extends Circle {
     let orders: number[] = [];
 
     if (completion === 1) {
-      if(!this.isProductChoosen()) {
-        throw new Error('product type not choosen yet but making order');
+      if (!this.isProductChoosen()) {
+        throw new Error("product type not choosen yet but making order");
       }
 
       this.orderQuantityRemaining = getRandomInt(1, 3);
@@ -169,6 +187,10 @@ export class Worker extends Circle {
         throw new Error("Recieve called but quantity needed is zero");
       }
       this.orderQuantityRemaining -= 1;
+      this.quantityView.text = this.orderQuantityRemaining;
+      if (this.isOrderCompleted()) {
+        this.quantityView.visible = false;
+      }
     } else {
       throw new Error("Recieve called with type mismatch");
     }
@@ -227,8 +249,10 @@ export function doFrontWork(
           state = "takeOrder";
           takeOrderStartTime = Date.now();
 
-          const availableStations = backStations.filter(s=>s.isUnlocked);
-          const productType = availableStations[getRandomInt(0,availableStations.length-1)].category;
+          const availableStations = backStations.filter((s) => s.isUnlocked);
+          const productType =
+            availableStations[getRandomInt(0, availableStations.length - 1)]
+              .category;
           jobFTO.customer.chooseProduct(productType);
         }
         break;
@@ -275,12 +299,10 @@ export function doBackWork(
 
   // get a slot from the back station and occupy it
   const slot = st.getSlot();
-  if(!slot) {
+  if (!slot) {
     return false;
   }
   slot.occupy();
-
-
 
   let state = "station";
   let workStartTime = -1;
@@ -361,12 +383,12 @@ export function doCustomerWork(
       case "waitArea":
         if (customer.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
           // wait for atleast 1 station to be unlocked
-          const availableStations = backStations.filter(s=>s.isUnlocked);
-          if(availableStations.length === 0) {
+          const availableStations = backStations.filter((s) => s.isUnlocked);
+          if (availableStations.length === 0) {
             // console.log('customer: no available stations, waiting..');
             break;
           }
-          
+
           // wait for order taking
           jobsFrontTakeOrder.push({ from: st, customer: customer });
           state = "wait";
@@ -374,12 +396,12 @@ export function doCustomerWork(
         break;
       case "wait":
         // NOTE:
-        // the Front worker take order from customer. 
+        // the Front worker take order from customer.
         // this also needs to be updated to decouple the process
         // so back workers can also do that!
 
         // wait for order to be taken
-        if(!customer.isProductChoosen()) {
+        if (!customer.isProductChoosen()) {
           // this means the order has not been taken yet
           // wait for next tick
           return;
@@ -388,7 +410,7 @@ export function doCustomerWork(
         // the above check passed i.e order already taken
         // pick a product from the table if any delivered
         const rpt = customer.choosenProductType;
-        if(st.has(rpt)) {
+        if (st.has(rpt)) {
           const p = st.getProduct(rpt);
           customer.recieveProduct(p);
           app.stage.removeChild(p);
