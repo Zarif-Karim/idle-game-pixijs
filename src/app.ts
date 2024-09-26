@@ -9,6 +9,7 @@ import {
   jobsFrontTakeOrder,
   StageData,
   status,
+  viewUpdateJob,
   waitingArea,
   workersBack,
   workersFront,
@@ -42,10 +43,10 @@ export default async (app: Application) => {
   addWorkers({
     back: 5,
     front: 3,
-    customer: 6,
+    customer: 9,
   }, app);
-  // addCustomers(app);
-  assignJobs(app);
+
+  gameLoop(app);
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
@@ -116,15 +117,21 @@ function createBackStations(app: Application) {
   backStations.map((r) => app.stage.addChild(...r.getView()));
 }
 
-const assignJobs = (app: Application) => {
+const gameLoop = (app: Application) => {
   app.ticker.add(() => {
-    // console.log(app.ticker.count);
-    if (!workersBack.isEmpty) {
-      // if not jobs wait for it
-      if (jobsBack.isEmpty) {
-        return;
+    while(!viewUpdateJob.isEmpty) {
+      const { job, child } = viewUpdateJob.pop();
+      
+      // add to stage
+      if(job === 'add') {
+        child.zIndex = -1;
+        app.stage.addChild(child);
+      } else if (job === 'remove') {
+        app.stage.removeChild(child);
       }
+    }
 
+    if (!workersBack.isEmpty && !jobsBack.isEmpty) {
       const w = workersBack.pop();
       const j = jobsBack.pop();
       if(!doBackWork(w!, j!, app)) {
@@ -136,9 +143,7 @@ const assignJobs = (app: Application) => {
         console.log("Jobs back", jobsBack.length);
       }
     }
-  });
 
-  app.ticker.add(() => {
     if (!workersFront.isEmpty) {
       if (!jobsFrontTakeOrder.isEmpty) {
         const w = workersFront.pop();
@@ -153,12 +158,12 @@ const assignJobs = (app: Application) => {
       }
       // if no jobs, wait for it
      }
-  });
 
-  app.ticker.add(() => {
     if (!customers.isEmpty) {
       const c = customers.pop();
 
+      // TODO: debug why customers going to 
+      // occupied table when there are free ones
       const wa = waitingArea.pop();
       waitingArea.push(wa);
 

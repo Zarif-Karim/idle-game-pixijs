@@ -55,8 +55,8 @@ export class Worker extends Circle {
     this.choosenProductType = type;
   }
 
-  isOrderMade() {
-    return this.choosenProductType !== -1;
+  isProductChoosen() {
+    return (this.choosenProductType !== -1);
   }
 
   /**
@@ -147,7 +147,7 @@ export class Worker extends Circle {
     let orders: number[] = [];
 
     if (completion === 1) {
-      if(this.isOrderMade()) {
+      if(!this.isProductChoosen()) {
         throw new Error('product type not choosen yet but making order');
       }
 
@@ -377,7 +377,7 @@ export function doCustomerWork(
         // so back workers can also do that!
 
         // wait for order to be taken
-        if(customer.isOrderMade()) {
+        if(!customer.isProductChoosen()) {
           // this means the order has not been taken yet
           // wait for next tick
           return;

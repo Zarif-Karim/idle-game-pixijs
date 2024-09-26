@@ -1,3 +1,4 @@
+import { Container, Graphics } from "pixi.js";
 import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
@@ -60,6 +61,9 @@ export type FrontDelivery = FrontTakeOrder & {
   to: FrontStation;
   product: Product;
 };
+
+type ViewAble = Graphics | Container;
+export const viewUpdateJob: Queue<{job: string, child: ViewAble }> = new Queue();
 
 export const jobsBack: Queue<{ type: number; customer: Worker; at: FrontStation }> =
   new Queue();

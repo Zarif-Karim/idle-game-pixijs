@@ -1,4 +1,4 @@
-import { x } from "../../globals";
+import { viewUpdateJob, x } from "../../globals";
 import { Product } from "../product";
 import { BackStationSlot } from "./back-station-slot";
 import { DockPoint, Station, type StationOptions } from "./stations";
@@ -41,30 +41,32 @@ export class BackStation extends Station {
     this.price = price;
     this.workDuration = workDuration;
 
+    this.view.alpha = 0.5;
+
+    // for now unlocking and upgrading stations on click
+    // TODO: Update from pop ups when enough coins available
+    this.view.on("pointertap", () => {
+      this.isUnlocked = true;
+      this.view.alpha = 1;
+
+      const slot = this.addSlot();
+      slot && viewUpdateJob.push({ job: "add", child: slot.view });
+    });
+
     this.slotGrowDirection = slotGrowDirection;
-    // Since stations are unlocked by default for now
-    // add slots to get started
-    // slots are also taken as a query
-    this.addSlot();
-    this.addSlot();
-    this.addSlot();
   }
 
   getSlot(): BackStationSlot | undefined {
-    if(!this.isUnlocked) return undefined;
+    if (!this.isUnlocked) return undefined;
 
     let slot: BackStationSlot | undefined = undefined;
-    for(let i = 0; i < this.slots.length; i++) {
+    for (let i = 0; i < this.slots.length; i++) {
       if (this.slots[i].available()) {
         slot = this.slots[i];
         break;
       }
-    };
+    }
     return slot;
-  }
-
-  getView() {
-    return [this.view, ...this.slots.map((s) => s.view)];
   }
 
   addSlot(): Station | undefined {
@@ -76,8 +78,10 @@ export class BackStation extends Station {
 
     const _x = lastSlot.x + (d ? 0 : BackStation.SIZE + x(1));
     const _y = lastSlot.y + (d ? BackStation.SIZE + x(1) : 0);
-    const newSlot = new BackStationSlot(_x, _y, { color: this.color, dockSide: d ? DockPoint.RIGHT : DockPoint.TOP });
-    newSlot.view.alpha = 0.5;
+    const newSlot = new BackStationSlot(_x, _y, {
+      color: this.color,
+      dockSide: d ? DockPoint.RIGHT : DockPoint.TOP,
+    });
 
     this.slots.push(newSlot);
     return newSlot;
