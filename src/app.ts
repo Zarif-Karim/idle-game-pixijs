@@ -1,4 +1,4 @@
-import { type Application, Point } from "pixi.js";
+import { type Application, Point, Text } from "pixi.js";
 import {
   backStations,
   customers,
@@ -33,26 +33,43 @@ export default async (app: Application) => {
 
   // create delivery destinations
   createMiddlePointHorizontalDeliveryTable(app);
-
   // create customer waiting waitingArea
   createCustomerWaitingArea(app);
-
   // add stations
   createBackStations(app);
-
+  // add workers count upgrade buttons
+  addWorkerIncreaseButtons(app);
+  // add workers
   addWorkers({
-    back: 5,
-    front: 3,
-    customer: 9,
+    back: 1,
+    front: 1,
+    customer: 1,
   }, app);
-
-  gameLoop(app);
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-
   status.update(`Coins: ${StageData.coins}`);
+
+  // start the game loop
+  gameLoop(app);
 };
+
+function addWorkerIncreaseButtons(app: Application) {
+  createButton(x(90), y(5), 'white', 'black', { customer: 1 }, app);
+  createButton(x(90), y(11), 'blue', 'white', { front: 1 }, app);
+  createButton(x(90), y(17), 'green', 'white', { back: 1 }, app);
+}
+
+function createButton(_x: number, _y: number, bgColor: string, txtColor: string, worker: any, app: Application) {
+  const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
+  btn.view.on('pointertap', () => addWorkers(worker, app));
+
+  const text = new Text({ text: '+', anchor: 0.5, style: { fontWeight: 'bold', fontSize: '50em', fill: txtColor }});
+  text.position = btn.centre;
+  text.eventMode = 'none';
+
+  app.stage.addChild(btn.view, text);
+}
 
 function addScreenBorder(app: Application) {
   const top = new Rectangle(0, 0, EDGES.width, 2);
@@ -173,25 +190,22 @@ const gameLoop = (app: Application) => {
 };
 
 const addWorkers = (
-  options: { back: number; front: number; customer: number },
+  { back = 0, front = 0, customer = 0 }: { back?: number; front?: number; customer?: number },
   app: Application,
 ) => {
   // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
 
   // back workers
-  const amountBack = options.back;
-  for (let i = 0; i < amountBack; i++) {
+  for (let i = 0; i < back; i++) {
     addNewWorker(app, workersBack, "green");
   }
 
   // front workers
-  const amountFront = options.front;
-  for (let i = 0; i < amountFront; i++) {
+  for (let i = 0; i < front; i++) {
     addNewWorker(app, workersFront, "blue");
   }
 
-  const amountCustomer = options.customer;
-  for (let i = 0; i < amountCustomer; i++) {
+  for (let i = 0; i < customer; i++) {
     createCustomer(app);
   }
 };

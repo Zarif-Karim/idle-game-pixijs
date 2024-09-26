@@ -34,13 +34,6 @@ export class Station extends Rectangle {
     this.dockingPoints = [dpTop, dpBottom, dpLeft, dpRight];
   }
 
-  get centre() {
-    return new Point(
-      this.view.x + this.view.width / 2,
-      this.view.y + this.view.height / 2,
-    );
-  }
-
   get size() {
     return this.view.width;
   }

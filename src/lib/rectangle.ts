@@ -1,4 +1,4 @@
-import { Color, Graphics } from "pixi.js";
+import { Color, Graphics, Point } from "pixi.js";
 
 type RectangleOptions = {
   color?: Color | string;
@@ -23,9 +23,10 @@ export class Rectangle {
     this.view.height = h;
 
     this.view.eventMode = "static";
+    this.view.cursor = "pointer";
 
     this.view.on("pointerover", () => {
-      this.view.tint = "grey";
+      this.view.tint = "lightgrey";
     });
     this.view.on("pointerout", () => {
       this.view.tint = "white";
@@ -35,7 +36,7 @@ export class Rectangle {
       this.view.tint = "grey";
     });
     this.view.on("pointerup", () => {
-      this.view.tint = "white";
+      this.view.tint = "lightgrey";
     });
   }
 
@@ -58,6 +59,14 @@ export class Rectangle {
   get height() {
     return this.view.height;
   }
+
+  get centre() {
+    return new Point(
+      this.view.x + this.view.width / 2,
+      this.view.y + this.view.height / 2,
+    );
+  }
+
 
   getView() {
     return [this.view];
