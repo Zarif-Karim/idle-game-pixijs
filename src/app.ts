@@ -140,7 +140,7 @@ const gameLoop = (app: Application) => {
         // if not done, push back for now
         workersBack.push(w!);
         jobsBack.push(j!);
-        console.log("Jobs back", jobsBack.length);
+        // console.log("Jobs back", jobsBack.length);
       }
     }
 

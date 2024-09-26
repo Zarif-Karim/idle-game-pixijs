@@ -226,6 +226,10 @@ export function doFrontWork(
           // Take Order
           state = "takeOrder";
           takeOrderStartTime = Date.now();
+
+          const availableStations = backStations.filter(s=>s.isUnlocked);
+          const productType = availableStations[getRandomInt(0,availableStations.length-1)].category;
+          jobFTO.customer.chooseProduct(productType);
         }
         break;
       case "takeOrder":
@@ -359,11 +363,9 @@ export function doCustomerWork(
           // wait for atleast 1 station to be unlocked
           const availableStations = backStations.filter(s=>s.isUnlocked);
           if(availableStations.length === 0) {
-            console.log('customer: no available stations, waiting..');
+            // console.log('customer: no available stations, waiting..');
             break;
           }
-          const productType = availableStations[getRandomInt(0,availableStations.length-1)].category;
-          customer.chooseProduct(productType);
           
           // wait for order taking
           jobsFrontTakeOrder.push({ from: st, customer: customer });
