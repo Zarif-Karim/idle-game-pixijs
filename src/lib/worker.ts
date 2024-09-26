@@ -37,7 +37,7 @@ export class Worker extends Circle {
   // customer specific TODO: make new class for customers
   private makeOrderTime = 1_000; // 1 second
   public orderQuantityRemaining = -1;
-  public requiredProductType = -1;
+  public choosenProductType = -1;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
     const size = options?.size || Worker.defaultSize;
@@ -49,6 +49,14 @@ export class Worker extends Circle {
     this.progressBar = new RoundProgressBar(size, -size, size / 2);
     this.progressBar.reset();
     this.addChild(this.progressBar);
+  }
+
+  chooseProduct(type: number) {
+    this.choosenProductType = type;
+  }
+
+  isOrderMade() {
+    return this.choosenProductType !== -1;
   }
 
   /**
@@ -139,16 +147,16 @@ export class Worker extends Circle {
     let orders: number[] = [];
 
     if (completion === 1) {
-      const productType = getRandomInt(0, backStations.length - 1);
-      this.requiredProductType = productType;
-      const quantity = getRandomInt(1, 3);
+      if(this.isOrderMade()) {
+        throw new Error('product type not choosen yet but making order');
+      }
 
-      this.orderQuantityRemaining = quantity;
-      orders = Array(quantity).fill(productType);
+      this.orderQuantityRemaining = getRandomInt(1, 3);
+      orders = Array(this.orderQuantityRemaining).fill(this.choosenProductType);
 
       // TODO: this is temp code to show which order customer wants
       // should later be changed to a pop up with image and number
-      const p = this.makeProduct(backStations[productType]);
+      const p = this.makeProduct(backStations[this.choosenProductType]);
       this.takeProduct(p);
     }
 
@@ -156,7 +164,7 @@ export class Worker extends Circle {
   }
 
   recieveProduct(p: Product) {
-    if (p.category === this.requiredProductType) {
+    if (p.category === this.choosenProductType) {
       if (this.orderQuantityRemaining === 0) {
         throw new Error("Recieve called but quantity needed is zero");
       }
@@ -348,6 +356,15 @@ export function doCustomerWork(
     switch (state) {
       case "waitArea":
         if (customer.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
+          // wait for atleast 1 station to be unlocked
+          const availableStations = backStations.filter(s=>s.isUnlocked);
+          if(availableStations.length === 0) {
+            console.log('customer: no available stations, waiting..');
+            break;
+          }
+          const productType = availableStations[getRandomInt(0,availableStations.length-1)].category;
+          customer.chooseProduct(productType);
+          
           // wait for order taking
           jobsFrontTakeOrder.push({ from: st, customer: customer });
           state = "wait";
@@ -360,7 +377,7 @@ export function doCustomerWork(
         // so back workers can also do that!
 
         // wait for order to be taken
-        if(customer.requiredProductType === -1) {
+        if(customer.isOrderMade()) {
           // this means the order has not been taken yet
           // wait for next tick
           return;
@@ -368,7 +385,7 @@ export function doCustomerWork(
 
         // the above check passed i.e order already taken
         // pick a product from the table if any delivered
-        const rpt = customer.requiredProductType;
+        const rpt = customer.choosenProductType;
         if(st.has(rpt)) {
           const p = st.getProduct(rpt);
           customer.recieveProduct(p);

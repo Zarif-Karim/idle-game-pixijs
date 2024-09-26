@@ -24,7 +24,7 @@ export class BackStation extends Station {
   public workDuration = ONE_MS * 1.5;
 
   // TODO: make stations locked by default
-  public isUnlocked = true;
+  public isUnlocked = false;
 
   private slots: BackStationSlot[] = [];
   // TODO: temp var for dev (assess)
@@ -51,6 +51,8 @@ export class BackStation extends Station {
   }
 
   getSlot(): BackStationSlot | undefined {
+    if(!this.isUnlocked) return undefined;
+
     let slot: BackStationSlot | undefined = undefined;
     for(let i = 0; i < this.slots.length; i++) {
       if (this.slots[i].available()) {
