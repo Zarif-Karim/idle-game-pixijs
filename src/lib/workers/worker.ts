@@ -1,12 +1,9 @@
 import { Application, Color, Point, Text } from "pixi.js";
 import {
   backStations,
-  deliveryLocations,
   EDGES,
-  jobsFrontDelivery,
   jobsFrontTakeOrder,
   SPEED,
-  workersBack,
   x,
 } from "../../globals";
 import { Circle } from "../circle";
@@ -203,85 +200,6 @@ export class Worker extends Circle {
     this.removeChild(this.hold);
     return true;
   }
-}
-
-export function doBackWork(
-  w: Worker,
-  { type, customer, at }: { type: number; customer: Worker; at: FrontStation },
-  app: Application,
-) {
-  const context = { w, type, st: Date.now() };
-  const st = backStations[type];
-  const { workDuration: wd } = st;
-
-  // get a slot from the back station and occupy it
-  const slot = st.getSlot();
-  if (!slot) {
-    return false;
-  }
-  slot.occupy();
-
-  let state = "station";
-  let workStartTime = -1;
-  let dt = 0;
-  let dl: FrontStation;
-
-  const work = ({ deltaTime }: { deltaTime: number }) => {
-    const speed = SPEED * deltaTime;
-    switch (state) {
-      case "station":
-        // go to the right station
-        if (w.moveTo(slot.getDock(), speed)) {
-          state = "work";
-          workStartTime = Date.now();
-        }
-        break;
-
-      case "work":
-        dt = Date.now() - workStartTime;
-        // wait for the required time
-        if (dt >= wd) {
-          state = "deliver";
-          w.progressBar.reset();
-          slot.vacate();
-
-          // product pickup
-          const product = w.makeProduct(st);
-          w.takeProduct(product);
-
-          // choose the delivery location
-          dl = deliveryLocations[getRandomInt(0, deliveryLocations.length - 1)];
-        } else {
-          // update wait loading bar
-          w.progressBar.update(dt / wd);
-        }
-        break;
-
-      case "deliver":
-        // deliver product
-        if (w.moveTo(dl.getDockingPoint(DockPoint.BOTTOM), speed)) {
-          // move product from hand to table
-          const p = w.leaveProduct(dl);
-          app.stage.addChild(p);
-
-          // these products should be deliverd by FE workers
-          jobsFrontDelivery.push({ from: dl, to: at, product: p, customer });
-          state = "done";
-        }
-        break;
-      case "done":
-        // work done
-        app.ticker.remove(work, context);
-        // join back into queue
-        workersBack.push(w);
-        break;
-      default:
-        throw new Error("Work fell in default case!");
-    }
-  };
-
-  app.ticker.add(work, context);
-  return true;
 }
 
 export function doCustomerWork(

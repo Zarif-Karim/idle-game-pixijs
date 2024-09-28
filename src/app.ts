@@ -18,7 +18,7 @@ import {
 } from "./globals";
 
 import { Queue } from "./lib/queue";
-import { doBackWork, doCustomerWork, FrontWorker, Worker } from "./lib/workers";
+import { BackWorker, doCustomerWork, FrontWorker, Worker } from "./lib/workers";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
@@ -153,7 +153,7 @@ const gameLoop = (app: Application) => {
     if (!workersBack.isEmpty && !jobsBack.isEmpty) {
       const w = workersBack.pop();
       const j = jobsBack.pop();
-      if(!doBackWork(w!, j!, app)) {
+      if(!w.doWork(j!, app)) {
         // TODO: look for a better way to do this
         // observer console.log to see concern
         // if not done, push back for now
@@ -214,7 +214,7 @@ const addWorkers = (
 
 function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   const { x, y } = randomPositionMiddle(EDGES);
-  const WorkerClass = color === "blue" ? FrontWorker : Worker;
+  const WorkerClass = color === "blue" ? FrontWorker : BackWorker;
   const w = new WorkerClass(x, y, { color });
 
   // add to queue
