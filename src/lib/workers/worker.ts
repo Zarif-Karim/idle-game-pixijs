@@ -1,15 +1,12 @@
-import { Color, Point, Text } from "pixi.js";
-import {
-  backStations,
-  x,
-} from "../../globals";
+import { Color, Point } from "pixi.js";
+import { x } from "../../globals";
 import { Circle } from "../circle";
 import { Product } from "../product";
 import { BackStation, FrontStation, Station } from "../stations";
-import { generateRandomColorHex, getRandomInt } from "../utils";
+import { generateRandomColorHex } from "../utils";
 import { RoundProgressBar } from "../progress-bar";
 
-type WorkerOptions = {
+export type WorkerOptions = {
   size?: number;
   color?: Color | string;
 };
@@ -21,11 +18,6 @@ export class Worker extends Circle {
 
   public hold: Product | null = null;
   public progressBar: RoundProgressBar;
-
-  private makeOrderTime = 1_000; // 1 second
-  public orderQuantityRemaining = -1;
-  public choosenProductType = -1;
-  private quantityView: Text;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
     const size = options?.size || Worker.defaultSize;
@@ -39,27 +31,6 @@ export class Worker extends Circle {
     this.progressBar = new RoundProgressBar(size, -size, size / 2);
     this.progressBar.reset();
     this.addChild(this.progressBar);
-
-    this.quantityView = new Text({
-      anchor: 1.5,
-      text: this.orderQuantityRemaining,
-      style: {
-        fill: "white",
-        fontWeight: "bold",
-        fontSize: "40em",
-        padding: 5,
-      },
-    });
-    this.quantityView.visible = false;
-    this.addChild(this.quantityView);
-  }
-
-  chooseProduct(type: number) {
-    this.choosenProductType = type;
-  }
-
-  isProductChoosen() {
-    return (this.choosenProductType !== -1);
   }
 
   /**
@@ -106,11 +77,6 @@ export class Worker extends Circle {
     p.setPos(0, 0);
     this.addChild(this.hold);
     this.hold.scale = 1;
-
-    if (this.isProductChoosen()) {
-      this.quantityView.text = this.orderQuantityRemaining;
-      this.quantityView.visible = true;
-    }
   }
 
   leaveProduct(s: FrontStation) {
@@ -148,54 +114,4 @@ export class Worker extends Circle {
     // Minus 10 as we want to have some overlap
     return distance <= radius + halfWidth - 10;
   }
-
-  // TODO: customer specific method, move to its own class
-  makeOrder(startTime: number) {
-    const dt = Date.now() - startTime;
-    let completion = dt / this.makeOrderTime;
-    completion = completion > 1 ? 1 : completion;
-    let orders: number[] = [];
-
-    if (completion === 1) {
-      if (!this.isProductChoosen()) {
-        throw new Error("product type not choosen yet but making order");
-      }
-
-      this.orderQuantityRemaining = getRandomInt(1, 3);
-      orders = Array(this.orderQuantityRemaining).fill(this.choosenProductType);
-
-      // TODO: this is temp code to show which order customer wants
-      // should later be changed to a pop up with image and number
-      const p = this.makeProduct(backStations[this.choosenProductType]);
-      this.takeProduct(p);
-    }
-
-    return { completion, orders };
-  }
-
-  recieveProduct(p: Product) {
-    if (p.category === this.choosenProductType) {
-      if (this.orderQuantityRemaining === 0) {
-        throw new Error("Recieve called but quantity needed is zero");
-      }
-      this.orderQuantityRemaining -= 1;
-      this.quantityView.text = this.orderQuantityRemaining;
-      if (this.isOrderCompleted()) {
-        this.quantityView.visible = false;
-      }
-    } else {
-      throw new Error("Recieve called with type mismatch");
-    }
-  }
-
-  isOrderCompleted() {
-    if (this.orderQuantityRemaining !== 0) {
-      return false;
-    }
-
-    if (!this.hold) throw new Error("OrderComplete true but no product held");
-    this.removeChild(this.hold);
-    return true;
-  }
 }
-
