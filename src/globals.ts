@@ -3,7 +3,7 @@ import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
-import { Worker } from "./lib/worker";
+import { Worker } from "./lib/workers";
 
 // export const CUSTOMERS = {
 //   maxCount: 5,

@@ -18,7 +18,7 @@ import {
 } from "./globals";
 
 import { Queue } from "./lib/queue";
-import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/worker";
+import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/workers";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";

@@ -14,12 +14,12 @@ import {
   workersBack,
   workersFront,
   x,
-} from "../globals";
-import { Circle } from "./circle";
-import { Product } from "./product";
-import { BackStation, DockPoint, FrontStation, Station } from "./stations";
-import { generateRandomColorHex, getRandomInt } from "./utils";
-import { RoundProgressBar } from "./progress-bar";
+} from "../../globals";
+import { Circle } from "../circle";
+import { Product } from "../product";
+import { BackStation, DockPoint, FrontStation, Station } from "../stations";
+import { generateRandomColorHex, getRandomInt } from "../utils";
+import { RoundProgressBar } from "../progress-bar";
 
 type WorkerOptions = {
   size?: number;
