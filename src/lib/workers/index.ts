@@ -1,2 +1,4 @@
-export { doBackWork, doCustomerWork, doFrontWork, Worker } from "./worker";
+export { doBackWork, doCustomerWork, Worker } from "./worker";
+
+export { FrontWorker } from "./front-worker" 
 

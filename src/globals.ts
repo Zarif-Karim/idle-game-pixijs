@@ -3,7 +3,7 @@ import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
-import { Worker } from "./lib/workers";
+import { FrontWorker, Worker } from "./lib/workers";
 
 // export const CUSTOMERS = {
 //   maxCount: 5,
@@ -74,7 +74,7 @@ export const deliveryLocations: FrontStation[] = [];
 
 export const jobsFrontDelivery: Queue<FrontDelivery> = new Queue();
 export const jobsFrontTakeOrder: Queue<FrontTakeOrder> = new Queue();
-export const workersFront: Queue<Worker> = new Queue();
+export const workersFront: Queue<FrontWorker> = new Queue();
 export const waitingArea: Queue<FrontStation> = new Queue();
 
 export const customers: Queue<Worker> = new Queue();

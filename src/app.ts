@@ -18,7 +18,7 @@ import {
 } from "./globals";
 
 import { Queue } from "./lib/queue";
-import { doBackWork, doCustomerWork, doFrontWork, Worker } from "./lib/workers";
+import { doBackWork, doCustomerWork, FrontWorker, Worker } from "./lib/workers";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
@@ -168,12 +168,12 @@ const gameLoop = (app: Application) => {
         const w = workersFront.pop();
         const j = jobsFrontTakeOrder.pop();
 
-        doFrontWork(w!, j!, app);
+        w.doWork(j!, app);
       } else if (!jobsFrontDelivery.isEmpty) {
         const w = workersFront.pop();
         const j = jobsFrontDelivery.pop();
 
-        doFrontWork(w!, j!, app);
+        w.doWork(j!, app);
       }
       // if no jobs, wait for it
      }
@@ -214,7 +214,8 @@ const addWorkers = (
 
 function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   const { x, y } = randomPositionMiddle(EDGES);
-  const w = new Worker(x, y, { color });
+  const WorkerClass = color === "blue" ? FrontWorker : Worker;
+  const w = new WorkerClass(x, y, { color });
 
   // add to queue
   group.push(w);

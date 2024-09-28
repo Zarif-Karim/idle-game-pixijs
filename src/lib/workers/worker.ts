@@ -3,16 +3,10 @@ import {
   backStations,
   deliveryLocations,
   EDGES,
-  FrontDelivery,
-  FrontTakeOrder,
-  jobsBack,
   jobsFrontDelivery,
   jobsFrontTakeOrder,
   SPEED,
-  StageData,
-  status,
   workersBack,
-  workersFront,
   x,
 } from "../../globals";
 import { Circle } from "../circle";
@@ -34,7 +28,6 @@ export class Worker extends Circle {
   public hold: Product | null = null;
   public progressBar: RoundProgressBar;
 
-  // customer specific TODO: make new class for customers
   private makeOrderTime = 1_000; // 1 second
   public orderQuantityRemaining = -1;
   public choosenProductType = -1;
@@ -56,7 +49,12 @@ export class Worker extends Circle {
     this.quantityView = new Text({
       anchor: 1.5,
       text: this.orderQuantityRemaining,
-      style: { fill: 'white', fontWeight: "bold", fontSize: "40em", padding: 5 },
+      style: {
+        fill: "white",
+        fontWeight: "bold",
+        fontSize: "40em",
+        padding: 5,
+      },
     });
     this.quantityView.visible = false;
     this.addChild(this.quantityView);
@@ -205,87 +203,6 @@ export class Worker extends Circle {
     this.removeChild(this.hold);
     return true;
   }
-}
-
-export function doFrontWork(
-  w: Worker,
-  job: FrontTakeOrder | FrontDelivery,
-  app: Application,
-) {
-  const context = { w, job, st: Date.now() };
-  const jobType = "product" in job ? "FD" : "FTO";
-  let state = jobType === "FD" ? "pick" : "customer";
-  const jobFD = job as FrontDelivery;
-  const jobFTO = job as FrontTakeOrder;
-
-  let takeOrderStartTime: number;
-
-  const work = ({ deltaTime }: { deltaTime: number }) => {
-    const speed = SPEED * deltaTime;
-    switch (state) {
-      case "pick":
-        if (w.moveTo(jobFD.from.getDockingPoint(DockPoint.TOP), speed)) {
-          // pick product
-          app.stage.removeChild(jobFD.product);
-          w.takeProduct(jobFD.product);
-          state = "deliver";
-        }
-        break;
-      case "deliver":
-        if (w.moveTo(jobFD.to.getDockingPoint(DockPoint.BOTTOM), speed)) {
-          const p = w.leaveProduct(jobFD.to);
-          app.stage.addChild(p);
-
-          StageData.coins += p.price;
-          status.update(`Coins: ${StageData.coins}`);
-
-          state = "done";
-        }
-        break;
-
-      case "customer":
-        if (w.moveTo(jobFTO.from.getDockingPoint(DockPoint.BOTTOM), speed)) {
-          // Take Order
-          state = "takeOrder";
-          takeOrderStartTime = Date.now();
-
-          const availableStations = backStations.filter((s) => s.isUnlocked);
-          const productType =
-            availableStations[getRandomInt(0, availableStations.length - 1)]
-              .category;
-          jobFTO.customer.chooseProduct(productType);
-        }
-        break;
-      case "takeOrder":
-        const progress = jobFTO.customer.makeOrder(takeOrderStartTime);
-        if (progress.completion === 1) {
-          progress.orders.forEach((o) => {
-            jobsBack.push({
-              type: o,
-              customer: jobFTO.customer,
-              at: jobFTO.from,
-            });
-          });
-          w.progressBar.reset();
-          state = "done";
-        } else {
-          // update progress bar
-          w.progressBar.update(progress.completion);
-        }
-
-        break;
-      case "done":
-        // work done
-        app.ticker.remove(work, context);
-        // join back into queue
-        workersFront.push(w);
-        break;
-      default:
-        throw new Error("Work fell in default case!");
-    }
-  };
-
-  app.ticker.add(work, context);
 }
 
 export function doBackWork(
