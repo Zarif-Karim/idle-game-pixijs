@@ -1,14 +1,11 @@
-import { Application, Color, Point, Text } from "pixi.js";
+import { Color, Point, Text } from "pixi.js";
 import {
   backStations,
-  EDGES,
-  jobsFrontTakeOrder,
-  SPEED,
   x,
 } from "../../globals";
 import { Circle } from "../circle";
 import { Product } from "../product";
-import { BackStation, DockPoint, FrontStation, Station } from "../stations";
+import { BackStation, FrontStation, Station } from "../stations";
 import { generateRandomColorHex, getRandomInt } from "../utils";
 import { RoundProgressBar } from "../progress-bar";
 
@@ -202,72 +199,3 @@ export class Worker extends Circle {
   }
 }
 
-export function doCustomerWork(
-  customer: Worker,
-  st: FrontStation,
-  createCustomer: Function,
-  app: Application,
-  state = "waitArea",
-) {
-  const context = { s: st, c: customer, st: Date.now() };
-  state = "waitArea";
-
-  const work = ({ deltaTime }: any) => {
-    const speed = SPEED * deltaTime;
-    switch (state) {
-      case "waitArea":
-        if (customer.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
-          // wait for atleast 1 station to be unlocked
-          const availableStations = backStations.filter((s) => s.isUnlocked);
-          if (availableStations.length === 0) {
-            // console.log('customer: no available stations, waiting..');
-            break;
-          }
-
-          // wait for order taking
-          jobsFrontTakeOrder.push({ from: st, customer: customer });
-          state = "wait";
-        }
-        break;
-      case "wait":
-        // NOTE:
-        // the Front worker take order from customer.
-        // this also needs to be updated to decouple the process
-        // so back workers can also do that!
-
-        // wait for order to be taken
-        if (!customer.isProductChoosen()) {
-          // this means the order has not been taken yet
-          // wait for next tick
-          return;
-        }
-
-        // the above check passed i.e order already taken
-        // pick a product from the table if any delivered
-        const rpt = customer.choosenProductType;
-        if (st.has(rpt)) {
-          const p = st.getProduct(rpt);
-          customer.recieveProduct(p);
-          app.stage.removeChild(p);
-        }
-
-        if (customer.isOrderCompleted()) {
-          state = "leave";
-        }
-        break;
-      case "leave":
-        const exitPoint = new Point(EDGES.width + 100, 50);
-        if (customer.moveTo(exitPoint, speed)) {
-          state = "done";
-        }
-        break;
-      case "done":
-        app.ticker.remove(work, context);
-        app.stage.removeChild(customer);
-        createCustomer(app);
-        break;
-    }
-  };
-
-  app.ticker.add(work, context);
-}

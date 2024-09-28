@@ -18,10 +18,11 @@ import {
 } from "./globals";
 
 import { Queue } from "./lib/queue";
-import { BackWorker, doCustomerWork, FrontWorker, Worker } from "./lib/workers";
+import { BackWorker, FrontWorker, Worker } from "./lib/workers";
 import { getRandomInt, randomPositionMiddle } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
+import { CustomerWorker } from "./lib/workers/customer-worker";
 
 export default async (app: Application) => {
   // add a screen border for debugging
@@ -41,9 +42,9 @@ export default async (app: Application) => {
   addWorkerIncreaseButtons(app);
   // add workers
   addWorkers({
-    back: 1,
+    back: 3,
     front: 1,
-    customer: 1,
+    customer: 3,
   }, app);
 
   // add the status last so its always visible
@@ -186,7 +187,7 @@ const gameLoop = (app: Application) => {
       const wa = waitingArea.pop();
       waitingArea.push(wa);
 
-      doCustomerWork(c!, wa!, createCustomer, app);
+      c.doWork(wa!, createCustomer, app);
     }
   });
 };
@@ -234,7 +235,7 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
 
   const { x, y } = gp;
-  const w = new Worker(x, y, { color: "white" });
+  const w = new CustomerWorker(x, y, { color: "white" });
 
   // add to screen
   app.stage.addChild(w);
