@@ -7,7 +7,8 @@ import {
   jobsFrontDelivery,
   SPEED,
   workersBack,
-} from "../../globals"; import { getRandomInt } from "../utils";
+} from "../../globals";
+import { getRandomInt } from "../utils";
 
 export class BackWorker extends Worker {
   doWork(
@@ -54,7 +55,7 @@ export class BackWorker extends Worker {
             slot.vacate();
 
             // product pickup
-            const product = this.makeProduct(st);
+            const product = st.createProduct();
             this.takeProduct(product);
 
             // choose the delivery location

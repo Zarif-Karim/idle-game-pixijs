@@ -1,9 +1,9 @@
-import { Application, Point, Text} from "pixi.js";
+import { Application, Point, Text } from "pixi.js";
 import { DockPoint, FrontStation } from "../stations";
 import { Worker, type WorkerOptions } from "./worker";
 import { backStations, EDGES, jobsFrontTakeOrder, SPEED } from "../../globals";
 import { generateRandomColorHex, getRandomInt } from "../utils";
-import { Product } from "../product"
+import { Product } from "../product";
 
 export class CustomerWorker extends Worker {
   public orderQuantityRemaining = -1;
@@ -12,7 +12,7 @@ export class CustomerWorker extends Worker {
   private makeOrderTime = 1_000; // 1 second
 
   constructor(x: number, y: number, options?: WorkerOptions) {
-    super(x,y, options);
+    super(x, y, options);
 
     this.quantityView = new Text({
       anchor: 1.5,
@@ -60,7 +60,8 @@ export class CustomerWorker extends Worker {
 
       // TODO: this is temp code to show which order customer wants
       // should later be changed to a pop up with image and number
-      const p = this.makeProduct(backStations[this.choosenProductType]);
+      const st = backStations[this.choosenProductType];
+      const p = st.createProduct(st);
       this.takeProduct(p);
     }
 

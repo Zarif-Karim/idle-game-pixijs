@@ -2,7 +2,7 @@ import { Color, Point } from "pixi.js";
 import { x } from "../../globals";
 import { Circle } from "../circle";
 import { Product } from "../product";
-import { BackStation, FrontStation, Station } from "../stations";
+import { FrontStation, Station } from "../stations";
 import { generateRandomColorHex } from "../utils";
 import { RoundProgressBar } from "../progress-bar";
 
@@ -90,28 +90,5 @@ export class Worker extends Circle {
     s.putProduct(p);
 
     return p;
-  }
-
-  makeProduct(s: BackStation) {
-    return s.createProduct();
-  }
-
-  /**
-   * @deprecated use Worker.moveTo(...) instead
-   */
-  isAt(object: Station | Product) {
-    const stCentre = object.centre;
-
-    // Calculate the distance between the objects
-    const dx = this.x - stCentre.x;
-    const dy = this.y - stCentre.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    const radius = this.radius;
-    const halfWidth = object.size / 2;
-
-    // Check if the distance is less than or equal to the sum of the radii
-    // Minus 10 as we want to have some overlap
-    return distance <= radius + halfWidth - 10;
   }
 }
