@@ -119,22 +119,20 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
-    [[x(7.95), y(55.9), 1, 2_000], ["cyan", "bottom"]],
-    [[x(7.95), y(78.5), 15, 3_000], ["hotpink", "bottom"]],
-    [[x(35.6), y(92.7), 110, 5_000], ["red", "right"]],
-    [[x(35.6), y(70.4), 890, 6_000], ["pink", "right"]],
-    [[x(92.04) - BackStation.SIZE, y(55.9), 5250, 9_000], ["yellow", "bottom"]],
-    [[x(92.04) - BackStation.SIZE, y(78.5), 70_505, 13_000], ["purple", "bottom"]],
+    [[x(7.95), y(55.9), 5, 3_000, 7], ["cyan", "bottom"]],
+    [[x(7.95), y(78.5), 500, 7_000, 1500], ["hotpink", "bottom"]],
+    [[x(35.6), y(92.7), 100_000, 15_000, 200_000], ["red", "right"]],
+    [[x(35.6), y(70.4), 1_000_000, 20_000, 5_000_000], ["pink", "right"]],
+    [[x(92.04) - BackStation.SIZE, y(55.9), 10_000_000, 25_000, 5000_000_000], ["yellow", "bottom"]],
+    [[x(92.04) - BackStation.SIZE, y(78.5), 1_000_000_000, 40_000, 50_000_000_000], ["purple", "bottom"]],
   ];
 
   backStations.push(
-    ...stationsParams.map(([[x, y, price, workDuration], [color, slotGrowDirection]], category) => {
-      return new BackStation(x, y, { category, color, price, workDuration, slotGrowDirection });
+    ...stationsParams.map(([[x, y, price, workDuration, unlockPrice], [color, slotGrowDirection]], category) => {
+      return new BackStation(x, y, { category, color, price, workDuration, slotGrowDirection, unlockPrice });
     }),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));
-  // make the first station unlocked automatically for now!
-  backStations[0].upgrade();
 }
 
 const gameLoop = (app: Application) => {

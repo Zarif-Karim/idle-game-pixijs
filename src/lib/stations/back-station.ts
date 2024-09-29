@@ -14,6 +14,8 @@ type BackStationOptions = StationOptions & {
   workDuration: number;
   // TODO: temp option for dev, should be extracted from config
   slotGrowDirection: string;
+  // price to unlock the station
+  unlockPrice: number;
 };
 
 export class BackStation extends Station {
@@ -25,6 +27,7 @@ export class BackStation extends Station {
 
   // TODO: make stations locked by default
   public isUnlocked = false;
+  public unlockPrice: number;
 
   private slots: BackStationSlot[] = [];
   // TODO: temp var for dev (assess)
@@ -33,13 +36,14 @@ export class BackStation extends Station {
   constructor(
     x: number,
     y: number,
-    { color, price, workDuration, category, slotGrowDirection }:
+    { color, price, workDuration, category, slotGrowDirection, unlockPrice }:
       BackStationOptions,
   ) {
     super(x, y, { color });
     this.category = category;
     this.price = price;
     this.workDuration = workDuration;
+    this.unlockPrice = unlockPrice;
 
     this.view.alpha = 0.5;
 

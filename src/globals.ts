@@ -11,7 +11,7 @@ import { CustomerWorker } from "./lib/workers/customer-worker";
 // };
 
 export const StageData = {
-  coins: 0,
+  coins: 8,
 };
 
 // Maintain an aspect ration of 9:16 to be mobile friendly
