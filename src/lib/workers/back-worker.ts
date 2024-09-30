@@ -9,12 +9,13 @@ import {
   workersBack,
 } from "../../globals";
 import { getRandomInt } from "../utils";
+import { CustomerWorker } from "./customer-worker";
 
 export class BackWorker extends Worker {
   doWork(
     { type, customer, at }: {
       type: number;
-      customer: Worker;
+      customer: CustomerWorker;
       at: FrontStation;
     },
     app: Application,

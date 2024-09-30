@@ -2,7 +2,7 @@ import { Application, Point, Text } from "pixi.js";
 import { DockPoint, FrontStation } from "../stations";
 import { Worker, type WorkerOptions } from "./worker";
 import { backStations, EDGES, jobsFrontTakeOrder, SPEED } from "../../globals";
-import { generateRandomColorHex, getRandomInt } from "../utils";
+import { getRandomInt } from "../utils";
 import { Product } from "../product";
 
 export class CustomerWorker extends Worker {
@@ -61,7 +61,7 @@ export class CustomerWorker extends Worker {
       // TODO: this is temp code to show which order customer wants
       // should later be changed to a pop up with image and number
       const st = backStations[this.choosenProductType];
-      const p = st.createProduct(st);
+      const p = st.createProduct();
       this.takeProduct(p);
     }
 
