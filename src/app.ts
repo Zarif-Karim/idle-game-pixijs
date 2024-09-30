@@ -1,5 +1,6 @@
 import { type Application, Point, Text } from "pixi.js";
 import {
+    addToView,
   backStations,
   customers,
   deliveryLocations,
@@ -7,6 +8,7 @@ import {
   jobsBack,
   jobsFrontDelivery,
   jobsFrontTakeOrder,
+  removeFromView,
   StageData,
   status,
   viewUpdateJob,
@@ -48,7 +50,7 @@ export default async (app: Application) => {
   }, app);
 
   // add the status last so its always visible
-  app.stage.addChild(status.text);
+  addToView(app, status.text);
   status.update(`Coins: ${StageData.coins}`);
 
   // start the game loop
@@ -69,7 +71,7 @@ function createButton(_x: number, _y: number, bgColor: string, txtColor: string,
   text.position = btn.centre;
   text.eventMode = 'none';
 
-  app.stage.addChild(btn.view, text);
+  addToView(app, btn.view, text);
 }
 
 function addScreenBorder(app: Application) {
@@ -78,7 +80,7 @@ function addScreenBorder(app: Application) {
   const left = new Rectangle(0, 0, 2, EDGES.height);
   const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height);
 
-  app.stage.addChild(...[top, bottom, left, right].map((r) => r.view));
+  addToView(app, ...[top, bottom, left, right].map((r) => r.view));
 }
 
 function createMiddlePointHorizontalDeliveryTable(app: Application) {
@@ -91,7 +93,7 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
       color: "grey",
     });
     deliveryLocations.push(loc);
-    app.stage.addChild(loc.view);
+    addToView(app, loc.view);
   }
 }
 
@@ -106,7 +108,7 @@ function createCustomerWaitingArea(app: Application) {
       new FrontStation(x + (FrontStation.SIZE + stsg) * 2, y, options),
     ].forEach((s) => {
       waitingArea.push(s);
-      app.stage.addChild(s.view);
+      addToView(app, s.view);
     });
   };
 
@@ -132,7 +134,7 @@ function createBackStations(app: Application) {
       return new BackStation(x, y, { category, color, price, workDuration, slotGrowDirection });
     }),
   );
-  backStations.map((r) => app.stage.addChild(...r.getView()));
+  backStations.map((r) => addToView(app, ...r.getView()));
   // make the first station unlocked automatically for now!
   backStations[0].upgrade();
 }
@@ -145,9 +147,9 @@ const gameLoop = (app: Application) => {
       // add to stage
       if(job === 'add') {
         child.zIndex = -1;
-        app.stage.addChild(child);
+        addToView(app, child);
       } else if (job === 'remove') {
-        app.stage.removeChild(child);
+        removeFromView(app, child);
       }
     }
 
@@ -222,7 +224,7 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   group.push(w);
 
   // add to screen
-  app.stage.addChild(w);
+  addToView(app, w);
 }
 
 function createCustomer(app: Application /*, _group: Queue<Worker> */) {
@@ -238,7 +240,7 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const w = new CustomerWorker(x, y, { color: "white" });
 
   // add to screen
-  app.stage.addChild(w);
+  addToView(app, w);
   // add to queue
   customers.push(w);
 }

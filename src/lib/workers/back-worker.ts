@@ -2,6 +2,7 @@ import { Application } from "pixi.js";
 import { Worker } from "./worker";
 import { DockPoint, FrontStation } from "../stations";
 import {
+    addToView,
   backStations,
   deliveryLocations,
   jobsFrontDelivery,
@@ -73,7 +74,7 @@ export class BackWorker extends Worker {
           if (this.moveTo(dl.getDockingPoint(DockPoint.BOTTOM), speed)) {
             // move product from hand to table
             const p = this.leaveProduct(dl);
-            app.stage.addChild(p);
+            addToView(app, p);
 
             // these products should be deliverd by FE workers
             jobsFrontDelivery.push({ from: dl, to: at, product: p, customer });

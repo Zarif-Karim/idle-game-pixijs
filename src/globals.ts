@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Application, Container, Graphics } from "pixi.js";
 import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
@@ -76,3 +76,40 @@ export const workersFront: Queue<FrontWorker> = new Queue();
 export const waitingArea: Queue<FrontStation> = new Queue();
 
 export const customers: Queue<CustomerWorker> = new Queue();
+
+export const screenView: Set<any> = new Set();
+
+export function addToView(app: Application, ...children: any) {
+  if(!(children instanceof Array)) {
+    children = [children]
+  } 
+
+  for (let i = 0; i < children.length; i++) {
+    // if (screenView.has(children[i])) {
+    //   console.log('child already present', children[i]);
+    //   continue;
+    // }
+
+    // NOTE: Is it safe to leave it without any checks!!
+    screenView.add(children[i]);
+    app.stage.addChild(children[i]);
+  }
+}
+
+export function removeFromView(app: Application, ...children: any) {
+  if(!(children instanceof Array)) {
+    children = [children]
+  } 
+
+  for (let i = 0; i < children.length; i++) {
+    // if (!screenView.has(children)) {
+    //   console.log('child doesnt exist', children);
+    //   continue;
+    // }
+
+    // NOTE: Is it safe to leave it without any checks!!
+    screenView.delete(children[i]);
+    app.stage.removeChild(children[i]);
+  }
+}
+

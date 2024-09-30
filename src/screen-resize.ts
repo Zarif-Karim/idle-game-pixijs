@@ -1,5 +1,5 @@
 import { Application, Assets, Point, Sprite } from "pixi.js";
-import { x, y } from "./globals";
+import { addToView, x, y } from "./globals";
 
 let IS_FULLSCREEN = false;
 
@@ -61,7 +61,7 @@ export class FullscreenButton extends Sprite {
 export async function addFullScreenButton(app: Application) {
   const imgFullScreenBtn = await Assets.load("full-screen-button.png");
   const btn = new FullscreenButton(imgFullScreenBtn, app);
-  app.stage.addChild(btn);
+  addToView(app, btn);
   return btn;
 }
 

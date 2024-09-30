@@ -1,7 +1,7 @@
 import { Application, Point, Text } from "pixi.js";
 import { DockPoint, FrontStation } from "../stations";
 import { Worker, type WorkerOptions } from "./worker";
-import { backStations, EDGES, jobsFrontTakeOrder, SPEED } from "../../globals";
+import { backStations, EDGES, jobsFrontTakeOrder, removeFromView, SPEED } from "../../globals";
 import { getRandomInt } from "../utils";
 import { Product } from "../product";
 
@@ -138,7 +138,7 @@ export class CustomerWorker extends Worker {
           if (st.has(rpt)) {
             const p = st.getProduct(rpt);
             this.recieveProduct(p);
-            app.stage.removeChild(p);
+            removeFromView(app, p);
           }
 
           if (this.isOrderCompleted()) {
@@ -153,7 +153,8 @@ export class CustomerWorker extends Worker {
           break;
         case "done":
           app.ticker.remove(work, context);
-          app.stage.removeChild(this);
+          removeFromView(app, this);
+
           createCustomer(app);
           break;
       }

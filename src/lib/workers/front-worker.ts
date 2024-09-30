@@ -1,9 +1,11 @@
 import { Application } from "pixi.js";
 import {
+    addToView,
   backStations,
   FrontDelivery,
   FrontTakeOrder,
   jobsBack,
+  removeFromView,
   SPEED,
   StageData,
   status,
@@ -32,7 +34,7 @@ export class FrontWorker extends Worker {
         case "pick":
           if (this.moveTo(jobFD.from.getDockingPoint(DockPoint.TOP), speed)) {
             // pick product
-            app.stage.removeChild(jobFD.product);
+            removeFromView(app, jobFD.product);
             this.takeProduct(jobFD.product);
             state = "deliver";
           }
@@ -40,7 +42,7 @@ export class FrontWorker extends Worker {
         case "deliver":
           if (this.moveTo(jobFD.to.getDockingPoint(DockPoint.BOTTOM), speed)) {
             const p = this.leaveProduct(jobFD.to);
-            app.stage.addChild(p);
+            addToView(app, p);
 
             StageData.coins += p.price;
             status.update(`Coins: ${StageData.coins}`);
