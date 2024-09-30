@@ -65,22 +65,23 @@ function addWorkerIncreaseButtons(app: Application) {
 
 function createButton(_x: number, _y: number, bgColor: string, txtColor: string, worker: any, app: Application) {
   const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
-  btn.view.on('pointertap', () => addWorkers(worker, app));
+  btn.on('pointertap', () => addWorkers(worker, app));
 
   const text = new Text({ text: '+', anchor: 0.5, style: { fontWeight: 'bold', fontSize: '50em', fill: txtColor }});
   text.position = btn.centre;
   text.eventMode = 'none';
+  (text as any).resize = () => {};
 
-  addToView(app, btn.view, text);
+  addToView(app, btn, text);
 }
 
 function addScreenBorder(app: Application) {
-  const top = new Rectangle(0, 0, EDGES.width, 2);
+  const top = new Rectangle(0, 0, EDGES.width, 2, { nx: 0, ny: 0, nw: 100, nh: 0.5 });
   const bottom = new Rectangle(0, EDGES.height - 2, EDGES.width, 2);
   const left = new Rectangle(0, 0, 2, EDGES.height);
   const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height);
 
-  addToView(app, ...[top, bottom, left, right].map((r) => r.view));
+  addToView(app, ...[top, bottom, left, right]);
 }
 
 function createMiddlePointHorizontalDeliveryTable(app: Application) {
@@ -93,7 +94,7 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
       color: "grey",
     });
     deliveryLocations.push(loc);
-    addToView(app, loc.view);
+    addToView(app, loc);
   }
 }
 
@@ -108,7 +109,7 @@ function createCustomerWaitingArea(app: Application) {
       new FrontStation(x + (FrontStation.SIZE + stsg) * 2, y, options),
     ].forEach((s) => {
       waitingArea.push(s);
-      addToView(app, s.view);
+      addToView(app, s);
     });
   };
 

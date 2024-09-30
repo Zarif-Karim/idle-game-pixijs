@@ -11,7 +11,7 @@ export class BackStationSlot extends Station {
 
   constructor(x: number, y: number, { color, dockSide }: BackStationSlotOptions) {
     super(x, y, { color });
-    this.view.alpha = 0.5;
+    this.alpha = 0.5;
     this.dockSide = dockSide;
   }
 

@@ -17,7 +17,7 @@ import { EDGES, getScreenSize, screenView } from "./globals";
   // dynamically reset screen size
   window.addEventListener("resize", () => {
     const { width, height } = getScreenSize();
-    console.log({ width, height });
+    // console.log({ width, height });
 
     EDGES.width = width;
     EDGES.height = height;
@@ -26,7 +26,7 @@ import { EDGES, getScreenSize, screenView } from "./globals";
     app.stage.removeChildren();
     for(let child of screenView.values()) {
       // TODO: add a resize function to all the classes
-      // child.resize();
+      child.resize && child.resize();
       app.stage.addChild(child);
     }
   });

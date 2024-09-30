@@ -49,6 +49,13 @@ export class FullscreenButton extends Sprite {
     });
   }
 
+  resize() {
+    this.width = x(5);
+    this.height = x(5);
+
+    this.position.set(x(94), x(1));
+  }
+
   reset() {
     this.width = x(5);
     this.height = x(5);

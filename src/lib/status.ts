@@ -27,6 +27,10 @@ export class Status {
     this.onScreenText.anchor = { x: 0, y: 0 };
   }
 
+  resize() {
+    return;
+  }
+
   update(msg: string) {
     this.onScreenText.text = msg;
   }
