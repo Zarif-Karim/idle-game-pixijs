@@ -119,17 +119,17 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
-    [[x(7.95), y(55.9), 1, 2_000], ["cyan", "bottom"]],
-    [[x(7.95), y(78.5), 15, 3_000], ["hotpink", "bottom"]],
-    [[x(35.6), y(92.7), 110, 5_000], ["red", "right"]],
-    [[x(35.6), y(70.4), 890, 6_000], ["pink", "right"]],
-    [[x(92.04) - BackStation.SIZE, y(55.9), 5250, 9_000], ["yellow", "bottom"]],
-    [[x(92.04) - BackStation.SIZE, y(78.5), 70_505, 13_000], ["purple", "bottom"]],
+    [[x(7.95), y(55.9), 5, 7, 2_000], ["cyan", "bottom"]],
+    [[x(7.95), y(78.5), 700, 1500, 3_000], ["hotpink", "bottom"]],
+    [[x(35.6), y(92.7), 50_000, 170_000, 5_000], ["red", "right"]],
+    [[x(35.6), y(70.4), 250_000, 1_200_000], ["pink", "right"]],
+    [[x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000], ["yellow", "bottom"]],
+    [[x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000], ["purple", "bottom"]],
   ];
 
   backStations.push(
-    ...stationsParams.map(([[x, y, productPrice, workDuration], [color, slotGrowDirection]], category) => {
-      return new BackStation(x, y, { category, color, productPrice, workDuration, slotGrowDirection });
+    ...stationsParams.map(([[x, y, productPrice, upgradePrice, workDuration], [color, slotGrowDirection]], category) => {
+      return new BackStation(x, y, { category, color, productPrice, upgradePrice, workDuration, slotGrowDirection });
     }),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));

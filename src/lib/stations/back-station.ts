@@ -16,8 +16,6 @@ type BackStationOptions = StationOptions & {
   slotGrowDirection: string;
   // price needed to upgrade station for the first time
   upgradePrice?: number;
-  // price to unlock the station
-  buyPrice?: number;
 };
 
 export class BackStation extends Station {
@@ -25,10 +23,7 @@ export class BackStation extends Station {
 
   public productPrice: number;
 
-  // starting out with a small number for now
-  // to iteratively move from optional to required
   public upgradePrice: number;
-  public buyPrice: number;
 
   public category: number;
   public workDuration = ONE_MS * 1.5;
@@ -49,8 +44,7 @@ export class BackStation extends Station {
     this.productPrice = opts.productPrice;
     this.workDuration = opts.workDuration;
 
-    this.buyPrice = opts.buyPrice || 7;
-    this.upgradePrice = opts.upgradePrice || 5;
+    this.upgradePrice = opts.upgradePrice || 7;
 
     this.view.alpha = 0.5;
 
@@ -62,30 +56,27 @@ export class BackStation extends Station {
   }
 
   canUpgrade(wallet: number) {
-    const canUnlock = !this.isUnlocked && wallet >= this.buyPrice;
+    const canUnlock = !this.isUnlocked && wallet >= this.upgradePrice;
     const canUpgrade = wallet >= this.upgradePrice;
     return canUnlock || canUpgrade;
   }
 
   upgrade() {
     if (!this.canUpgrade(StateData.coins)) {
-      status.update(`${this.category}: need ${this.isUnlocked ? this.upgradePrice : this.buyPrice}`)
+      status.update(`${this.category}: need ${this.upgradePrice}`)
       setTimeout(() =>
         status.update(`Coins: ${StateData.coins}`), 1000);
       return;
     }
 
-    if (!this.isUnlocked) {
-      this.isUnlocked = true;
-      this.view.alpha = 1;
-      StateData.coins -= this.buyPrice;
-    } else {
-      StateData.coins -= this.upgradePrice;
-      // increase product sell price by 8% every upgrade
-      this.productPrice = Math.ceil(this.productPrice * 1.08);
-      // increase next upgrade price by 20% every upgrade
-      this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
-    }
+    this.isUnlocked = true;
+    this.view.alpha = 1;
+
+    StateData.coins -= this.upgradePrice;
+    // increase product sell price by 8% every upgrade
+    this.productPrice = Math.ceil(this.productPrice * 1.08);
+    // increase next upgrade price by 20% every upgrade
+    this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
 
     const slot = this.addSlot();
     slot && viewUpdateJob.push({ job: "add", child: slot.view });
