@@ -39,9 +39,10 @@ export class Status {
     this.prefixText = opts?.prefix || '';
     this.onScreenText = new Text({ text: msg, style: this.style });
 
-    this.onScreenText.x = 20;
-    this.onScreenText.y = 20;
     this.onScreenText.anchor = { x: 0, y: 0 };
+    this.onScreenText.x = opts?.x || 20;
+    this.onScreenText.y = opts?.y || 20;
+    this.update(msg);
   }
 
   setPrefix(txt: string) {

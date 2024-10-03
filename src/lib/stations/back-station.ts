@@ -35,6 +35,9 @@ export class BackStation extends Station {
   // TODO: temp var for dev (assess)
   private slotGrowDirection: string;
 
+  private upgradePriceText: Status;
+  private productPriceText: Status;
+
   constructor(
     x: number,
     y: number,
@@ -49,7 +52,18 @@ export class BackStation extends Station {
 
     // TODO: make pop-up
     // showing prices on the side as a workaround
-    const upgradePriceText = new Status()
+    this.upgradePriceText = new Status(`${this.upgradePrice}`, {
+      x: 50,
+      y: -2,
+      prefix: 'U: ',
+    });
+    this.productPriceText = new Status(`${this.productPrice}`, {
+      x: 50,
+      y: 20,
+      prefix: 'P: ',
+    });
+    this.view.addChild(this.upgradePriceText.text);
+    this.view.addChild(this.productPriceText.text);
 
     this.view.alpha = 0.5;
 
@@ -80,8 +94,11 @@ export class BackStation extends Station {
     StateData.coins -= this.upgradePrice;
     // increase product sell price by 8% every upgrade
     this.productPrice = Math.ceil(this.productPrice * 1.08);
+    this.productPriceText.update(`${this.productPrice}`);
     // increase next upgrade price by 20% every upgrade
     this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
+    this.upgradePriceText.update(`${this.upgradePrice}`);
+
 
     const slot = this.addSlot();
     slot && viewUpdateJob.push({ job: "add", child: slot.view });
