@@ -12,11 +12,13 @@ export type StatusOptions = {
   wordWrapWidth?: number;
   breakWords?: boolean,
   app?: Application;
+  prefix?: string;
 }
 
 export class Status {
   private style: TextStyle;
   private onScreenText: Text;
+  private prefixText: string;
 
 
   constructor(msg: string, opts?: StatusOptions) {
@@ -34,6 +36,7 @@ export class Status {
       breakWords: opts?.breakWords || true,
     });
 
+    this.prefixText = opts?.prefix || '';
     this.onScreenText = new Text({ text: msg, style: this.style });
 
     this.onScreenText.x = 20;
@@ -41,13 +44,16 @@ export class Status {
     this.onScreenText.anchor = { x: 0, y: 0 };
   }
 
+  setPrefix(txt: string) {
+    this.prefixText = txt;
+  }
+
   update(msg: string) {
-    this.onScreenText.text = msg;
+    this.onScreenText.text = `${this.prefixText}${msg}`;
   }
 
   get text() {
     return this.onScreenText;
   }
-
 }
 

@@ -1,5 +1,6 @@
 import { StateData, status, viewUpdateJob, x } from "../../globals";
 import { Product } from "../product";
+import { Status } from "../status";
 import { BackStationSlot } from "./back-station-slot";
 import { DockPoint, Station, type StationOptions } from "./stations";
 
@@ -48,7 +49,7 @@ export class BackStation extends Station {
 
     // TODO: make pop-up
     // showing prices on the side as a workaround
-    //const upgradePriceText = new Text
+    const upgradePriceText = new Status()
 
     this.view.alpha = 0.5;
 
