@@ -23,7 +23,6 @@ export class BackStation extends Station {
   public price: number;
   public workDuration = ONE_MS * 1.5;
 
-  // TODO: make stations locked by default
   public isUnlocked = false;
 
   private slots: BackStationSlot[] = [];
