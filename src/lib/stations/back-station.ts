@@ -1,4 +1,4 @@
-import { viewUpdateJob, x } from "../../globals";
+import { StateData, status, viewUpdateJob, x } from "../../globals";
 import { Product } from "../product";
 import { BackStationSlot } from "./back-station-slot";
 import { DockPoint, Station, type StationOptions } from "./stations";
@@ -14,12 +14,21 @@ type BackStationOptions = StationOptions & {
   workDuration: number;
   // TODO: temp option for dev, should be extracted from config
   slotGrowDirection: string;
+  // price needed to upgrade station for the first time
+  upgradePrice?: number;
+  // price to unlock the station
+  buyPrice?: number;
 };
 
 export class BackStation extends Station {
   static MAX_SLOTS = 3;
 
   public productPrice: number;
+
+  // starting out with a small number for now
+  // to iteratively move from optional to required
+  public upgradePrice: number = 0;
+  public buyPrice: number = 0;
 
   public category: number;
   public workDuration = ONE_MS * 1.5;
@@ -49,13 +58,29 @@ export class BackStation extends Station {
 
     this.slotGrowDirection = slotGrowDirection;
   }
-  
+
+  canUpgrade(wallet: number) {
+    const canUnlock = !this.isUnlocked && wallet >= this.buyPrice;
+    const canUpgrade = wallet >= this.upgradePrice;
+    return canUnlock || canUpgrade;
+  }
+
   upgrade() {
+    if (!this.canUpgrade(StateData.coins)) {
+      status.update(`${this.category}: need ${this.isUnlocked ? this.upgradePrice : this.buyPrice}`)
+      return;
+    }
+
+    if(!this.isUnlocked) {
       this.isUnlocked = true;
       this.view.alpha = 1;
+      StateData.coins -= this.buyPrice;
+    } else {
+      StateData.coins -= this.upgradePrice;
+    }
 
-      const slot = this.addSlot();
-      slot && viewUpdateJob.push({ job: "add", child: slot.view });
+    const slot = this.addSlot();
+    slot && viewUpdateJob.push({ job: "add", child: slot.view });
   }
 
   getSlot(): BackStationSlot | undefined {
