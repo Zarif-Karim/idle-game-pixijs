@@ -19,8 +19,9 @@ type BackStationOptions = StationOptions & {
 export class BackStation extends Station {
   static MAX_SLOTS = 3;
 
+  public productPrice: number;
+
   public category: number;
-  public price: number;
   public workDuration = ONE_MS * 1.5;
 
   public isUnlocked = false;
@@ -37,7 +38,7 @@ export class BackStation extends Station {
   ) {
     super(x, y, { color });
     this.category = category;
-    this.price = price;
+    this.productPrice = price;
     this.workDuration = workDuration;
 
     this.view.alpha = 0.5;
@@ -89,6 +90,6 @@ export class BackStation extends Station {
   }
 
   createProduct() {
-    return new Product(this.category, this.color, this.price);
+    return new Product(this.category, this.color, this.productPrice);
   }
 }
