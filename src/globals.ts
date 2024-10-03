@@ -27,9 +27,6 @@ export function getScreenSize() {
   return { width, height };
 }
 
-// the rate at which the objects move in the screen
-// always multiply this with the deltaTIme
-export const SPEED = 4;
 // right and bottom are dynamically set by app.screen
 export const EDGES = { top: 0, left: 0, ...getScreenSize() };
 
@@ -52,6 +49,10 @@ export function x(percentage: number): number {
 export function y(percentage: number): number {
   return EDGES.height * (percentage / 100);
 }
+
+// the rate at which the objects move in the screen
+// always multiply this with the deltaTIme
+export const SPEED = x(0.6);
 
 export type FrontTakeOrder = {
   from: FrontStation;
