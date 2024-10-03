@@ -7,7 +7,7 @@ import {
   jobsBack,
   jobsFrontDelivery,
   jobsFrontTakeOrder,
-  StageData,
+  StateData,
   status,
   viewUpdateJob,
   waitingArea,
@@ -49,7 +49,7 @@ export default async (app: Application) => {
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-  status.update(`Coins: ${StageData.coins}`);
+  status.update(`Coins: ${StateData.coins}`);
 
   // start the game loop
   gameLoop(app);

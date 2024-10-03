@@ -10,7 +10,11 @@ import { CustomerWorker } from "./lib/workers/customer-worker";
 //   maxCount: 5,
 // };
 
-export const StageData = {
+export type StateInfo = {
+  coins: number;
+}
+
+export const StateData: StateInfo = {
   coins: 0,
 };
 

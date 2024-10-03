@@ -5,7 +5,7 @@ import {
   FrontTakeOrder,
   jobsBack,
   SPEED,
-  StageData,
+  StateData,
   status,
   workersFront,
 } from "../../globals";
@@ -42,8 +42,8 @@ export class FrontWorker extends Worker {
             const p = this.leaveProduct(jobFD.to);
             app.stage.addChild(p);
 
-            StageData.coins += p.price;
-            status.update(`Coins: ${StageData.coins}`);
+            StateData.coins += p.price;
+            status.update(`Coins: ${StateData.coins}`);
 
             state = "done";
           }
