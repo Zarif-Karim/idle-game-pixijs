@@ -27,7 +27,7 @@ export class BackStation extends Station {
 
   // starting out with a small number for now
   // to iteratively move from optional to required
-  public upgradePrice: number = 0;
+  public upgradePrice: number;
   public buyPrice: number;
 
   public category: number;
@@ -42,23 +42,23 @@ export class BackStation extends Station {
   constructor(
     x: number,
     y: number,
-    { color, productPrice, buyPrice, workDuration, category, slotGrowDirection }:
-      BackStationOptions,
+    opts: BackStationOptions,
   ) {
-    super(x, y, { color });
-    this.category = category;
-    this.productPrice = productPrice;
-    this.workDuration = workDuration;
+    super(x, y, { color: opts.color });
+    this.category = opts.category;
+    this.productPrice = opts.productPrice;
+    this.workDuration = opts.workDuration;
 
-    this.buyPrice = buyPrice || 7;
+    this.buyPrice = opts.buyPrice || 7;
+    this.upgradePrice = opts.upgradePrice || 5;
 
-      this.view.alpha = 0.5;
+    this.view.alpha = 0.5;
 
     // for now unlocking and upgrading stations on click
     // TODO: Update from pop ups when enough coins available
     this.view.on("pointertap", () => this.upgrade());
 
-    this.slotGrowDirection = slotGrowDirection;
+    this.slotGrowDirection = opts.slotGrowDirection;
   }
 
   canUpgrade(wallet: number) {
