@@ -70,6 +70,8 @@ export class BackStation extends Station {
   upgrade() {
     if (!this.canUpgrade(StateData.coins)) {
       status.update(`${this.category}: need ${this.isUnlocked ? this.upgradePrice : this.buyPrice}`)
+      setTimeout(() =>
+        status.update(`Coins: ${StateData.coins}`), 1000);
       return;
     }
 
@@ -79,10 +81,15 @@ export class BackStation extends Station {
       StateData.coins -= this.buyPrice;
     } else {
       StateData.coins -= this.upgradePrice;
+      // increase product sell price by 8% every upgrade
+      this.productPrice = Math.ceil(this.productPrice * 1.08);
+      // increase next upgrade price by 20% every upgrade
+      this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
     }
 
     const slot = this.addSlot();
     slot && viewUpdateJob.push({ job: "add", child: slot.view });
+    status.update(`Coins: ${StateData.coins}`);
   }
 
   getSlot(): BackStationSlot | undefined {
