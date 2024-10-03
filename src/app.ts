@@ -65,7 +65,7 @@ function createButton(_x: number, _y: number, bgColor: string, txtColor: string,
   const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
   btn.view.on('pointertap', () => addWorkers(worker, app));
 
-  const text = new Text({ text: '+', anchor: 0.5, style: { fontWeight: 'bold', fontSize: '50em', fill: txtColor }});
+  const text = new Text({ text: '+', anchor: 0.5, style: { fontWeight: 'bold', fontSize: '50em', fill: txtColor } });
   text.position = btn.centre;
   text.eventMode = 'none';
 
@@ -128,8 +128,8 @@ function createBackStations(app: Application) {
   ];
 
   backStations.push(
-    ...stationsParams.map(([[x, y, price, workDuration], [color, slotGrowDirection]], category) => {
-      return new BackStation(x, y, { category, color, price, workDuration, slotGrowDirection });
+    ...stationsParams.map(([[x, y, productPrice, workDuration], [color, slotGrowDirection]], category) => {
+      return new BackStation(x, y, { category, color, productPrice, workDuration, slotGrowDirection });
     }),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));
@@ -139,11 +139,11 @@ function createBackStations(app: Application) {
 
 const gameLoop = (app: Application) => {
   app.ticker.add(() => {
-    while(!viewUpdateJob.isEmpty) {
+    while (!viewUpdateJob.isEmpty) {
       const { job, child } = viewUpdateJob.pop();
-      
+
       // add to stage
-      if(job === 'add') {
+      if (job === 'add') {
         child.zIndex = -1;
         app.stage.addChild(child);
       } else if (job === 'remove') {
@@ -154,7 +154,7 @@ const gameLoop = (app: Application) => {
     if (!workersBack.isEmpty && !jobsBack.isEmpty) {
       const w = workersBack.pop();
       const j = jobsBack.pop();
-      if(!w.doWork(j!, app)) {
+      if (!w.doWork(j!, app)) {
         // TODO: look for a better way to do this
         // observer console.log to see concern
         // if not done, push back for now
@@ -177,7 +177,7 @@ const gameLoop = (app: Application) => {
         w.doWork(j!, app);
       }
       // if no jobs, wait for it
-     }
+    }
 
     if (!customers.isEmpty) {
       const c = customers.pop();

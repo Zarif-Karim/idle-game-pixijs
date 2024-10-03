@@ -15,7 +15,7 @@ export type StateInfo = {
 }
 
 export const StateData: StateInfo = {
-  coins: 7,
+  coins: 8,
 };
 
 // Maintain an aspect ration of 9:16 to be mobile friendly

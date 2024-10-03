@@ -9,7 +9,7 @@ type BackStationOptions = StationOptions & {
   // identifier
   category: number;
   // starting price of produced product
-  price: number;
+  productPrice: number;
   // starting time in milliseconds for work to complete
   workDuration: number;
   // TODO: temp option for dev, should be extracted from config
@@ -28,7 +28,7 @@ export class BackStation extends Station {
   // starting out with a small number for now
   // to iteratively move from optional to required
   public upgradePrice: number = 0;
-  public buyPrice: number = 0;
+  public buyPrice: number;
 
   public category: number;
   public workDuration = ONE_MS * 1.5;
@@ -42,15 +42,17 @@ export class BackStation extends Station {
   constructor(
     x: number,
     y: number,
-    { color, price, workDuration, category, slotGrowDirection }:
+    { color, productPrice, buyPrice, workDuration, category, slotGrowDirection }:
       BackStationOptions,
   ) {
     super(x, y, { color });
     this.category = category;
-    this.productPrice = price;
+    this.productPrice = productPrice;
     this.workDuration = workDuration;
 
-    this.view.alpha = 0.5;
+    this.buyPrice = buyPrice || 7;
+
+      this.view.alpha = 0.5;
 
     // for now unlocking and upgrading stations on click
     // TODO: Update from pop ups when enough coins available
@@ -71,7 +73,7 @@ export class BackStation extends Station {
       return;
     }
 
-    if(!this.isUnlocked) {
+    if (!this.isUnlocked) {
       this.isUnlocked = true;
       this.view.alpha = 1;
       StateData.coins -= this.buyPrice;
