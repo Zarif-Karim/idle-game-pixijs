@@ -46,6 +46,10 @@ export class BackStation extends Station {
 
     this.upgradePrice = opts.upgradePrice;
 
+    // TODO: make pop-up
+    // showing prices on the side as a workaround
+    //const upgradePriceText = new Text
+
     this.view.alpha = 0.5;
 
     // for now unlocking and upgrading stations on click

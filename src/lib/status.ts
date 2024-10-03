@@ -1,23 +1,37 @@
-import { Application, Text, TextStyle } from "pixi.js";
+import { Application, Text, TextStyle, TextStyleAlign } from "pixi.js";
+
+export type StatusOptions = {
+  x?: number;
+  y?: number;
+  stroke?: string;
+  fill?: string;
+  fontSize?: number;
+  fontFamily?: string;
+  align?: TextStyleAlign;
+  wordWrap?: boolean;
+  wordWrapWidth?: number;
+  breakWords?: boolean,
+  app?: Application;
+}
 
 export class Status {
   private style: TextStyle;
   private onScreenText: Text;
 
 
-  constructor(msg: string, app?: Application) {
+  constructor(msg: string, opts?: StatusOptions) {
     this.style = new TextStyle({
-      fontFamily: 'Arial',
-      fontSize: 15,
-      fill: 0xFF0000, // Red text
-      stroke: 0xFFFFFF, // White stroke
+      fontFamily: opts?.fontFamily || 'Arial',
+      fontSize: opts?.fontSize || 15,
+      fill: opts?.fill || 0xFF0000, // Red text
+      stroke: opts?.stroke || 0xFFFFFF, // White stroke
       //strokeThickness: 5, // 5px stroke width
-      align: 'center',
+      align: opts?.align || 'center',
       //x: 20,
       //y: 20,
-      wordWrap: true,
-      wordWrapWidth: app ? app.canvas.width : window.innerHeight,
-      breakWords: true,
+      wordWrap: opts?.wordWrap || true,
+      wordWrapWidth: opts?.app ? opts.app.canvas.width : window.innerHeight,
+      breakWords: opts?.breakWords || true,
     });
 
     this.onScreenText = new Text({ text: msg, style: this.style });
