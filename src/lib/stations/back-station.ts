@@ -14,8 +14,8 @@ type BackStationOptions = StationOptions & {
   workDuration: number;
   // TODO: temp option for dev, should be extracted from config
   slotGrowDirection: string;
-  // price needed to upgrade station for the first time
-  upgradePrice?: number;
+  // price needed to unlock station for the first time
+  upgradePrice: number;
 };
 
 export class BackStation extends Station {
@@ -44,7 +44,7 @@ export class BackStation extends Station {
     this.productPrice = opts.productPrice;
     this.workDuration = opts.workDuration;
 
-    this.upgradePrice = opts.upgradePrice || 7;
+    this.upgradePrice = opts.upgradePrice;
 
     this.view.alpha = 0.5;
 
