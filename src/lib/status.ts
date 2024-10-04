@@ -26,7 +26,7 @@ export class Status {
       fontFamily: opts?.fontFamily || 'Arial',
       fontSize: opts?.fontSize || 15,
       fill: opts?.fill || 0xFF0000, // Red text
-      stroke: opts?.stroke || 0xFFFFFF, // White stroke
+      // stroke: opts?.stroke || 0xFFFFFF, // White stroke
       //strokeThickness: 5, // 5px stroke width
       align: opts?.align || 'center',
       wordWrap: opts?.wordWrap || true,

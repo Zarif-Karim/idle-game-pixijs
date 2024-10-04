@@ -52,16 +52,19 @@ export class BackStation extends Station {
 
     // TODO: make pop-up
     // showing prices on the side as a workaround
+    const fontSize = Station.SIZE * 0.45;
     this.upgradePriceText = new Status(`${this.upgradePrice}`, {
-      x: 50,
-      y: -2,
-      prefix: 'U: ',
+      x: Station.SIZE,
+      prefix: ' U: ',
+      fontSize,
     });
     this.productPriceText = new Status(`${this.productPrice}`, {
-      x: 50,
-      y: 20,
-      prefix: 'P: ',
+      x: Station.SIZE,
+      y: Station.SIZE * 0.5,
+      prefix: ' P: ',
+      fontSize,
     });
+    this.productPriceText.text.visible = false;
     this.view.addChild(this.upgradePriceText.text);
     this.view.addChild(this.productPriceText.text);
 
@@ -72,6 +75,9 @@ export class BackStation extends Station {
     this.view.on("pointertap", () => this.upgrade());
 
     this.slotGrowDirection = opts.slotGrowDirection;
+
+    this.view.on('pointerover', () => this.view.scale = 1.07);
+    this.view.on('pointerout', () => this.view.scale = 1);
   }
 
   canUpgrade(wallet: number) {
@@ -90,6 +96,7 @@ export class BackStation extends Station {
 
     this.isUnlocked = true;
     this.view.alpha = 1;
+    this.productPriceText.text.visible = true;
 
     StateData.coins -= this.upgradePrice;
     // increase product sell price by 8% every upgrade
