@@ -29,8 +29,6 @@ export class Status {
       stroke: opts?.stroke || 0xFFFFFF, // White stroke
       //strokeThickness: 5, // 5px stroke width
       align: opts?.align || 'center',
-      //x: 20,
-      //y: 20,
       wordWrap: opts?.wordWrap || true,
       wordWrapWidth: opts?.app ? opts.app.canvas.width : window.innerHeight,
       breakWords: opts?.breakWords || true,
@@ -40,8 +38,8 @@ export class Status {
     this.onScreenText = new Text({ text: msg, style: this.style });
 
     this.onScreenText.anchor = { x: 0, y: 0 };
-    this.onScreenText.x = opts?.x || 20;
-    this.onScreenText.y = opts?.y || 20;
+    this.onScreenText.x = opts?.x || 0;
+    this.onScreenText.y = opts?.y || 0;
     this.update(msg);
   }
 

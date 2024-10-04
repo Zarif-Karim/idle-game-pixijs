@@ -34,7 +34,7 @@ export function getScreenSize() {
 // right and bottom are dynamically set by app.screen
 export const EDGES = { top: 0, left: 0, ...getScreenSize() };
 
-export const status: Status = new Status("Initialising");
+export const status: Status = new Status("Initialising", { x: 20, y: 20 });
 
 /**
  * Take a number between 0 - 100 (including fractions)
