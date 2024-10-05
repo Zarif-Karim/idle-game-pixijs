@@ -3,8 +3,7 @@ import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
-import { BackWorker, FrontWorker, Worker } from "./lib/workers";
-import { CustomerWorker } from "./lib/workers/customer-worker";
+import { BackWorker, FrontWorker, CustomerWorker } from "./lib/workers";
 
 // export const CUSTOMERS = {
 //   maxCount: 5,
@@ -60,7 +59,7 @@ export const SPEED = x(0.6);
 
 export type FrontTakeOrder = {
   from: FrontStation;
-  customer: Worker;
+  customer: CustomerWorker;
 };
 
 export type FrontDelivery = FrontTakeOrder & {
@@ -71,7 +70,7 @@ export type FrontDelivery = FrontTakeOrder & {
 type ViewAble = Graphics | Container;
 export const viewUpdateJob: Queue<{job: string, child: ViewAble }> = new Queue();
 
-export const jobsBack: Queue<{ type: number; customer: Worker; at: FrontStation }> =
+export const jobsBack: Queue<{ type: number; customer: CustomerWorker; at: FrontStation }> =
   new Queue();
 export const workersBack: Queue<BackWorker> = new Queue();
 export const backStations: BackStation[] = [];
