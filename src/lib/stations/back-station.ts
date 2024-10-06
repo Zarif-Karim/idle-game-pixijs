@@ -4,8 +4,6 @@ import { Status } from "../status";
 import { BackStationSlot } from "./back-station-slot";
 import { DockPoint, Station, type StationOptions } from "./stations";
 
-const ONE_MS = 1_000; // 1000 ms aka 1 s
-
 type BackStationOptions = StationOptions & {
   // identifier
   category: number;
@@ -21,13 +19,16 @@ type BackStationOptions = StationOptions & {
 
 export class BackStation extends Station {
   static MAX_SLOTS = 3;
+  static DOUBLES_PRICE_AT = [10, 25, 50, 75, 100, 150, 200, 250, 300];
+  static ADD_SLOTS_AT = [1, 25, 75, 150];
 
+  public LEVEL = 0;
   public productPrice: number;
 
   public upgradePrice: number;
 
   public category: number;
-  public workDuration = ONE_MS * 1.5;
+  public workDuration: number;
 
   public isUnlocked = false;
 
@@ -35,6 +36,7 @@ export class BackStation extends Station {
   // TODO: temp var for dev (assess)
   private slotGrowDirection: string;
 
+  private levelText: Status;
   private upgradePriceText: Status;
   private productPriceText: Status;
 
@@ -53,18 +55,22 @@ export class BackStation extends Station {
     // TODO: make pop-up
     // showing prices on the side as a workaround
     const fontSize = Station.SIZE * 0.45;
+    this.levelText = new Status(`${this.LEVEL}`, { fontSize });
     this.upgradePriceText = new Status(`${this.upgradePrice}`, {
       x: Station.SIZE,
-      prefix: ' U: ',
+      prefix: " U: ",
       fontSize,
     });
     this.productPriceText = new Status(`${this.productPrice}`, {
       x: Station.SIZE,
       y: Station.SIZE * 0.5,
-      prefix: ' P: ',
+      prefix: " P: ",
       fontSize,
     });
+
+    this.levelText.text.visible = false;
     this.productPriceText.text.visible = false;
+    this.view.addChild(this.levelText.text);
     this.view.addChild(this.upgradePriceText.text);
     this.view.addChild(this.productPriceText.text);
 
@@ -76,8 +82,8 @@ export class BackStation extends Station {
 
     this.slotGrowDirection = opts.slotGrowDirection;
 
-    this.view.on('pointerover', () => this.view.scale = 1.07);
-    this.view.on('pointerout', () => this.view.scale = 1);
+    this.view.on("pointerover", () => this.view.scale = 1.07);
+    this.view.on("pointerout", () => this.view.scale = 1);
   }
 
   canUpgrade(wallet: number) {
@@ -88,27 +94,33 @@ export class BackStation extends Station {
 
   upgrade() {
     if (!this.canUpgrade(StateData.coins)) {
-      status.update(`${this.category}: need ${this.upgradePrice}`)
-      setTimeout(() =>
-        status.update(`Coins: ${StateData.coins}`), 1000);
+      status.update(`${this.category}: need ${this.upgradePrice}`);
+      setTimeout(() => status.update(`Coins: ${StateData.coins}`), 1000);
       return;
     }
 
     this.isUnlocked = true;
     this.view.alpha = 1;
+    this.LEVEL += 1;
+    this.levelText.update(this.LEVEL.toString());
     this.productPriceText.text.visible = true;
+    this.levelText.text.visible = true;
 
     StateData.coins -= this.upgradePrice;
     // increase product sell price by 8% every upgrade
     this.productPrice = Math.ceil(this.productPrice * 1.08);
+    if(BackStation.DOUBLES_PRICE_AT.includes(this.LEVEL)) {
+      this.productPrice *= 2;
+    }
     this.productPriceText.update(`${this.productPrice}`);
     // increase next upgrade price by 20% every upgrade
     this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
     this.upgradePriceText.update(`${this.upgradePrice}`);
 
-
-    const slot = this.addSlot();
-    slot && viewUpdateJob.push({ job: "add", child: slot.view });
+    if (BackStation.ADD_SLOTS_AT.includes(this.LEVEL)) {
+      const slot = this.addSlot();
+      slot && viewUpdateJob.push({ job: "add", child: slot.view });
+    }
     status.update(`Coins: ${StateData.coins}`);
   }
 
