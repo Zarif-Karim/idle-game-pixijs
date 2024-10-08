@@ -13,6 +13,7 @@ export class BackStationSlot extends Station {
     super(x, y, { color });
     this.view.alpha = 0.5;
     this.dockSide = dockSide;
+    this.view.zIndex = -1;
   }
 
   occupy() {

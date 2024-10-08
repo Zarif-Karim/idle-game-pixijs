@@ -144,7 +144,6 @@ const gameLoop = (app: Application) => {
 
       // add to stage
       if (job === 'add') {
-        child.zIndex = -1;
         app.stage.addChild(child);
       } else if (job === 'remove') {
         app.stage.removeChild(child);
