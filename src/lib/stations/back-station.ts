@@ -58,13 +58,19 @@ export class BackStation extends Station {
       this.upgradePrice,
       this.productPrice,
     );
+    this.infoPopup.visible = false;
     viewUpdateJob.push({ job: "add", child: this.infoPopup });
 
     this.view.alpha = 0.5;
 
     // for now unlocking and upgrading stations on click
     // TODO: Update from pop ups when enough coins available
-    this.view.on("pointertap", () => this.upgrade());
+    this.view.on("pointertap", () => {
+      this.upgrade();
+      // TODO: figure out a way to close the popup when clicked outside
+      // toggling for now on click
+      this.infoPopup.visible = !this.infoPopup.visible;
+    });
 
     this.slotGrowDirection = opts.slotGrowDirection;
 
