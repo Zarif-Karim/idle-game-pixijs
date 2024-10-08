@@ -52,13 +52,13 @@ export class BackStation extends Station {
     this.upgradePrice = opts.upgradePrice;
 
     this.infoPopup = new StationDetails(
-      0,
-      0,
+      x,
+      y,
       this.LEVEL,
       this.upgradePrice,
       this.productPrice,
     );
-    this.view.addChild(this.infoPopup);
+    viewUpdateJob.push({ job: "add", child: this.infoPopup });
 
     this.view.alpha = 0.5;
 
