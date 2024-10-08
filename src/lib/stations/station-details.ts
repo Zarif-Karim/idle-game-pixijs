@@ -20,23 +20,7 @@ export class StationDetails extends Container {
     productPrice: number,
   ) {
     super({ x, y });
-    const fontSize = Station.SIZE * 0.45;
-    this.levelText = new Status(`${level}`, { fontSize });
-    this.upgradePriceText = new Status(`${upgradePrice}`, {
-      x: Station.SIZE,
-      prefix: " U: ",
-      fontSize,
-    });
-    this.productPriceText = new Status(`${productPrice}`, {
-      x: Station.SIZE,
-      y: Station.SIZE * 0.5,
-      prefix: " P: ",
-      fontSize,
-    });
-
-    this.addChild(this.levelText.text);
-    this.addChild(this.upgradePriceText.text);
-    this.addChild(this.productPriceText.text);
+    const fontSize = Station.SIZE * 0.35;
 
     const ss = Station.SIZE;
     const color = "BlanchedAlmond";
@@ -45,11 +29,44 @@ export class StationDetails extends Container {
       color,
     });
 
-    this.bgAnchor = new Graphics().star(ss/2, -ss/2, 3, ss/2, ss/4, Math.PI).fill({
+    this.bgAnchor = new Graphics().star(
+      ss / 2,
+      -ss / 2,
+      3,
+      ss / 2,
+      ss / 4,
+      Math.PI,
+    ).fill({
       color,
     });
 
     this.addChild(this.bgAnchor, this.bgBoard);
+
+    this.levelText = new Status(`${level}`, {
+      x: bgp.x + bgp.w/2,
+      y: bgp.y + bgp.h * 0.15,
+      prefix: "Level ",
+      fontSize,
+      fill: 'black'
+    });
+
+    this.upgradePriceText = new Status(`${upgradePrice}`, {
+      x: bgp.x + bgp.w/2,
+      y: bgp.y + bgp.h * 0.35,
+      prefix: "Price: ",
+      fontSize,
+      fill: 'black'
+    });
+    this.productPriceText = new Status(`${productPrice}`, {
+      x: bgp.x + bgp.w/2,
+      y: bgp.y + bgp.h * 0.55,
+      prefix: "Product: ",
+      fontSize,
+      fill: 'black'
+    });
+    this.addChild(this.levelText.text);
+    this.addChild(this.upgradePriceText.text);
+    this.addChild(this.productPriceText.text);
     // this is an info panel, should be above everything in the ingame screen
     this.zIndex = 100;
   }
@@ -58,18 +75,18 @@ export class StationDetails extends Container {
     const ss = Station.SIZE;
     const w = ss * 4;
     const h = ss * 3;
-    let x = ss/2 - w/2;
-    if(this.x + x < EDGES.left) {
+    let x = ss / 2 - w / 2;
+    if (this.x + x < EDGES.left) {
       const localCoord = this.toLocal(new Point(sX(3), 0));
       x = localCoord.x;
     }
-    if(this.x + x + w > EDGES.width) {
+    if (this.x + x + w > EDGES.width) {
       const localCoord = this.toLocal(new Point(sX(97), 0));
       x = localCoord.x - w;
     }
-    let y = -h - ss/2;
+    let y = -h - ss / 2;
 
-    return { x, y, w, h};
+    return { x, y, w, h };
   }
 
   update(level: number, productPrice: number, upgradePrice: number) {
