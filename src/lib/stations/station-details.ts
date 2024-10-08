@@ -13,6 +13,9 @@ export class StationDetails extends Container {
   private bgAnchor?: Graphics;
 
   private upgradeButton?: Button;
+  private buttonViewEnabled?: Graphics;
+  private buttonViewDisabled?: Graphics;
+
   // TODO: add expanding animation
   constructor(
     x: number,
@@ -30,21 +33,28 @@ export class StationDetails extends Container {
     this.zIndex = 100;
   }
 
+  setUpgradable(flag: boolean) {
+    if (!this.upgradeButton) throw new Error("Upgrade button is not defined!");
+
+    this.upgradeButton.enabled = flag;
+    this.upgradeButton.view.visible = flag;
+  }
+
   private addUpgradeButton(upgradeFn: () => void) {
+    const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
     const color = "green";
     const radius = 5;
     const w = bgp.w * 0.75;
     let x = bgp.x + bgp.w / 2 - w / 2;
     let y = bgp.y + bgp.h * 0.65;
-    const buttonView = new Graphics().roundRect(
+    this.buttonViewEnabled = new Graphics().roundRect(
       x,
       y,
       w,
       bgp.h * 0.2,
       radius,
     ).fill({ color });
-    const fontSize = Station.SIZE * 0.35;
     const text = new Text({
       text: "Upgrade",
       anchor: 0.5,
@@ -53,14 +63,36 @@ export class StationDetails extends Container {
         fontSize,
       },
     });
+    text.eventMode = "none";
+    text.x = x + this.buttonViewEnabled.width / 2;
+    text.y = y + this.buttonViewEnabled.height / 2;
 
-    text.x = x + buttonView.width / 2;
-    text.y = y + buttonView.height / 2;
-    buttonView.addChild(text);
+    this.buttonViewDisabled = new Graphics().roundRect(
+      x,
+      y,
+      w,
+      bgp.h * 0.2,
+      radius,
+    ).fill({ color: "grey" });
+    this.buttonViewDisabled.eventMode = "none";
+    const text2 = new Text({
+      text: "Upgrade",
+      anchor: 0.5,
+      style: {
+        fill: "white",
+        fontSize,
+      },
+    });
+    text2.eventMode = "none";
+    text2.x = x + this.buttonViewDisabled.width / 2;
+    text2.y = y + this.buttonViewDisabled.height / 2;
 
-    this.upgradeButton = new Button(buttonView);
+    this.buttonViewEnabled.addChild(text);
+    this.buttonViewDisabled.addChild(text2);
 
-    this.upgradeButton.enabled = true;
+    this.upgradeButton = new Button(this.buttonViewEnabled);
+
+    this.upgradeButton.enabled = false;
 
     this.upgradeButton.onPress.connect(upgradeFn);
     this.upgradeButton.onDown.connect(() => {
@@ -69,6 +101,7 @@ export class StationDetails extends Container {
     this.upgradeButton.onUp.connect(() => {
       this.upgradeButton!.view.scale = 1;
     });
+    this.addChild(this.buttonViewDisabled);
     this.addChild(this.upgradeButton.view);
   }
 

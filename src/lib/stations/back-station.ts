@@ -94,6 +94,7 @@ export class BackStation extends Station {
 
   setUpgradable(flag: boolean) {
     this.upgradableMarker.visible = flag;
+    this.infoPopup.setUpgradable(flag);
   }
 
   upgrade() {
