@@ -1,3 +1,4 @@
+import { Graphics } from "pixi.js";
 import { StateData, status, viewUpdateJob, x } from "../../globals";
 import { Product } from "../product";
 import { BackStationSlot } from "./back-station-slot";
@@ -37,6 +38,7 @@ export class BackStation extends Station {
   private slotGrowDirection: string;
 
   private infoPopup: StationDetails;
+  private upgradableMarker: Graphics;
 
   constructor(
     x: number,
@@ -76,12 +78,22 @@ export class BackStation extends Station {
 
     this.view.on("pointerover", () => this.view.scale = 1.07);
     this.view.on("pointerout", () => this.view.scale = 1);
+
+    this.upgradableMarker = new Graphics().circle(0, 0, Station.SIZE * 0.25)
+      .fill({ color: "red" });
+    this.upgradableMarker.eventMode = "none";
+    this.upgradableMarker.visible = false;
+    this.view.addChild(this.upgradableMarker);
   }
 
   canUpgrade(wallet: number) {
     const canUnlock = !this.isUnlocked && wallet >= this.upgradePrice;
     const canUpgrade = wallet >= this.upgradePrice;
     return canUnlock || canUpgrade;
+  }
+
+  setUpgradable(flag: boolean) {
+    this.upgradableMarker.visible = flag;
   }
 
   upgrade() {

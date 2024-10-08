@@ -32,10 +32,10 @@ export class StationDetails extends Container {
 
   private addUpgradeButton(upgradeFn: () => void) {
     const bgp = this.getBgPosition();
-    const color = 'green';
+    const color = "green";
     const radius = 5;
     const w = bgp.w * 0.75;
-    let x = bgp.x + bgp.w/2 - w/2;
+    let x = bgp.x + bgp.w / 2 - w / 2;
     let y = bgp.y + bgp.h * 0.65;
     const buttonView = new Graphics().roundRect(
       x,
@@ -49,9 +49,9 @@ export class StationDetails extends Container {
       text: "Upgrade",
       anchor: 0.5,
       style: {
-        fill: 'white',
-        fontSize
-      }
+        fill: "white",
+        fontSize,
+      },
     });
 
     text.x = x + buttonView.width / 2;
@@ -63,8 +63,12 @@ export class StationDetails extends Container {
     this.upgradeButton.enabled = true;
 
     this.upgradeButton.onPress.connect(upgradeFn);
-    this.upgradeButton.onDown.connect(() => { this.upgradeButton!.view.scale = 0.98 });
-    this.upgradeButton.onUp.connect(() => { this.upgradeButton!.view.scale = 1 });
+    this.upgradeButton.onDown.connect(() => {
+      this.upgradeButton!.view.scale = 0.98;
+    });
+    this.upgradeButton.onUp.connect(() => {
+      this.upgradeButton!.view.scale = 1;
+    });
     this.addChild(this.upgradeButton.view);
   }
 

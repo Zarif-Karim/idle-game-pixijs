@@ -56,18 +56,29 @@ export default async (app: Application) => {
 };
 
 function addWorkerIncreaseButtons(app: Application) {
-  createButton(x(90), y(5), 'white', 'black', { customer: 1 }, app);
-  createButton(x(90), y(11), 'blue', 'white', { front: 1 }, app);
-  createButton(x(90), y(17), 'green', 'white', { back: 1 }, app);
+  createButton(x(90), y(5), "white", "black", { customer: 1 }, app);
+  createButton(x(90), y(11), "blue", "white", { front: 1 }, app);
+  createButton(x(90), y(17), "green", "white", { back: 1 }, app);
 }
 
-function createButton(_x: number, _y: number, bgColor: string, txtColor: string, worker: any, app: Application) {
+function createButton(
+  _x: number,
+  _y: number,
+  bgColor: string,
+  txtColor: string,
+  worker: any,
+  app: Application,
+) {
   const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
-  btn.view.on('pointertap', () => addWorkers(worker, app));
+  btn.view.on("pointertap", () => addWorkers(worker, app));
 
-  const text = new Text({ text: '+', anchor: 0.5, style: { fontWeight: 'bold', fontSize: '50em', fill: txtColor } });
+  const text = new Text({
+    text: "+",
+    anchor: 0.5,
+    style: { fontWeight: "bold", fontSize: "50em", fill: txtColor },
+  });
   text.position = btn.centre;
-  text.eventMode = 'none';
+  text.eventMode = "none";
 
   app.stage.addChild(btn.view, text);
 }
@@ -123,14 +134,35 @@ function createBackStations(app: Application) {
     [[x(7.95), y(78.5), 700, 1500, 3_000], ["hotpink", "bottom"]],
     [[x(35.6), y(92.7), 50_000, 170_000, 5_000], ["red", "right"]],
     [[x(35.6), y(70.4), 250_000, 1_200_000], ["pink", "right"]],
-    [[x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000], ["yellow", "bottom"]],
-    [[x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000], ["purple", "bottom"]],
+    [[x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000], [
+      "yellow",
+      "bottom",
+    ]],
+    [[x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000], [
+      "purple",
+      "bottom",
+    ]],
   ];
 
   backStations.push(
-    ...stationsParams.map(([[x, y, productPrice, upgradePrice, workDuration], [color, slotGrowDirection]], category) => {
-      return new BackStation(x, y, { category, color, productPrice, upgradePrice, workDuration, slotGrowDirection });
-    }),
+    ...stationsParams.map(
+      (
+        [
+          [x, y, productPrice, upgradePrice, workDuration],
+          [color, slotGrowDirection],
+        ],
+        category,
+      ) => {
+        return new BackStation(x, y, {
+          category,
+          color,
+          productPrice,
+          upgradePrice,
+          workDuration,
+          slotGrowDirection,
+        });
+      },
+    ),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));
   // make the first station unlocked automatically for now!
@@ -139,13 +171,20 @@ function createBackStations(app: Application) {
 
 const gameLoop = (app: Application) => {
   app.ticker.add(() => {
+    // the upgradable loop
+    // check all the objects to see if they are upgradable and mark them
+    // for now only checking back stations
+    backStations.forEach((bs) =>
+      bs.setUpgradable(bs.canUpgrade(StateData.coins))
+    );
+
     while (!viewUpdateJob.isEmpty) {
       const { job, child } = viewUpdateJob.pop();
 
       // add to stage
-      if (job === 'add') {
+      if (job === "add") {
         app.stage.addChild(child);
-      } else if (job === 'remove') {
+      } else if (job === "remove") {
         app.stage.removeChild(child);
       }
     }
@@ -181,7 +220,7 @@ const gameLoop = (app: Application) => {
     if (!customers.isEmpty) {
       const c = customers.pop();
 
-      // TODO: debug why customers going to 
+      // TODO: debug why customers going to
       // occupied table when there are free ones
       const wa = waitingArea.pop();
       waitingArea.push(wa);
@@ -192,7 +231,11 @@ const gameLoop = (app: Application) => {
 };
 
 const addWorkers = (
-  { back = 0, front = 0, customer = 0 }: { back?: number; front?: number; customer?: number },
+  { back = 0, front = 0, customer = 0 }: {
+    back?: number;
+    front?: number;
+    customer?: number;
+  },
   app: Application,
 ) => {
   // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
