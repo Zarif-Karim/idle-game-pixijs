@@ -4,12 +4,12 @@ import { Station } from "./stations";
 import { EDGES, x as sX } from "../../globals";
 
 export class StationDetails extends Container {
-  private levelText: Status;
-  private upgradePriceText: Status;
-  private productPriceText: Status;
+  private levelText?: Status;
+  private upgradePriceText?: Status;
+  private productPriceText?: Status;
 
-  private bgBoard: Graphics;
-  private bgAnchor: Graphics;
+  private bgBoard?: Graphics;
+  private bgAnchor?: Graphics;
 
   // TODO: add expanding animation
   constructor(
@@ -20,14 +20,51 @@ export class StationDetails extends Container {
     productPrice: number,
   ) {
     super({ x, y });
-    const fontSize = Station.SIZE * 0.35;
+    this.createBackground();
+    this.fillInfo(level, upgradePrice, productPrice);
+    // this is an info panel, should be above everything in the ingame screen
+    this.zIndex = 100;
+  }
 
+  private fillInfo(level: number, upgradePrice: number, productPrice: number) {
+    const fontSize = Station.SIZE * 0.35;
+    const bgp = this.getBgPosition();
+
+    this.levelText = new Status(`${level}`, {
+      x: bgp.x + bgp.w / 2,
+      y: bgp.y + bgp.h * 0.15,
+      prefix: "Level ",
+      fontSize,
+      fill: "black",
+    });
+
+    this.upgradePriceText = new Status(`${upgradePrice}`, {
+      x: bgp.x + bgp.w / 2,
+      y: bgp.y + bgp.h * 0.35,
+      prefix: "Price: ",
+      fontSize,
+      fill: "black",
+    });
+    this.productPriceText = new Status(`${productPrice}`, {
+      x: bgp.x + bgp.w / 2,
+      y: bgp.y + bgp.h * 0.55,
+      prefix: "Product: ",
+      fontSize,
+      fill: "black",
+    });
+    this.addChild(this.levelText.text);
+    this.addChild(this.upgradePriceText.text);
+    this.addChild(this.productPriceText.text);
+  }
+
+  private createBackground() {
     const ss = Station.SIZE;
     const color = "BlanchedAlmond";
     const bgp = this.getBgPosition();
     this.bgBoard = new Graphics().roundRect(bgp.x, bgp.y, bgp.w, bgp.h).fill({
       color,
     });
+    this.bgBoard.eventMode = "passive";
 
     this.bgAnchor = new Graphics().star(
       ss / 2,
@@ -39,36 +76,9 @@ export class StationDetails extends Container {
     ).fill({
       color,
     });
+    this.bgAnchor.eventMode = "none";
 
     this.addChild(this.bgAnchor, this.bgBoard);
-
-    this.levelText = new Status(`${level}`, {
-      x: bgp.x + bgp.w/2,
-      y: bgp.y + bgp.h * 0.15,
-      prefix: "Level ",
-      fontSize,
-      fill: 'black'
-    });
-
-    this.upgradePriceText = new Status(`${upgradePrice}`, {
-      x: bgp.x + bgp.w/2,
-      y: bgp.y + bgp.h * 0.35,
-      prefix: "Price: ",
-      fontSize,
-      fill: 'black'
-    });
-    this.productPriceText = new Status(`${productPrice}`, {
-      x: bgp.x + bgp.w/2,
-      y: bgp.y + bgp.h * 0.55,
-      prefix: "Product: ",
-      fontSize,
-      fill: 'black'
-    });
-    this.addChild(this.levelText.text);
-    this.addChild(this.upgradePriceText.text);
-    this.addChild(this.productPriceText.text);
-    // this is an info panel, should be above everything in the ingame screen
-    this.zIndex = 100;
   }
 
   private getBgPosition() {
@@ -96,14 +106,14 @@ export class StationDetails extends Container {
   }
 
   updateLevel(level: number) {
-    this.levelText.update(level.toString());
+    this.levelText?.update(level.toString());
   }
 
   updateProductPrice(price: number) {
-    this.productPriceText.update(price.toString());
+    this.productPriceText?.update(price.toString());
   }
 
   updateUpgradePrice(price: number) {
-    this.upgradePriceText.update(price.toString());
+    this.upgradePriceText?.update(price.toString());
   }
 }

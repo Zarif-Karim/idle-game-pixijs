@@ -1,4 +1,4 @@
-import { Application, Text, TextStyle, TextStyleAlign, Point } from "pixi.js";
+import { Application, Text, TextStyle, TextStyleAlign } from "pixi.js";
 
 export type StatusOptions = {
   x?: number;
