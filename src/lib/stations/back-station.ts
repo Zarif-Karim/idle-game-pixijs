@@ -66,6 +66,7 @@ export class BackStation extends Station {
     // for now unlocking and upgrading stations on click
     // TODO: Update from pop ups when enough coins available
     this.view.on("pointertap", () => {
+      // TODO: make the upgrades from the pop-up
       this.upgrade();
       // TODO: figure out a way to close the popup when clicked outside
       // toggling for now on click
