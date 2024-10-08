@@ -3,7 +3,7 @@ import { Product } from "./lib/product";
 import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
-import { BackWorker, FrontWorker, CustomerWorker } from "./lib/workers";
+import { BackWorker, CustomerWorker, FrontWorker } from "./lib/workers";
 
 // export const CUSTOMERS = {
 //   maxCount: 5,
@@ -11,7 +11,7 @@ import { BackWorker, FrontWorker, CustomerWorker } from "./lib/workers";
 
 export type StateInfo = {
   coins: number;
-}
+};
 
 export const StateData: StateInfo = {
   coins: 8,
@@ -33,7 +33,11 @@ export function getScreenSize() {
 // right and bottom are dynamically set by app.screen
 export const EDGES = { top: 0, left: 0, ...getScreenSize() };
 
-export const status: Status = new Status("Initialising", { x: 20, y: 20 });
+export const status: Status = new Status("Initialising", {
+  x: 20,
+  y: 20,
+  anchor: { x: 0, y: 0 },
+});
 
 /**
  * Take a number between 0 - 100 (including fractions)
@@ -68,10 +72,12 @@ export type FrontDelivery = FrontTakeOrder & {
 };
 
 type ViewAble = Graphics | Container;
-export const viewUpdateJob: Queue<{job: string, child: ViewAble }> = new Queue();
-
-export const jobsBack: Queue<{ type: number; customer: CustomerWorker; at: FrontStation }> =
+export const viewUpdateJob: Queue<{ job: string; child: ViewAble }> =
   new Queue();
+
+export const jobsBack: Queue<
+  { type: number; customer: CustomerWorker; at: FrontStation }
+> = new Queue();
 export const workersBack: Queue<BackWorker> = new Queue();
 export const backStations: BackStation[] = [];
 

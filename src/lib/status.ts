@@ -1,4 +1,4 @@
-import { Application, Text, TextStyle, TextStyleAlign } from "pixi.js";
+import { Application, Text, TextStyle, TextStyleAlign, Point } from "pixi.js";
 
 export type StatusOptions = {
   x?: number;
@@ -13,6 +13,7 @@ export type StatusOptions = {
   breakWords?: boolean,
   app?: Application;
   prefix?: string;
+  anchor?: { x: number, y: number };
 }
 
 export class Status {
@@ -27,7 +28,7 @@ export class Status {
       fontSize: opts?.fontSize || 15,
       fill: opts?.fill || 0xFF0000, // Red text
       // stroke: opts?.stroke || 0xFFFFFF, // White stroke
-      //strokeThickness: 5, // 5px stroke width
+      // strokeThickness: 5, // 5px stroke width
       align: opts?.align || 'center',
       wordWrap: opts?.wordWrap || true,
       wordWrapWidth: opts?.app ? opts.app.canvas.width : window.innerHeight,
@@ -37,7 +38,7 @@ export class Status {
     this.prefixText = opts?.prefix || '';
     this.onScreenText = new Text({ text: msg, style: this.style });
 
-    this.onScreenText.anchor = { x: 0, y: 0 };
+    this.onScreenText.anchor = opts?.anchor || { x: 0.5, y: 0.5 };
     this.onScreenText.x = opts?.x || 0;
     this.onScreenText.y = opts?.y || 0;
     this.update(msg);
