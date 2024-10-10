@@ -1,4 +1,4 @@
-import { type Application, Point, Text } from "pixi.js";
+import { type Application, FederatedPointerEvent, Point, Text } from "pixi.js";
 import {
   backStations,
   customers,
@@ -53,6 +53,17 @@ export default async (app: Application) => {
 
   // start the game loop
   gameLoop(app);
+
+
+  // close the station details view with clicked outside the station boundary
+  app.stage.on('pointertap', (event: FederatedPointerEvent) => {
+    backStations.forEach(bs => {
+      // const localPoint = event.getLocalPosition(bs.view);
+      if(!bs.contains(event.global)) {
+        bs.infoPopup.visible = false;
+      }
+    });
+  });
 };
 
 function addWorkerIncreaseButtons(app: Application) {

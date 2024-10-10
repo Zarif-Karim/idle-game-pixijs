@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Point } from "pixi.js";
 import { StateData, status, viewUpdateJob, x } from "../../globals";
 import { Product } from "../product";
 import { BackStationSlot } from "./back-station-slot";
@@ -38,7 +38,7 @@ export class BackStation extends Station {
   // TODO: temp var for dev (assess)
   private slotGrowDirection: string;
 
-  private infoPopup: StationDetails;
+  public infoPopup: StationDetails;
   private upgradableMarker: Graphics;
 
   constructor(
@@ -67,12 +67,8 @@ export class BackStation extends Station {
 
     this.view.alpha = 0.5;
 
-    // for now unlocking and upgrading stations on click
-    // TODO: Update from pop ups when enough coins available
     this.view.on("pointertap", () => {
-      // TODO: figure out a way to close the popup when clicked outside
-      // toggling for now on click
-      this.infoPopup.visible = !this.infoPopup.visible;
+      this.infoPopup.visible = true;
     });
 
     this.slotGrowDirection = opts.slotGrowDirection;
@@ -156,7 +152,7 @@ export class BackStation extends Station {
       color: this.color,
       dockSide: d ? DockPoint.RIGHT : DockPoint.TOP,
       toggleStationDetails: () => {
-        this.infoPopup.visible = !this.infoPopup.visible;
+        this.infoPopup.visible = true;
       },
     });
 
@@ -166,5 +162,14 @@ export class BackStation extends Station {
 
   createProduct() {
     return new Product(this.category, this.color, this.productPrice);
+  }
+
+  contains(point: Point) {
+    const inStationView = this.view.containsPoint(this.view.toLocal(point));
+    const inSlotView = this.slots.some((s) => s.view.containsPoint(s.view.toLocal(point)));
+    const inDetailsView = this.infoPopup.contains(point);
+    if (inStationView || inSlotView || inDetailsView) return true;
+
+    return false;
   }
 }

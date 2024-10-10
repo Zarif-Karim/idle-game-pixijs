@@ -29,7 +29,7 @@ export class StationDetails extends Container {
   ) {
     super({ x, y });
     this.createBackground();
-    this.fillInfo(level, upgradePrice, productPrice);
+    this.fillInfo(level, productPrice);
     this.addUpgradeButton(upgradeFn, upgradePrice);
     // this is an info panel, should be above everything in the ingame screen
     this.zIndex = 100;
@@ -183,5 +183,13 @@ export class StationDetails extends Container {
   updateUpgradePrice(price: number) {
     this.upgradePriceText?.update(price.toString());
     this.upgradePriceTextDisabled?.update(price.toString());
+  }
+
+  contains(point: Point) {
+    if (
+      this.bgBoard?.containsPoint(this.bgBoard.toLocal(point)) ||
+      this.bgAnchor?.containsPoint(this.bgAnchor.toLocal(point))
+    ) return true;
+    return false;
   }
 }
