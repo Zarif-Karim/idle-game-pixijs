@@ -1,6 +1,7 @@
 import { Color, Point, Text } from "pixi.js";
 import { Circle } from "./circle";
 import { x } from "../globals";
+import { ICONS } from "./utils";
 
 export class Product extends Circle {
   public category: number;
@@ -12,7 +13,7 @@ export class Product extends Circle {
     this.category = category;
     this.price = price;
     this.priceView = new Text({
-      text: `💰${this.price}`,
+      text: `${ICONS.MONEYSACK} ${this.price}`,
       anchor: 0.5,
       style: {
         fill: 'white',

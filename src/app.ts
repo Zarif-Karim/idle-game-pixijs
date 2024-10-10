@@ -19,7 +19,7 @@ import {
 
 import { Queue } from "./lib/queue";
 import { BackWorker, FrontWorker, Worker } from "./lib/workers";
-import { getRandomInt, randomPositionMiddle } from "./lib/utils";
+import { getRandomInt, ICONS, randomPositionMiddle } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
@@ -49,7 +49,7 @@ export default async (app: Application) => {
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-  status.update(`💰 ${StateData.coins}`);
+  status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
 
   // start the game loop
   gameLoop(app);

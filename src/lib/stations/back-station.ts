@@ -4,6 +4,7 @@ import { Product } from "../product";
 import { BackStationSlot } from "./back-station-slot";
 import { StationDetails } from "./station-details";
 import { DockPoint, Station, type StationOptions } from "./stations";
+import { ICONS } from "../utils";
 
 type BackStationOptions = StationOptions & {
   // identifier
@@ -100,7 +101,7 @@ export class BackStation extends Station {
   upgrade() {
     if (!this.canUpgrade(StateData.coins)) {
       status.update(`${this.category}: need ${this.upgradePrice}`);
-      setTimeout(() => status.update(`💰 ${StateData.coins}`), 1000);
+      setTimeout(() => status.update(`${ICONS.MONEYSACK} ${StateData.coins}`), 1000);
       return;
     }
 
@@ -123,7 +124,7 @@ export class BackStation extends Station {
     }
 
     this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
-    status.update(`💰 ${StateData.coins}`);
+    status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
   }
 
   getSlot(): BackStationSlot | undefined {

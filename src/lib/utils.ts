@@ -7,6 +7,10 @@ interface Edges {
   left: number;
 }
 
+export enum ICONS {
+  MONEYSACK = "💰",
+};
+
 // generation random hex avoiding too much black
 export function generateRandomColorHex(): string {
   const components = ["r", "g", "b"];
@@ -31,7 +35,7 @@ export const makeTarget = (
 export function getRandomInt(min: number, max: number) {
   min = Math.floor(min);
   max = Math.ceil(max);
-  return Math.floor(Math.random() * (max-min+1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export const randomPositionMiddle = (edges: Edges) => {
@@ -52,4 +56,3 @@ export const randomPoint = (a: Point, b: Point) => {
   const randomFraction = Math.random();
   return new Point(minX + dx * randomFraction, minY + dy * randomFraction);
 };
-

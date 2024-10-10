@@ -11,7 +11,7 @@ import {
 } from "../../globals";
 import { Worker } from "./worker";
 import { DockPoint } from "../stations";
-import { getRandomInt } from "../utils";
+import { getRandomInt, ICONS } from "../utils";
 
 export class FrontWorker extends Worker {
   doWork(
@@ -43,7 +43,7 @@ export class FrontWorker extends Worker {
             app.stage.addChild(p);
 
             StateData.coins += p.price;
-            status.update(`💰 ${StateData.coins}`);
+            status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
 
             state = "done";
           }
