@@ -5,16 +5,22 @@ import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
 import { BackWorker, CustomerWorker, FrontWorker } from "./lib/workers";
 
-// export const CUSTOMERS = {
-//   maxCount: 5,
-// };
-
 export type StateInfo = {
+  stage: 'string';
   coins: number;
+  backWorkers: number,
+  frontWorkers: number,
+  customerWorkers: number,
+  stations: number[],
 };
 
 export const StateData: StateInfo = {
+  stage: '1-1',
   coins: 8,
+  backWorkers: 1,
+  frontWorkers: 1,
+  customerWorkers: 1,
+  stations: [],
 };
 
 // Maintain an aspect ration of 9:16 to be mobile friendly

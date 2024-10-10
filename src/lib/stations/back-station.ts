@@ -94,13 +94,11 @@ export class BackStation extends Station {
     this.infoPopup.setUpgradable(flag);
   }
 
-  upgrade() {
-    if (!this.canUpgrade(StateData.coins)) {
-      status.update(`${this.category}: need ${this.upgradePrice}`);
-      setTimeout(
-        () => status.update(`${ICONS.MONEYSACK} ${StateData.coins}`),
-        1000,
-      );
+  /**
+  * @param onLoadRun should only be set to true when loading the game state on app startup
+  */
+  upgrade(onLoadRun = false) {
+    if (!onLoadRun && !this.canUpgrade(StateData.coins)) {
       return;
     }
 
@@ -108,7 +106,7 @@ export class BackStation extends Station {
     this.view.alpha = 1;
     this.LEVEL += 1;
 
-    StateData.coins -= this.upgradePrice;
+    if(!onLoadRun) StateData.coins -= this.upgradePrice;
     // increase product sell price by 8% every upgrade
     this.productPrice = Math.ceil(this.productPrice * 1.08);
     if (BackStation.DOUBLES_PRICE_AT.includes(this.LEVEL)) {
@@ -123,7 +121,7 @@ export class BackStation extends Station {
     }
 
     this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
-    status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
+    if(!onLoadRun) status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
   }
 
   getSlot(): BackStationSlot | undefined {

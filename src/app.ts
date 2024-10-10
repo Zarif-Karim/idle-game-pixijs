@@ -40,11 +40,15 @@ export default async (app: Application) => {
   createBackStations(app);
   // add workers count upgrade buttons
   addWorkerIncreaseButtons(app);
+
+  // load the game state
+  loadGame();
+
   // add workers
   addWorkers({
-    back: 3,
-    front: 1,
-    customer: 3,
+    back: StateData.backWorkers,
+    front: StateData.frontWorkers,
+    customer: StateData.customerWorkers,
   }, app);
 
   // add the status last so its always visible
@@ -54,17 +58,75 @@ export default async (app: Application) => {
   // start the game loop
   gameLoop(app);
 
-
   // close the station details view with clicked outside the station boundary
-  app.stage.on('pointertap', (event: FederatedPointerEvent) => {
-    backStations.forEach(bs => {
-      // const localPoint = event.getLocalPosition(bs.view);
-      if(!bs.contains(event.global)) {
+  app.stage.on("pointertap", (event: FederatedPointerEvent) => {
+    backStations.forEach((bs) => {
+      if (!bs.contains(event.global)) {
         bs.infoPopup.visible = false;
       }
     });
   });
+
+  // save game every 1s
+  setInterval(() => saveGame(), 1000);
 };
+
+function loadGame() {
+  for (let key in StateData) {
+    const data = localStorage.getItem(key);
+    if (data) {
+      switch (key) {
+        case "stage":
+          StateData[key] = data;
+          break;
+        case "coins":
+        case "backWorkers":
+        case "frontWorkers":
+        case "customerWorkers":
+          StateData[key] = Number(data);
+          break;
+        case "stations":
+          const parsedData = JSON.parse(data);
+          for(let i = 0; i < backStations.length; i++) {
+            for(let l = 0; l < parsedData[i]; l++) {
+              backStations[i].upgrade(true);
+            }
+          }
+          break;
+        default:
+          console.log("unrecognised keyword in StateData");
+          throw new Error("unrecognised keyword in StateData");
+      }
+    }
+  }
+  console.log("Game loaded");
+}
+
+function saveGame() {
+  for (let key in StateData) {
+    localStorage.setItem(key, StateData[key]);
+    switch (key) {
+      case "stage":
+        // stage is hard coaded for now
+        localStorage.setItem(key, "1-1");
+        break;
+      case "coins":
+      case "backWorkers":
+      case "frontWorkers":
+      case "customerWorkers":
+        localStorage.setItem(key, StateData[key]);
+        break;
+      case "stations":
+        localStorage.setItem(key, JSON.stringify(backStations.map((bs) => bs.LEVEL)));
+        break;
+      default:
+        console.log("unrecognised keyword in StateData");
+        throw new Error("unrecognised keyword in StateData");
+    }
+  }
+  localStorage.setItem('lastUpdated', Date().toString());
+  console.log("Game saved");
+}
 
 function addWorkerIncreaseButtons(app: Application) {
   createButton(x(90), y(5), "white", "black", { customer: 1 }, app);
@@ -81,7 +143,7 @@ function createButton(
   app: Application,
 ) {
   const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
-  btn.view.on("pointertap", () => addWorkers(worker, app));
+  btn.view.on("pointertap", () => addWorkers(worker, app, true));
 
   const text = new Text({
     text: "+",
@@ -144,7 +206,7 @@ function createBackStations(app: Application) {
     [[x(7.95), y(55.9), 5, 7, 2_000], ["cyan", "bottom"]],
     [[x(7.95), y(78.5), 700, 1500, 3_000], ["hotpink", "bottom"]],
     [[x(35.6), y(92.7), 50_000, 170_000, 5_000], ["red", "right"]],
-    [[x(35.6), y(70.4), 250_000, 1_200_000], ["pink", "right"]],
+    [[x(35.6), y(70.4), 250_000, 1_200_000, 7_000], ["pink", "right"]],
     [[x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000], [
       "yellow",
       "bottom",
@@ -176,8 +238,6 @@ function createBackStations(app: Application) {
     ),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));
-  // make the first station unlocked automatically for now!
-  backStations[0].upgrade();
 }
 
 const gameLoop = (app: Application) => {
@@ -248,28 +308,35 @@ const addWorkers = (
     customer?: number;
   },
   app: Application,
+  incrementMaxCounter = false,
 ) => {
   // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
 
   // back workers
   for (let i = 0; i < back; i++) {
-    addNewWorker(app, workersBack, "green");
+    addNewWorker(app, workersBack, "green", incrementMaxCounter);
   }
 
   // front workers
   for (let i = 0; i < front; i++) {
-    addNewWorker(app, workersFront, "blue");
+    addNewWorker(app, workersFront, "blue", incrementMaxCounter);
   }
 
   for (let i = 0; i < customer; i++) {
-    createCustomer(app);
+    createCustomer(app, incrementMaxCounter);
   }
 };
 
-function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
+function addNewWorker(app: Application, group: Queue<Worker>, color: string, incrementMaxCounter = false) {
   const { x, y } = randomPositionMiddle(EDGES);
-  const WorkerClass = color === "blue" ? FrontWorker : BackWorker;
-  const w = new WorkerClass(x, y, { color });
+  let w: FrontWorker | BackWorker;
+  if (color === "blue") {
+    w = new FrontWorker(x, y, { color });
+    if(incrementMaxCounter) StateData.frontWorkers += 1;
+  } else {
+    w = new BackWorker(x, y, { color });
+    if(incrementMaxCounter) StateData.backWorkers += 1;
+  }
 
   // add to queue
   group.push(w);
@@ -278,7 +345,7 @@ function addNewWorker(app: Application, group: Queue<Worker>, color: string) {
   app.stage.addChild(w);
 }
 
-function createCustomer(app: Application /*, _group: Queue<Worker> */) {
+function createCustomer(app: Application, incrementMaxCounter = false) {
   const generationPoints: Point[] = [
     new Point(-100, 20),
     new Point(EDGES.width / 2, -100),
@@ -294,4 +361,6 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   app.stage.addChild(w);
   // add to queue
   customers.push(w);
+  // update StateData
+  if(incrementMaxCounter) StateData.customerWorkers += 1;
 }
