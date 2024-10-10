@@ -3,10 +3,12 @@ import { Status } from "../status";
 import { Station } from "./stations";
 import { EDGES, x as sX } from "../../globals";
 import { Button } from "@pixi/ui";
+import { ICONS } from "../utils";
 
 export class StationDetails extends Container {
   private levelText?: Status;
   private upgradePriceText?: Status;
+  private upgradePriceTextDisabled?: Status;
   private productPriceText?: Status;
 
   private bgBoard?: Graphics;
@@ -28,7 +30,7 @@ export class StationDetails extends Container {
     super({ x, y });
     this.createBackground();
     this.fillInfo(level, upgradePrice, productPrice);
-    this.addUpgradeButton(upgradeFn);
+    this.addUpgradeButton(upgradeFn, upgradePrice);
     // this is an info panel, should be above everything in the ingame screen
     this.zIndex = 100;
   }
@@ -40,7 +42,7 @@ export class StationDetails extends Container {
     this.upgradeButton.view.visible = flag;
   }
 
-  private addUpgradeButton(upgradeFn: () => void) {
+  private addUpgradeButton(upgradeFn: () => void, upgradePrice: number) {
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
     const color = "green";
@@ -55,17 +57,14 @@ export class StationDetails extends Container {
       bgp.h * 0.2,
       radius,
     ).fill({ color });
-    const text = new Text({
-      text: "Upgrade",
-      anchor: 0.5,
-      style: {
-        fill: "white",
-        fontSize,
-      },
+
+    this.upgradePriceText = new Status(`${upgradePrice}`, {
+      x: x + this.buttonViewEnabled.width / 2,
+      y: y + this.buttonViewEnabled.height / 2,
+      prefix: ICONS.MONEYSACK + " ",
+      fontSize,
+      fill: "white",
     });
-    text.eventMode = "none";
-    text.x = x + this.buttonViewEnabled.width / 2;
-    text.y = y + this.buttonViewEnabled.height / 2;
 
     this.buttonViewDisabled = new Graphics().roundRect(
       x,
@@ -75,20 +74,17 @@ export class StationDetails extends Container {
       radius,
     ).fill({ color: "grey" });
     this.buttonViewDisabled.eventMode = "none";
-    const text2 = new Text({
-      text: "Upgrade",
-      anchor: 0.5,
-      style: {
-        fill: "white",
-        fontSize,
-      },
+    this.upgradePriceTextDisabled = new Status(`${upgradePrice}`, {
+      x: x + this.buttonViewEnabled.width / 2,
+      y: y + this.buttonViewEnabled.height / 2,
+      prefix: ICONS.MONEYSACK + " ",
+      fontSize,
+      fill: "white",
     });
-    text2.eventMode = "none";
-    text2.x = x + this.buttonViewDisabled.width / 2;
-    text2.y = y + this.buttonViewDisabled.height / 2;
+    this.upgradePriceTextDisabled.text.eventMode = "none";
 
-    this.buttonViewEnabled.addChild(text);
-    this.buttonViewDisabled.addChild(text2);
+    this.buttonViewEnabled.addChild(this.upgradePriceText.text);
+    this.buttonViewDisabled.addChild(this.upgradePriceTextDisabled.text);
 
     this.upgradeButton = new Button(this.buttonViewEnabled);
 
@@ -105,7 +101,7 @@ export class StationDetails extends Container {
     this.addChild(this.upgradeButton.view);
   }
 
-  private fillInfo(level: number, upgradePrice: number, productPrice: number) {
+  private fillInfo(level: number, productPrice: number) {
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
 
@@ -117,13 +113,6 @@ export class StationDetails extends Container {
       fill: "black",
     });
 
-    this.upgradePriceText = new Status(`${upgradePrice}`, {
-      x: bgp.x + bgp.w / 2,
-      y: bgp.y + bgp.h * 0.35,
-      prefix: "Price: ",
-      fontSize,
-      fill: "black",
-    });
     this.productPriceText = new Status(`${productPrice}`, {
       x: bgp.x + bgp.w / 2,
       y: bgp.y + bgp.h * 0.55,
@@ -132,7 +121,6 @@ export class StationDetails extends Container {
       fill: "black",
     });
     this.addChild(this.levelText.text);
-    this.addChild(this.upgradePriceText.text);
     this.addChild(this.productPriceText.text);
   }
 
@@ -194,5 +182,6 @@ export class StationDetails extends Container {
 
   updateUpgradePrice(price: number) {
     this.upgradePriceText?.update(price.toString());
+    this.upgradePriceTextDisabled?.update(price.toString());
   }
 }
