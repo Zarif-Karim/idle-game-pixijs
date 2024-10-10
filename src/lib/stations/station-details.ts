@@ -1,4 +1,4 @@
-import { Container, Graphics, Point, Text } from "pixi.js";
+import { Container, Graphics, Point } from "pixi.js";
 import { Status } from "../status";
 import { Station } from "./stations";
 import { EDGES, x as sX } from "../../globals";
