@@ -101,7 +101,10 @@ export class BackStation extends Station {
   upgrade() {
     if (!this.canUpgrade(StateData.coins)) {
       status.update(`${this.category}: need ${this.upgradePrice}`);
-      setTimeout(() => status.update(`${ICONS.MONEYSACK} ${StateData.coins}`), 1000);
+      setTimeout(
+        () => status.update(`${ICONS.MONEYSACK} ${StateData.coins}`),
+        1000,
+      );
       return;
     }
 
@@ -152,6 +155,9 @@ export class BackStation extends Station {
     const newSlot = new BackStationSlot(_x, _y, {
       color: this.color,
       dockSide: d ? DockPoint.RIGHT : DockPoint.TOP,
+      toggleStationDetails: () => {
+        this.infoPopup.visible = !this.infoPopup.visible;
+      },
     });
 
     this.slots.push(newSlot);
