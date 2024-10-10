@@ -74,7 +74,7 @@ export class Worker extends Circle {
 
   takeProduct(p: Product) {
     this.hold = p;
-    p.setPos(0, 0);
+    p.setPos(0, -this.radius);
     this.addChild(this.hold);
     this.hold.scale = 1;
   }

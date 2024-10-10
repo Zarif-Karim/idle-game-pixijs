@@ -15,16 +15,18 @@ export class CustomerWorker extends Worker {
     super(x, y, options);
 
     this.quantityView = new Text({
-      anchor: 1.5,
+      anchor: 0.5,
       text: this.orderQuantityRemaining,
       style: {
         fill: "white",
         fontWeight: "bold",
-        fontSize: "40em",
+        fontSize: "30vw",
         padding: 5,
+        stroke: 'black',
       },
     });
     this.quantityView.visible = false;
+    this.quantityView.position.set(-this.radius, -this.radius);
     this.addChild(this.quantityView);
   }
 
@@ -41,6 +43,7 @@ export class CustomerWorker extends Worker {
     if (this.isProductChoosen()) {
       this.quantityView.text = this.orderQuantityRemaining;
       this.quantityView.visible = true;
+      p.priceView.visible = false;
     }
   }
 

@@ -100,7 +100,7 @@ export class BackStation extends Station {
   upgrade() {
     if (!this.canUpgrade(StateData.coins)) {
       status.update(`${this.category}: need ${this.upgradePrice}`);
-      setTimeout(() => status.update(`Coins: ${StateData.coins}`), 1000);
+      setTimeout(() => status.update(`💰 ${StateData.coins}`), 1000);
       return;
     }
 
@@ -123,7 +123,7 @@ export class BackStation extends Station {
     }
 
     this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
-    status.update(`Coins: ${StateData.coins}`);
+    status.update(`💰 ${StateData.coins}`);
   }
 
   getSlot(): BackStationSlot | undefined {

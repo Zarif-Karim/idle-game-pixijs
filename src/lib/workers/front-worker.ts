@@ -43,7 +43,7 @@ export class FrontWorker extends Worker {
             app.stage.addChild(p);
 
             StateData.coins += p.price;
-            status.update(`Coins: ${StateData.coins}`);
+            status.update(`💰 ${StateData.coins}`);
 
             state = "done";
           }

@@ -49,7 +49,7 @@ export default async (app: Application) => {
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-  status.update(`Coins: ${StateData.coins}`);
+  status.update(`💰 ${StateData.coins}`);
 
   // start the game loop
   gameLoop(app);
@@ -277,7 +277,7 @@ function createCustomer(app: Application /*, _group: Queue<Worker> */) {
   const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
 
   const { x, y } = gp;
-  const w = new CustomerWorker(x, y, { color: "white" });
+  const w = new CustomerWorker(x, y, { color: "beige" });
 
   // add to screen
   app.stage.addChild(w);
