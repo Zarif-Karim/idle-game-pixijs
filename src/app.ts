@@ -8,6 +8,7 @@ import {
   jobsFrontDelivery,
   jobsFrontTakeOrder,
   StateData,
+  StateInfo,
   status,
   viewUpdateJob,
   waitingArea,
@@ -104,7 +105,6 @@ function loadGame() {
 
 function saveGame() {
   for (let key in StateData) {
-    localStorage.setItem(key, StateData[key]);
     switch (key) {
       case "stage":
         // stage is hard coaded for now
@@ -114,7 +114,7 @@ function saveGame() {
       case "backWorkers":
       case "frontWorkers":
       case "customerWorkers":
-        localStorage.setItem(key, StateData[key]);
+        localStorage.setItem(key, StateData[key].toString());
         break;
       case "stations":
         localStorage.setItem(key, JSON.stringify(backStations.map((bs) => bs.LEVEL)));

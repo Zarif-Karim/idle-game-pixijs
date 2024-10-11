@@ -6,7 +6,7 @@ import { Status } from "./lib/status";
 import { BackWorker, CustomerWorker, FrontWorker } from "./lib/workers";
 
 export type StateInfo = {
-  stage: 'string';
+  stage: string;
   coins: number;
   backWorkers: number,
   frontWorkers: number,
