@@ -35,7 +35,7 @@ export class StationDetails extends Container {
     this.createBackground();
     this.fillInfo(level, productPrice);
     this.addUpgradeButton(upgradeFn, upgradePrice);
-    this.addProgressBar(level);
+    this.addProgressBar();
     // this is an info panel, should be above everything in the ingame screen
     this.zIndex = 100;
   }
@@ -47,7 +47,7 @@ export class StationDetails extends Container {
     this.upgradeButton.view.visible = flag;
   }
 
-  private addProgressBar(level: number) {
+  private addProgressBar() {
     const b = this.getBgPosition();
     const w = b.w * 0.85;
     const h = b.h * 0.15;
@@ -61,18 +61,7 @@ export class StationDetails extends Container {
       h * 0.3,
     );
     this.addChild(this.levelProgress);
-
-    // const label = new Text({ text: "2x", style: { align: 'justify' } });
-    // label.scale.set(0.35);
-    // label.anchor.set(0.5);
-    // label.x = this.localWidth * 0.98;
-    // label.y = py + ph/2;
-
-
-    // if(level === 0) {
-    //
-    //   this.levelProgress.visible = false;
-    // }
+    this.levelProgress.visible = false;
   }
 
   private addUpgradeButton(upgradeFn: () => void, upgradePrice: number) {
@@ -201,7 +190,7 @@ export class StationDetails extends Container {
 
   update(level: number, productPrice: number, upgradePrice: number) {
     this.updateLevel(level);
-    // this.updateLevelProgressView(level);
+    this.updateLevelProgressView(level);
     this.updateProductPrice(productPrice);
     this.updateUpgradePrice(upgradePrice);
   }
@@ -211,18 +200,17 @@ export class StationDetails extends Container {
   }
 
   updateLevelProgressView(level: number) {
+    // lower boundary value
+    // start in the lowest bracket
+    let lbv = 0;
+
     // upperBoundary of level range
     const ub = BackStation.DOUBLES_PRICE_AT.findIndex((v) => v > level);
-
-    if (ub === 0) {
-      // the station is still at level zero, i.e not unlocked yet
-      this.levelProgress!.visible = false;
-      return;
+    if (ub > 0) {
+      lbv = BackStation.DOUBLES_PRICE_AT[ub-1];
     }
     this.levelProgress!.visible = true;
 
-    // lower boundary value
-    const lbv = BackStation.DOUBLES_PRICE_AT[ub - 1];
     const range = BackStation.DOUBLES_PRICE_AT[ub] - lbv;
     const progress = level - lbv;
     if (progress < 0) throw new Error("Progress can't be below zero");
