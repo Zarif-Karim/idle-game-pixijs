@@ -100,7 +100,7 @@ function loadGame() {
       }
     }
   }
-  console.log("Game loaded");
+  // console.log("Game loaded");
 }
 
 function saveGame() {
@@ -125,7 +125,7 @@ function saveGame() {
     }
   }
   localStorage.setItem('lastUpdated', Date().toString());
-  console.log("Game saved");
+  // console.log("Game saved");
 }
 
 function addWorkerIncreaseButtons(app: Application) {

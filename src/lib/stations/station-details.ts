@@ -4,6 +4,8 @@ import { Station } from "./stations";
 import { EDGES, x as sX } from "../../globals";
 import { Button } from "@pixi/ui";
 import { ICONS } from "../utils";
+import { StraightProgressBar } from "../progress-bar";
+import { BackStation } from "./back-station";
 
 export class StationDetails extends Container {
   private levelText?: Status;
@@ -18,6 +20,8 @@ export class StationDetails extends Container {
   private buttonViewEnabled?: Graphics;
   private buttonViewDisabled?: Graphics;
 
+  private levelProgress?: StraightProgressBar;
+
   // TODO: add expanding animation
   constructor(
     x: number,
@@ -31,6 +35,7 @@ export class StationDetails extends Container {
     this.createBackground();
     this.fillInfo(level, productPrice);
     this.addUpgradeButton(upgradeFn, upgradePrice);
+    this.addProgressBar(level);
     // this is an info panel, should be above everything in the ingame screen
     this.zIndex = 100;
   }
@@ -40,6 +45,21 @@ export class StationDetails extends Container {
 
     this.upgradeButton.enabled = flag;
     this.upgradeButton.view.visible = flag;
+  }
+
+  private addProgressBar(level: number) {
+    const b = this.getBgPosition();
+    const x = b.x; 
+    const y = b.y; 
+    const w = b.w; 
+    const h = b.h; 
+    this.levelProgress = new StraightProgressBar(x, y, w * 0.85, h * 0.2, h*0.07);
+    this.addChild(this.levelProgress);
+
+    // if(level === 0) {
+    //
+    //   this.levelProgress.visible = false;
+    // }
   }
 
   private addUpgradeButton(upgradeFn: () => void, upgradePrice: number) {
@@ -168,12 +188,33 @@ export class StationDetails extends Container {
 
   update(level: number, productPrice: number, upgradePrice: number) {
     this.updateLevel(level);
+    // this.updateLevelProgressView(level);
     this.updateProductPrice(productPrice);
     this.updateUpgradePrice(upgradePrice);
   }
 
   updateLevel(level: number) {
     this.levelText?.update(level.toString());
+  }
+
+  updateLevelProgressView(level: number) {
+    // upperBoundary of level range
+    const ub = BackStation.DOUBLES_PRICE_AT.findIndex((v) => v > level);
+
+    if (ub === 0) {
+      // the station is still at level zero, i.e not unlocked yet
+      this.levelProgress!.visible = false;
+      return;
+    }
+    this.levelProgress!.visible = true;
+
+    // lower boundary value
+    const lbv = BackStation.DOUBLES_PRICE_AT[ub - 1];
+    const range = BackStation.DOUBLES_PRICE_AT[ub] - lbv;
+    const progress = level - lbv;
+    if (progress < 0) throw new Error("Progress can't be below zero");
+
+    this.levelProgress?.update(progress / range);
   }
 
   updateProductPrice(price: number) {
