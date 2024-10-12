@@ -1,8 +1,10 @@
 import { Product } from "../product";
+import { CustomerWorker } from "../workers";
 import { Station } from "./stations";
 
 export class FrontStation extends Station {
   private hold: Map<number, Product[]> = new Map();
+  public occupants: Set<CustomerWorker> = new Set();
 
   putProduct(p: Product) {
     const c = this.centre;
@@ -25,5 +27,13 @@ export class FrontStation extends Station {
 
   has(category: number) {
     return !!(this.hold.get(category)?.length);
+  }
+
+  occupy(customer: CustomerWorker) {
+    this.occupants.add(customer);
+  }
+  
+  vacate(customer: CustomerWorker) {
+    this.occupants.delete(customer);
   }
 }

@@ -104,6 +104,8 @@ export class CustomerWorker extends Worker {
   ) {
     const context = { s: st, c: this, st: Date.now() };
     state = "waitArea";
+    
+    st.occupy(this);
 
     const work = ({ deltaTime }: any) => {
       const speed = SPEED * deltaTime;
@@ -146,6 +148,7 @@ export class CustomerWorker extends Worker {
 
           if (this.isOrderCompleted()) {
             state = "leave";
+            st.vacate(this);
             createCustomer(app);
           }
           break;
