@@ -8,7 +8,6 @@ import {
   jobsFrontDelivery,
   jobsFrontTakeOrder,
   StateData,
-  StateInfo,
   status,
   viewUpdateJob,
   waitingArea,
