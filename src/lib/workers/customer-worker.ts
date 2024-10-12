@@ -146,6 +146,7 @@ export class CustomerWorker extends Worker {
 
           if (this.isOrderCompleted()) {
             state = "leave";
+            createCustomer(app);
           }
           break;
         case "leave":
@@ -157,7 +158,6 @@ export class CustomerWorker extends Worker {
         case "done":
           app.ticker.remove(work, context);
           app.stage.removeChild(this);
-          createCustomer(app);
           break;
       }
     };
