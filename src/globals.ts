@@ -92,6 +92,6 @@ export const deliveryLocations: FrontStation[] = [];
 export const jobsFrontDelivery: Queue<FrontDelivery> = new Queue();
 export const jobsFrontTakeOrder: Queue<FrontTakeOrder> = new Queue();
 export const workersFront: Queue<FrontWorker> = new Queue();
-export const waitingArea: Queue<FrontStation> = new Queue();
+export const waitingArea: FrontStation[] = [];
 
 export const customers: Queue<CustomerWorker> = new Queue();

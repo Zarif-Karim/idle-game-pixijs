@@ -290,10 +290,10 @@ const gameLoop = (app: Application) => {
     if (!customers.isEmpty) {
       const c = customers.pop();
 
-      // TODO: debug why customers going to
-      // occupied table when there are free ones
-      const wa = waitingArea.pop();
-      waitingArea.push(wa);
+      const wa = waitingArea.reduce((p,c,i,a) => {
+        if(p.occupants.size < c.occupants.size) return p;
+        else return c;
+      }, waitingArea[0]);
 
       c.doWork(wa!, createCustomer, app);
     }
