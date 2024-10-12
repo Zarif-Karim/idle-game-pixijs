@@ -49,12 +49,25 @@ export class StationDetails extends Container {
 
   private addProgressBar(level: number) {
     const b = this.getBgPosition();
-    const x = b.x; 
-    const y = b.y; 
-    const w = b.w; 
-    const h = b.h; 
-    this.levelProgress = new StraightProgressBar(x, y, w * 0.85, h * 0.2, h*0.07);
+    const w = b.w * 0.85;
+    const h = b.h * 0.15;
+    const x = (b.x + b.w/2) - w/2;
+    const y = b.y + b.h * 0.25;
+    this.levelProgress = new StraightProgressBar(
+      x,
+      y,
+      w,
+      h,
+      h * 0.3,
+    );
     this.addChild(this.levelProgress);
+
+    // const label = new Text({ text: "2x", style: { align: 'justify' } });
+    // label.scale.set(0.35);
+    // label.anchor.set(0.5);
+    // label.x = this.localWidth * 0.98;
+    // label.y = py + ph/2;
+
 
     // if(level === 0) {
     //
