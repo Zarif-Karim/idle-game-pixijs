@@ -1,4 +1,4 @@
-import { Graphics, Text } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { ProgressBar } from "./base";
 
 export class StraightProgressBar extends ProgressBar {
@@ -36,7 +36,8 @@ export class StraightProgressBar extends ProgressBar {
     const ph = this.localHeight * 0.5;
     const px = this.localWidth / 2 - pw / 2;
     const py = this.localHeight / 2 - ph / 2;
-    this.progressFill.roundRect(px, py, pw, ph).fill("#a8c3ed");
+    // set static zero width to start empty
+    this.progressFill.roundRect(px, py, 0, ph).fill("#a8c3ed");
 
     this.addChild(...[
       this.background,
@@ -45,6 +46,15 @@ export class StraightProgressBar extends ProgressBar {
   }
 
   update(percentage: number) {
-    console.log(percentage);
+    let pw = this.localWidth * 0.8;
+    const ph = this.localHeight * 0.5;
+    const px = this.localWidth / 2 - pw / 2;
+    const py = this.localHeight / 2 - ph / 2;
+
+    pw = pw * percentage;
+    this.progressFill
+      .clear()
+      .roundRect(px, py, pw, ph).fill("#a8c3ed");
+
   }
 }
