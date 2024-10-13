@@ -56,3 +56,12 @@ export const randomPoint = (a: Point, b: Point) => {
   const randomFraction = Math.random();
   return new Point(minX + dx * randomFraction, minY + dy * randomFraction);
 };
+
+/**
+ * @description throws an error with the given msg if condition not met
+ * @param condition the condition that must be true otherwise error is thrown
+ * @param msg the message to be displayed if error is thrown
+ */
+export function assert(condition: boolean, msg: string) {
+  if(!condition) throw new Error(msg);
+};
