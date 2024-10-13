@@ -1,3 +1,5 @@
+// Ported from below
+
 /**
  * @overview idle-bignum.
  * @copyright 2019 Frederic 경진 Rezeau
@@ -122,6 +124,8 @@ const powTenToName = {
   "333": "decicentillion",
 };
 
+// const IdleGameExponents = [ "", "K", "M", "B", "T" ];
+
 const MAX_MAGNITUDE = 12; // Max power magnitude diff for operands.
 const TEN_CUBED = 1e3; // Used for normalizing numbers.
 
@@ -129,12 +133,13 @@ const TEN_CUBED = 1e3; // Used for normalizing numbers.
 export class BigNumber {
   private value: number;
   private exp: number;
-  // private negative: boolean;
+  public negative: boolean;
 
   constructor(value: number, exp?: number) {
-    // this.negative = value < 0;
+    this.negative = value < 0;
     this.value = value;
     this.exp = exp ? exp : 0;
+    this.normalize();
   }
 
   // Normalize a number (Engineering notation).
@@ -151,7 +156,7 @@ export class BigNumber {
       }
     } else if (this.value <= 0) {
       // Negative flag is set but negative number operations are not supported.
-      // this.negative = this.value < 0 ? true : false;
+      this.negative = this.value < 0 ? true : false;
       this.exp = 0;
       this.value = 0;
     }
@@ -224,5 +229,9 @@ export class BigNumber {
   // toString.
   toString() {
     return this.value.toString() + " " + this.getExpName();
+  }
+
+  isZero() {
+    return this.value === 0 && this.exp === 0;
   }
 }
