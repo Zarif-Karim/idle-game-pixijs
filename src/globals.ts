@@ -4,6 +4,7 @@ import { Queue } from "./lib/queue";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
 import { BackWorker, CustomerWorker, FrontWorker } from "./lib/workers";
+import { BigNumber } from "./lib/idle-bignum";
 
 export type StateInfo = {
   stage: string;
@@ -12,6 +13,7 @@ export type StateInfo = {
   frontWorkers: number,
   customerWorkers: number,
   stations: number[],
+  bcoins: BigNumber;
 };
 
 export const StateData: StateInfo = {
@@ -21,6 +23,7 @@ export const StateData: StateInfo = {
   frontWorkers: 1,
   customerWorkers: 1,
   stations: [],
+  bcoins: new BigNumber(8),
 };
 
 // Maintain an aspect ration of 9:16 to be mobile friendly
