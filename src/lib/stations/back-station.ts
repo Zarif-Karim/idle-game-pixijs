@@ -4,7 +4,8 @@ import { Product } from "../product";
 import { BackStationSlot } from "./back-station-slot";
 import { StationDetails } from "./station-details";
 import { DockPoint, Station, type StationOptions } from "./stations";
-import { ICONS } from "../utils";
+import { assert, ICONS } from "../utils";
+import { BigNumber } from "../idle-bignum";
 
 type BackStationOptions = StationOptions & {
   // identifier
@@ -83,10 +84,12 @@ export class BackStation extends Station {
     this.view.addChild(this.upgradableMarker);
   }
 
-  canUpgrade(wallet: number) {
-    const canUnlock = !this.isUnlocked && wallet >= this.upgradePrice;
-    const canUpgrade = wallet >= this.upgradePrice;
-    return canUnlock || canUpgrade;
+  canUpgrade(wallet: BigNumber) {
+    const ubn = new BigNumber(this.upgradePrice);
+    assert(!ubn.negative, "upgradePrice cannot be negative");
+
+    ubn.substract(wallet);
+    return ubn.negative || ubn.isZero();
   }
 
   setUpgradable(flag: boolean) {
@@ -95,10 +98,10 @@ export class BackStation extends Station {
   }
 
   /**
-  * @param onLoadRun should only be set to true when loading the game state on app startup
-  */
+   * @param onLoadRun should only be set to true when loading the game state on app startup
+   */
   upgrade(onLoadRun = false) {
-    if (!onLoadRun && !this.canUpgrade(StateData.coins)) {
+    if (!onLoadRun && !this.canUpgrade(new BigNumber(StateData.coins))) {
       return;
     }
 
@@ -106,7 +109,7 @@ export class BackStation extends Station {
     this.view.alpha = 1;
     this.LEVEL += 1;
 
-    if(!onLoadRun) StateData.coins -= this.upgradePrice;
+    if (!onLoadRun) StateData.coins -= this.upgradePrice;
     // increase product sell price by 8% every upgrade
     this.productPrice = Math.ceil(this.productPrice * 1.08);
     if (BackStation.DOUBLES_PRICE_AT.includes(this.LEVEL)) {
@@ -121,7 +124,7 @@ export class BackStation extends Station {
     }
 
     this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
-    if(!onLoadRun) status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
+    if (!onLoadRun) status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
   }
 
   getSlot(): BackStationSlot | undefined {
@@ -164,7 +167,9 @@ export class BackStation extends Station {
 
   contains(point: Point) {
     const inStationView = this.view.containsPoint(this.view.toLocal(point));
-    const inSlotView = this.slots.some((s) => s.view.containsPoint(s.view.toLocal(point)));
+    const inSlotView = this.slots.some((s) =>
+      s.view.containsPoint(s.view.toLocal(point))
+    );
     const inDetailsView = this.infoPopup.contains(point);
     if (inStationView || inSlotView || inDetailsView) return true;
 

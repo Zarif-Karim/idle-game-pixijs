@@ -23,6 +23,7 @@ import { getRandomInt, ICONS, randomPositionMiddle } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
+import { BigNumber } from "./lib/idle-bignum";
 
 export default async (app: Application) => {
   // add a screen border for debugging
@@ -53,7 +54,7 @@ export default async (app: Application) => {
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
-  status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
+  status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
 
   // start the game loop
   gameLoop(app);
@@ -99,7 +100,6 @@ function loadGame() {
       }
     }
   }
-  // console.log("Game loaded");
 }
 
 function saveGame() {
@@ -117,6 +117,9 @@ function saveGame() {
         break;
       case "stations":
         localStorage.setItem(key, JSON.stringify(backStations.map((bs) => bs.LEVEL)));
+        break;
+      case "bcoins":
+        console.log("bcoins not saved");
         break;
       default:
         console.log("unrecognised keyword in StateData");
@@ -245,7 +248,7 @@ const gameLoop = (app: Application) => {
     // check all the objects to see if they are upgradable and mark them
     // for now only checking back stations
     backStations.forEach((bs) =>
-      bs.setUpgradable(bs.canUpgrade(StateData.coins))
+      bs.setUpgradable(bs.canUpgrade(new BigNumber(StateData.coins)))
     );
 
     while (!viewUpdateJob.isEmpty) {
