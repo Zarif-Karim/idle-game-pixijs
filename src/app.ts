@@ -290,7 +290,7 @@ const gameLoop = (app: Application) => {
     if (!customers.isEmpty) {
       const c = customers.pop();
 
-      const wa = waitingArea.reduce((p,c,i,a) => {
+      const wa = waitingArea.reduce((p,c) => {
         if(p.occupants.size < c.occupants.size) return p;
         else return c;
       }, waitingArea[0]);
@@ -309,8 +309,6 @@ const addWorkers = (
   app: Application,
   incrementMaxCounter = false,
 ) => {
-  // TODO: populate a consumer randomly on the edges and move to waiting waitingArea
-
   // back workers
   for (let i = 0; i < back; i++) {
     addNewWorker(app, workersBack, "green", incrementMaxCounter);
