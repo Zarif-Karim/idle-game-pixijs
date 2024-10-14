@@ -66,6 +66,8 @@ export class StationDetails extends Container {
   }
 
   private addUpgradeButton(upgradeFn: () => void, upgradePrice: number) {
+    const bup = BigNumber.from(upgradePrice);
+
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
     const color = "green";
@@ -81,7 +83,7 @@ export class StationDetails extends Container {
       radius,
     ).fill({ color });
 
-    this.upgradePriceText = new Status(`${upgradePrice}`, {
+    this.upgradePriceText = new Status(`${bup}`, {
       x: x + this.buttonViewEnabled.width / 2,
       y: y + this.buttonViewEnabled.height / 2,
       prefix: ICONS.MONEYSACK + " ",
@@ -97,7 +99,7 @@ export class StationDetails extends Container {
       radius,
     ).fill({ color: "grey" });
     this.buttonViewDisabled.eventMode = "none";
-    this.upgradePriceTextDisabled = new Status(`${upgradePrice}`, {
+    this.upgradePriceTextDisabled = new Status(`${bup}`, {
       x: x + this.buttonViewEnabled.width / 2,
       y: y + this.buttonViewEnabled.height / 2,
       prefix: ICONS.MONEYSACK + " ",
@@ -226,8 +228,9 @@ export class StationDetails extends Container {
   }
 
   updateUpgradePrice(price: number) {
-    this.upgradePriceText?.update(price.toString());
-    this.upgradePriceTextDisabled?.update(price.toString());
+    const bp = BigNumber.from(price);
+    this.upgradePriceText?.update(bp.toString());
+    this.upgradePriceTextDisabled?.update(bp.toString());
   }
 
   contains(point: Point) {
