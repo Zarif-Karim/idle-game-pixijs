@@ -12,6 +12,7 @@ import {
 import { Worker } from "./worker";
 import { DockPoint } from "../stations";
 import { getRandomInt, ICONS } from "../utils";
+import { BigNumber } from "../idle-bignum";
 
 export class FrontWorker extends Worker {
   doWork(
@@ -42,8 +43,8 @@ export class FrontWorker extends Worker {
             const p = this.leaveProduct(jobFD.to);
             app.stage.addChild(p);
 
-            StateData.coins += p.price;
-            status.update(`${ICONS.MONEYSACK} ${StateData.coins}`);
+            StateData.bcoins.add(new BigNumber(p.price));
+            status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
 
             state = "done";
           }

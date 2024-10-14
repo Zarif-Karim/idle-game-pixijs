@@ -8,7 +8,6 @@ import { BigNumber } from "./lib/idle-bignum";
 
 export type StateInfo = {
   stage: string;
-  coins: number;
   backWorkers: number,
   frontWorkers: number,
   customerWorkers: number,
@@ -18,7 +17,6 @@ export type StateInfo = {
 
 export const StateData: StateInfo = {
   stage: '1-1',
-  coins: 8,
   backWorkers: 1,
   frontWorkers: 1,
   customerWorkers: 1,
