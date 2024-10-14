@@ -43,7 +43,7 @@ export class FrontWorker extends Worker {
             const p = this.leaveProduct(jobFD.to);
             app.stage.addChild(p);
 
-            StateData.bcoins.add(new BigNumber(p.price));
+            StateData.bcoins.add(p.price);
             status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
 
             state = "done";

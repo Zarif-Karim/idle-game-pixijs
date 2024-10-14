@@ -165,7 +165,7 @@ export class BackStation extends Station {
   }
 
   createProduct() {
-    return new Product(this.category, this.color, this.productPrice);
+    return new Product(this.category, this.color, new BigNumber(this.productPrice));
   }
 
   contains(point: Point) {
