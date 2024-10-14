@@ -124,7 +124,9 @@ const powTenToName = {
   "333": "decicentillion",
 };
 
-// const IdleGameExponents = [ "", "K", "M", "B", "T" ];
+const IdleGameExponents = [ "", "K", "M", "B", "T" ];
+const AMOUNT_OF_LETTERS_IN_ALPHABET = 26;
+const A_CharCode = 65;
 
 const MAX_MAGNITUDE = 12; // Max power magnitude diff for operands.
 const TEN_CUBED = 1e3; // Used for normalizing numbers.
@@ -238,8 +240,21 @@ export class BigNumber {
 
   // getExpName. Return the exponent name as string.
   getExpName() {
-    const key = this.exp.toString() as keyof typeof powTenToName;
-    return powTenToName[key];
+    let unit = "";
+    const magnitude = this.exp / 3;
+
+    if(magnitude < IdleGameExponents.length) {
+      unit = IdleGameExponents[magnitude];
+    } else {
+      const unitInt = magnitude - IdleGameExponents.length;
+      const firstUnit = A_CharCode + unitInt /  AMOUNT_OF_LETTERS_IN_ALPHABET;
+      const secondUnit = A_CharCode + unitInt %  AMOUNT_OF_LETTERS_IN_ALPHABET;
+
+      unit = String.fromCharCode(firstUnit, secondUnit);  
+
+    }
+
+    return unit;
   }
 
   // getExp. Return the exponent as string.
