@@ -12,7 +12,6 @@ import {
 import { Worker } from "./worker";
 import { DockPoint } from "../stations";
 import { getRandomInt, ICONS } from "../utils";
-import { BigNumber } from "../idle-bignum";
 
 export class FrontWorker extends Worker {
   doWork(

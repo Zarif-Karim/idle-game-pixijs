@@ -6,6 +6,7 @@ import { Button } from "@pixi/ui";
 import { ICONS } from "../utils";
 import { StraightProgressBar } from "../progress-bar";
 import { BackStation } from "./back-station";
+import { BigNumber } from "../idle-bignum";
 
 export class StationDetails extends Container {
   private levelText?: Status;
@@ -126,6 +127,7 @@ export class StationDetails extends Container {
   private fillInfo(level: number, productPrice: number) {
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
+    const bp = BigNumber.from(productPrice);
 
     this.levelText = new Status(`${level}`, {
       x: bgp.x + bgp.w / 2,
@@ -135,10 +137,10 @@ export class StationDetails extends Container {
       fill: "black",
     });
 
-    this.productPriceText = new Status(`${productPrice}`, {
+    this.productPriceText = new Status(`${bp}`, {
       x: bgp.x + bgp.w / 2,
       y: bgp.y + bgp.h * 0.55,
-      prefix: "Sells: ",
+      prefix: `${ICONS.MONEYSACK}`,
       fontSize,
       fill: "black",
     });
@@ -219,7 +221,8 @@ export class StationDetails extends Container {
   }
 
   updateProductPrice(price: number) {
-    this.productPriceText?.update(price.toString());
+    const bp = BigNumber.from(price);
+    this.productPriceText?.update(bp.toString());
   }
 
   updateUpgradePrice(price: number) {

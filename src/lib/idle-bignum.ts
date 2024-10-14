@@ -143,6 +143,11 @@ export class BigNumber {
     });
   }
 
+  static from(value: number) {
+    const bn = new BigNumber(value);
+    return bn.normalize();
+  }
+
   constructor(value: number, exp?: number, negative?: boolean) {
     this.negative = negative || (value < 0);
     this.value = value;
@@ -169,6 +174,8 @@ export class BigNumber {
         this.exp += 3;
       }
     }
+
+    return this;
   }
 
   // Compute the equivalent number at 1.Eexp (note: assumes exp is greater than this.exp).
