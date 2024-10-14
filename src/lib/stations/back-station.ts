@@ -59,8 +59,8 @@ export class BackStation extends Station {
       x,
       y,
       this.LEVEL,
-      this.upgradePrice,
-      this.productPrice,
+      BigNumber.from(this.upgradePrice),
+      BigNumber.from(this.productPrice),
       () => this.upgrade(),
     );
     this.infoPopup.visible = false;

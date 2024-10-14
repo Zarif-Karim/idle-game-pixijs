@@ -28,8 +28,8 @@ export class StationDetails extends Container {
     x: number,
     y: number,
     level: number,
-    upgradePrice: number,
-    productPrice: number,
+    upgradePrice: BigNumber,
+    productPrice: BigNumber,
     upgradeFn: () => void,
   ) {
     super({ x, y });
@@ -65,9 +65,7 @@ export class StationDetails extends Container {
     this.levelProgress.visible = false;
   }
 
-  private addUpgradeButton(upgradeFn: () => void, upgradePrice: number) {
-    const bup = BigNumber.from(upgradePrice);
-
+  private addUpgradeButton(upgradeFn: () => void, upgradePrice: BigNumber) {
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
     const color = "green";
@@ -83,7 +81,7 @@ export class StationDetails extends Container {
       radius,
     ).fill({ color });
 
-    this.upgradePriceText = new Status(`${bup}`, {
+    this.upgradePriceText = new Status(`${upgradePrice}`, {
       x: x + this.buttonViewEnabled.width / 2,
       y: y + this.buttonViewEnabled.height / 2,
       prefix: ICONS.MONEYSACK + " ",
@@ -99,7 +97,7 @@ export class StationDetails extends Container {
       radius,
     ).fill({ color: "grey" });
     this.buttonViewDisabled.eventMode = "none";
-    this.upgradePriceTextDisabled = new Status(`${bup}`, {
+    this.upgradePriceTextDisabled = new Status(`${upgradePrice}`, {
       x: x + this.buttonViewEnabled.width / 2,
       y: y + this.buttonViewEnabled.height / 2,
       prefix: ICONS.MONEYSACK + " ",
@@ -126,10 +124,9 @@ export class StationDetails extends Container {
     this.addChild(this.upgradeButton.view);
   }
 
-  private fillInfo(level: number, productPrice: number) {
+  private fillInfo(level: number, productPrice: BigNumber) {
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
-    const bp = BigNumber.from(productPrice);
 
     this.levelText = new Status(`${level}`, {
       x: bgp.x + bgp.w / 2,
@@ -139,7 +136,7 @@ export class StationDetails extends Container {
       fill: "black",
     });
 
-    this.productPriceText = new Status(`${bp}`, {
+    this.productPriceText = new Status(`${productPrice}`, {
       x: bgp.x + bgp.w / 2,
       y: bgp.y + bgp.h * 0.55,
       prefix: `${ICONS.MONEYSACK}`,
