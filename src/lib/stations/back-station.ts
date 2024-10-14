@@ -89,7 +89,6 @@ export class BackStation extends Station {
     assert(!ubn.negative, "upgradePrice cannot be negative");
 
     ubn.substract(wallet);
-    console.log(this.color, this.upgradePrice, ubn, StateData.bcoins);
     return ubn.negative || ubn.isZero();
   }
 

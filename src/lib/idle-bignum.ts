@@ -139,11 +139,18 @@ export class BigNumber {
     this.negative = value < 0;
     this.value = value;
     this.exp = exp ? exp : 0;
-    this.normalize();
+    // this.normalize();
   }
 
   // Normalize a number (Engineering notation).
   normalize() {
+    if (this.value < 0) {
+      // Negative flag is set but negative number operations are not supported.
+      this.negative = this.value < 0 ? true : false;
+      // this.exp = 0;
+      this.value = Math.abs(this.value);
+    } 
+
     if (this.value < 1 && this.exp !== 0) {
       // e.g. 0.1E6 is converted to 100E3 ([0.1, 6] = [100, 3])
       this.value *= TEN_CUBED;
@@ -154,11 +161,6 @@ export class BigNumber {
         this.value *= 1 / TEN_CUBED;
         this.exp += 3;
       }
-    } else if (this.value <= 0) {
-      // Negative flag is set but negative number operations are not supported.
-      this.negative = this.value < 0 ? true : false;
-      // this.exp = 0;
-      this.value = Math.abs(this.value);
     }
   }
 
@@ -214,7 +216,7 @@ export class BigNumber {
 
   // getValue. Return the number value as string.
   getValue(precision?: number) {
-    return Number(this.value.toFixed(precision ? precision : 3)).toString();
+    return Number(this.value.toFixed(precision ? precision : 2)).toString();
   }
 
   // getExpName. Return the exponent name as string.
@@ -230,7 +232,7 @@ export class BigNumber {
 
   // toString.
   toString() {
-    return this.value.toString() + " " + this.getExpName();
+    return this.getValue() + " " + this.getExpName();
   }
 
   isZero() {

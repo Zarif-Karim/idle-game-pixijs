@@ -43,7 +43,7 @@ export default async (app: Application) => {
   addWorkerIncreaseButtons(app);
 
   // load the game state
-  loadGame();
+  // loadGame();
 
   // add workers
   addWorkers({
@@ -69,7 +69,7 @@ export default async (app: Application) => {
   });
 
   // save game every 1s
-  setInterval(() => saveGame(), 1000);
+  // setInterval(() => saveGame(), 1000);
 };
 
 function loadGame() {
@@ -88,8 +88,8 @@ function loadGame() {
           break;
         case "stations":
           const parsedData = JSON.parse(data);
-          for(let i = 0; i < backStations.length; i++) {
-            for(let l = 0; l < parsedData[i]; l++) {
+          for (let i = 0; i < backStations.length; i++) {
+            for (let l = 0; l < parsedData[i]; l++) {
               backStations[i].upgrade(true);
             }
           }
@@ -116,7 +116,10 @@ function saveGame() {
         localStorage.setItem(key, StateData[key].toString());
         break;
       case "stations":
-        localStorage.setItem(key, JSON.stringify(backStations.map((bs) => bs.LEVEL)));
+        localStorage.setItem(
+          key,
+          JSON.stringify(backStations.map((bs) => bs.LEVEL)),
+        );
         break;
       case "bcoins":
         console.log("bcoins not saved");
@@ -126,7 +129,7 @@ function saveGame() {
         throw new Error("unrecognised keyword in StateData");
     }
   }
-  localStorage.setItem('lastUpdated', Date().toString());
+  localStorage.setItem("lastUpdated", Date().toString());
   // console.log("Game saved");
 }
 
@@ -247,9 +250,10 @@ const gameLoop = (app: Application) => {
     // the upgradable loop
     // check all the objects to see if they are upgradable and mark them
     // for now only checking back stations
-    backStations.forEach((bs) =>
-      bs.setUpgradable(bs.canUpgrade(new BigNumber(StateData.coins)))
-    );
+    backStations.forEach((bs) => {
+      const ca = bs.canUpgrade(StateData.bcoins);
+      bs.setUpgradable(ca);
+    });
 
     while (!viewUpdateJob.isEmpty) {
       const { job, child } = viewUpdateJob.pop();
@@ -293,8 +297,8 @@ const gameLoop = (app: Application) => {
     if (!customers.isEmpty) {
       const c = customers.pop();
 
-      const wa = waitingArea.reduce((p,c) => {
-        if(p.occupants.size < c.occupants.size) return p;
+      const wa = waitingArea.reduce((p, c) => {
+        if (p.occupants.size < c.occupants.size) return p;
         else return c;
       }, waitingArea[0]);
 
@@ -327,15 +331,20 @@ const addWorkers = (
   }
 };
 
-function addNewWorker(app: Application, group: Queue<Worker>, color: string, incrementMaxCounter = false) {
+function addNewWorker(
+  app: Application,
+  group: Queue<Worker>,
+  color: string,
+  incrementMaxCounter = false,
+) {
   const { x, y } = randomPositionMiddle(EDGES);
   let w: FrontWorker | BackWorker;
   if (color === "blue") {
     w = new FrontWorker(x, y, { color });
-    if(incrementMaxCounter) StateData.frontWorkers += 1;
+    if (incrementMaxCounter) StateData.frontWorkers += 1;
   } else {
     w = new BackWorker(x, y, { color });
-    if(incrementMaxCounter) StateData.backWorkers += 1;
+    if (incrementMaxCounter) StateData.backWorkers += 1;
   }
 
   // add to queue
@@ -362,5 +371,5 @@ function createCustomer(app: Application, incrementMaxCounter = false) {
   // add to queue
   customers.push(w);
   // update StateData
-  if(incrementMaxCounter) StateData.customerWorkers += 1;
+  if (incrementMaxCounter) StateData.customerWorkers += 1;
 }
