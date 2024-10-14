@@ -28,7 +28,7 @@ export class BackStation extends Station {
   public LEVEL = 0;
   public productPrice: BigNumber;
 
-  public upgradePrice: number;
+  public upgradePrice: BigNumber;
 
   public category: number;
   public workDuration: number;
@@ -53,13 +53,13 @@ export class BackStation extends Station {
     this.productPrice = BigNumber.from(opts.productPrice);
     this.workDuration = opts.workDuration;
 
-    this.upgradePrice = opts.upgradePrice;
+    this.upgradePrice = BigNumber.from(opts.upgradePrice);
 
     this.infoPopup = new StationDetails(
       x,
       y,
       this.LEVEL,
-      BigNumber.from(this.upgradePrice),
+      this.upgradePrice,
       this.productPrice,
       () => this.upgrade(),
     );
@@ -85,7 +85,7 @@ export class BackStation extends Station {
   }
 
   canUpgrade(wallet: BigNumber) {
-    const ubn = new BigNumber(this.upgradePrice);
+    const ubn = BigNumber.from(this.upgradePrice);
     assert(!ubn.negative, "upgradePrice cannot be negative");
 
     ubn.substract(wallet);
@@ -110,7 +110,7 @@ export class BackStation extends Station {
     this.LEVEL += 1;
 
     if (!onLoadRun) {
-      StateData.bcoins.substract(new BigNumber(this.upgradePrice));
+      StateData.bcoins.substract(this.upgradePrice);
     }
 
     // increase product sell price by 8% every upgrade
@@ -119,7 +119,7 @@ export class BackStation extends Station {
       this.productPrice.multiply(2);
     }
     // increase next upgrade price by 20% every upgrade
-    this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
+    this.upgradePrice.multiply(1.2);
 
     if (BackStation.ADD_SLOTS_AT.includes(this.LEVEL)) {
       const slot = this.addSlot();

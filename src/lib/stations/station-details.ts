@@ -189,7 +189,7 @@ export class StationDetails extends Container {
     return { x, y, w, h };
   }
 
-  update(level: number, productPrice: BigNumber, upgradePrice: number) {
+  update(level: number, productPrice: BigNumber, upgradePrice: BigNumber) {
     this.updateLevel(level);
     this.updateLevelProgressView(level);
     this.updateProductPrice(productPrice);
@@ -223,10 +223,9 @@ export class StationDetails extends Container {
     this.productPriceText?.update(price.toString());
   }
 
-  updateUpgradePrice(price: number) {
-    const bp = BigNumber.from(price);
-    this.upgradePriceText?.update(bp.toString());
-    this.upgradePriceTextDisabled?.update(bp.toString());
+  updateUpgradePrice(price: BigNumber) {
+    this.upgradePriceText?.update(price.toString());
+    this.upgradePriceTextDisabled?.update(price.toString());
   }
 
   contains(point: Point) {

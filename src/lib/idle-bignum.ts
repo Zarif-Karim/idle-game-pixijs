@@ -143,7 +143,10 @@ export class BigNumber {
     });
   }
 
-  static from(value: number) {
+  static from(value: number | BigNumber) {
+    if(value instanceof BigNumber) {
+      return new BigNumber(value.value, value.exp, value.negative);
+    }
     const bn = new BigNumber(value);
     return bn.normalize();
   }
