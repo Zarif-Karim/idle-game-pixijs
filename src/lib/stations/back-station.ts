@@ -26,7 +26,7 @@ export class BackStation extends Station {
   static ADD_SLOTS_AT = [1, 25, 75, 150];
 
   public LEVEL = 0;
-  public productPrice: number;
+  public productPrice: BigNumber;
 
   public upgradePrice: number;
 
@@ -50,7 +50,7 @@ export class BackStation extends Station {
     super(x, y, { color: opts.color });
 
     this.category = opts.category;
-    this.productPrice = opts.productPrice;
+    this.productPrice = BigNumber.from(opts.productPrice);
     this.workDuration = opts.workDuration;
 
     this.upgradePrice = opts.upgradePrice;
@@ -60,7 +60,7 @@ export class BackStation extends Station {
       y,
       this.LEVEL,
       BigNumber.from(this.upgradePrice),
-      BigNumber.from(this.productPrice),
+      this.productPrice,
       () => this.upgrade(),
     );
     this.infoPopup.visible = false;
@@ -114,9 +114,9 @@ export class BackStation extends Station {
     }
 
     // increase product sell price by 8% every upgrade
-    this.productPrice = Math.ceil(this.productPrice * 1.08);
+    this.productPrice.multiply(1.08);
     if (BackStation.DOUBLES_PRICE_AT.includes(this.LEVEL)) {
-      this.productPrice *= 2;
+      this.productPrice.multiply(2);
     }
     // increase next upgrade price by 20% every upgrade
     this.upgradePrice = Math.ceil(this.upgradePrice * 1.2);
@@ -165,7 +165,7 @@ export class BackStation extends Station {
   }
 
   createProduct() {
-    return new Product(this.category, this.color, BigNumber.from(this.productPrice));
+    return new Product(this.category, this.color, this.productPrice);
   }
 
   contains(point: Point) {
