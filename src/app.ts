@@ -43,7 +43,7 @@ export default async (app: Application) => {
   addWorkerIncreaseButtons(app);
 
   // load the game state
-  // loadGame();
+  loadGame();
 
   // add workers
   addWorkers({
@@ -69,7 +69,7 @@ export default async (app: Application) => {
   });
 
   // save game every 1s
-  // setInterval(() => saveGame(), 1000);
+  setInterval(() => saveGame(), 1000);
 };
 
 function loadGame() {
@@ -80,7 +80,10 @@ function loadGame() {
         case "stage":
           StateData[key] = data;
           break;
-        case "coins":
+        case "bcoins":
+          const { value, exp, negative } = JSON.parse(data);
+          StateData[key] = new BigNumber(value, exp, negative);
+          break;
         case "backWorkers":
         case "frontWorkers":
         case "customerWorkers":
@@ -109,7 +112,9 @@ function saveGame() {
         // stage is hard coaded for now
         localStorage.setItem(key, "1-1");
         break;
-      case "coins":
+      case "bcoins":
+        localStorage.setItem(key, StateData[key].serialize());
+        break;
       case "backWorkers":
       case "frontWorkers":
       case "customerWorkers":
@@ -120,9 +125,6 @@ function saveGame() {
           key,
           JSON.stringify(backStations.map((bs) => bs.LEVEL)),
         );
-        break;
-      case "bcoins":
-        console.log("bcoins not saved");
         break;
       default:
         console.log("unrecognised keyword in StateData");

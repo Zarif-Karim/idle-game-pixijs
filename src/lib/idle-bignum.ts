@@ -135,11 +135,18 @@ export class BigNumber {
   private exp: number;
   public negative: boolean;
 
-  constructor(value: number, exp?: number) {
-    this.negative = value < 0;
+  serialize() {
+    return JSON.stringify({
+      value: this.value,
+      exp: this.exp,
+      negative: this.negative,
+    });
+  }
+
+  constructor(value: number, exp?: number, negative?: boolean) {
+    this.negative = negative || (value < 0);
     this.value = value;
     this.exp = exp ? exp : 0;
-    // this.normalize();
   }
 
   // Normalize a number (Engineering notation).
@@ -149,7 +156,7 @@ export class BigNumber {
       this.negative = this.value < 0 ? true : false;
       // this.exp = 0;
       this.value = Math.abs(this.value);
-    } 
+    }
 
     if (this.value < 1 && this.exp !== 0) {
       // e.g. 0.1E6 is converted to 100E3 ([0.1, 6] = [100, 3])
