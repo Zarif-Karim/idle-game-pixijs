@@ -157,8 +157,8 @@ export class BigNumber {
     } else if (this.value <= 0) {
       // Negative flag is set but negative number operations are not supported.
       this.negative = this.value < 0 ? true : false;
-      this.exp = 0;
-      this.value = 0;
+      // this.exp = 0;
+      this.value = Math.abs(this.value);
     }
   }
 
@@ -180,6 +180,7 @@ export class BigNumber {
     }
     this.value += bigNum.value;
     this.normalize();
+    bigNum.normalize();
   }
 
   // Subtract a number from this number.
@@ -191,6 +192,7 @@ export class BigNumber {
     }
     this.value -= bigNum.value;
     this.normalize();
+    bigNum.normalize();
   }
 
   // Multiply this number by factor.
