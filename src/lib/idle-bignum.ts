@@ -124,7 +124,7 @@ const powTenToName = {
   "333": "decicentillion",
 };
 
-const IdleGameExponents = [ "", "K", "M", "B", "T" ];
+const IdleGameExponents = ["", "K", "M", "B", "T"];
 const AMOUNT_OF_LETTERS_IN_ALPHABET = 26;
 const A_CharCode = 65;
 
@@ -146,7 +146,7 @@ export class BigNumber {
   }
 
   static from(value: number | BigNumber) {
-    if(value instanceof BigNumber) {
+    if (value instanceof BigNumber) {
       return new BigNumber(value.value, value.exp, value.negative);
     }
     const bn = new BigNumber(value);
@@ -157,6 +157,7 @@ export class BigNumber {
     this.negative = negative || (value < 0);
     this.value = value;
     this.exp = exp ? exp : 0;
+    this.normalize();
   }
 
   // Debug whats wrong with visualization
@@ -169,16 +170,15 @@ export class BigNumber {
       this.value = Math.abs(this.value);
     }
 
-    if (this.value < 1 && this.exp !== 0) {
+    while (this.value < 1 && this.exp !== 0) {
       // e.g. 0.1E6 is converted to 100E3 ([0.1, 6] = [100, 3])
       this.value *= TEN_CUBED;
       this.exp -= 3;
-    } else if (this.value >= TEN_CUBED) {
-      // e.g. 10000E3 is converted to 10E6 ([10000, 3] = [10, 6])
-      while (this.value >= TEN_CUBED) {
-        this.value *= 1 / TEN_CUBED;
-        this.exp += 3;
-      }
+    }
+    // e.g. 10000E3 is converted to 10E6 ([10000, 3] = [10, 6])
+    while (this.value >= TEN_CUBED) {
+      this.value *= 1 / TEN_CUBED;
+      this.exp += 3;
     }
 
     return this;
@@ -244,15 +244,14 @@ export class BigNumber {
     let unit = "";
     const magnitude = this.exp / 3;
 
-    if(magnitude < IdleGameExponents.length) {
+    if (magnitude < IdleGameExponents.length) {
       unit = IdleGameExponents[magnitude];
     } else {
       const unitInt = magnitude - IdleGameExponents.length;
-      const firstUnit = A_CharCode + unitInt /  AMOUNT_OF_LETTERS_IN_ALPHABET;
-      const secondUnit = A_CharCode + unitInt %  AMOUNT_OF_LETTERS_IN_ALPHABET;
+      const firstUnit = A_CharCode + unitInt / AMOUNT_OF_LETTERS_IN_ALPHABET;
+      const secondUnit = A_CharCode + unitInt % AMOUNT_OF_LETTERS_IN_ALPHABET;
 
-      unit = String.fromCharCode(firstUnit, secondUnit);  
-
+      unit = String.fromCharCode(firstUnit, secondUnit);
     }
 
     return unit;
