@@ -15,7 +15,7 @@ export class Product extends Circle {
     this.price = price;
     this.price.normalize();
     this.priceView = new Text({
-      text: `${ICONS.MONEYSACK} ${this.price}`,
+      text: `${ICONS.MONEYSACK} ${this.price.toString(1)}`,
       anchor: 0.5,
       style: {
         fill: 'white',

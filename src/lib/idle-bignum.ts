@@ -117,8 +117,8 @@ export class BigNumber {
   }
 
   // getValue. Return the number value as string.
-  getValue(precision?: number) {
-    return Number(this.value.toFixed(precision ? precision : 2)).toString();
+  getValue(precision: number) {
+    return Number(this.value.toFixed(precision >= 0 ? precision : 2)).toString();
   }
 
   // getExpName. Return the exponent name as string.
@@ -145,8 +145,8 @@ export class BigNumber {
   }
 
   // toString.
-  toString() {
-    return this.getValue() + " " + this.getExpName();
+  toString(precision = -1) {
+    return this.getValue(precision) + " " + this.getExpName();
   }
 
   isZero() {

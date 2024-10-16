@@ -69,7 +69,7 @@ export default async (app: Application) => {
   });
 
   // save game every 1s
-  setInterval(() => saveGame(), 1000);
+  // setInterval(() => saveGame(), 1000);
 };
 
 function loadGame() {
@@ -207,8 +207,8 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
-    [[x(7.95), y(55.9), 5, 7, 2_000], ["cyan", "bottom"]],
-    [[x(7.95), y(78.5), 700, 1500, 3_000], ["hotpink", "bottom"]],
+    [[x(7.95), y(55.9), 500_000_000, 7, 2_000], ["cyan", "bottom"]],
+    [[x(7.95), y(78.5), 7_000_000_000, 1500, 3_000], ["hotpink", "bottom"]],
     [[x(35.6), y(92.7), 50_000, 170_000, 5_000], ["red", "right"]],
     [[x(35.6), y(70.4), 250_000, 1_200_000, 7_000], ["pink", "right"]],
     [[x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000], [

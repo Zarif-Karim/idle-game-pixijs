@@ -52,7 +52,7 @@ export class StationDetails extends Container {
     const b = this.getBgPosition();
     const w = b.w * 0.85;
     const h = b.h * 0.15;
-    const x = (b.x + b.w/2) - w/2;
+    const x = (b.x + b.w / 2) - w / 2;
     const y = b.y + b.h * 0.25;
     this.levelProgress = new StraightProgressBar(
       x,
@@ -136,7 +136,7 @@ export class StationDetails extends Container {
       fill: "black",
     });
 
-    this.productPriceText = new Status(`${productPrice}`, {
+    this.productPriceText = new Status(`${productPrice.toString(0)}`, {
       x: bgp.x + bgp.w / 2,
       y: bgp.y + bgp.h * 0.55,
       prefix: `${ICONS.MONEYSACK}`,
@@ -208,7 +208,7 @@ export class StationDetails extends Container {
     // upperBoundary of level range
     const ub = BackStation.DOUBLES_PRICE_AT.findIndex((v) => v > level);
     if (ub > 0) {
-      lbv = BackStation.DOUBLES_PRICE_AT[ub-1];
+      lbv = BackStation.DOUBLES_PRICE_AT[ub - 1];
     }
     this.levelProgress!.visible = true;
 
@@ -220,12 +220,12 @@ export class StationDetails extends Container {
   }
 
   updateProductPrice(price: BigNumber) {
-    this.productPriceText?.update(price.toString());
+    this.productPriceText?.update(price.toString(1));
   }
 
   updateUpgradePrice(price: BigNumber) {
-    this.upgradePriceText?.update(price.toString());
-    this.upgradePriceTextDisabled?.update(price.toString());
+    this.upgradePriceText?.update(price.toString(1));
+    this.upgradePriceTextDisabled?.update(price.toString(1));
   }
 
   contains(point: Point) {
