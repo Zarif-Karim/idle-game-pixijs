@@ -113,12 +113,25 @@ export class StationDetails extends Container {
 
     this.upgradeButton.enabled = false;
 
+    let intervalId: number;
+    let held = false;
     this.upgradeButton.onPress.connect(upgradeFn);
     this.upgradeButton.onDown.connect(() => {
       this.upgradeButton!.view.scale = 0.98;
+      held = true;
+      setTimeout(() => {
+        if (held) {
+          intervalId = setInterval(upgradeFn, 100);
+        }
+      }, 400);
     });
     this.upgradeButton.onUp.connect(() => {
       this.upgradeButton!.view.scale = 1;
+      held = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = undefined;
+      }
     });
     this.addChild(this.buttonViewDisabled);
     this.addChild(this.upgradeButton.view);
