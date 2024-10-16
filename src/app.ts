@@ -98,7 +98,6 @@ function loadGame() {
           }
           break;
         default:
-          console.log("unrecognised keyword in StateData");
           throw new Error("unrecognised keyword in StateData");
       }
     }
@@ -127,12 +126,10 @@ function saveGame() {
         );
         break;
       default:
-        console.log("unrecognised keyword in StateData");
         throw new Error("unrecognised keyword in StateData");
     }
   }
   localStorage.setItem("lastUpdated", Date().toString());
-  // console.log("Game saved");
 }
 
 function addWorkerIncreaseButtons(app: Application) {
@@ -273,7 +270,7 @@ const gameLoop = (app: Application) => {
       const j = jobsBack.pop();
       if (!w.doWork(j!, app)) {
         // TODO: look for a better way to do this
-        // observer console.log to see concern
+        // observer log below to see concern
         // if not done, push back for now
         workersBack.push(w!);
         jobsBack.push(j!);

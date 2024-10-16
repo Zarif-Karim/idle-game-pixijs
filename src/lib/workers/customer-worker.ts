@@ -115,7 +115,6 @@ export class CustomerWorker extends Worker {
             // wait for atleast 1 station to be unlocked
             const availableStations = backStations.filter((s) => s.isUnlocked);
             if (availableStations.length === 0) {
-              // console.log('customer: no available stations, waiting..');
               break;
             }
 
