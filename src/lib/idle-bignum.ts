@@ -159,12 +159,13 @@ export class BigNumber {
     this.exp = exp ? exp : 0;
   }
 
+  // Debug whats wrong with visualization
   // Normalize a number (Engineering notation).
   normalize() {
     if (this.value < 0) {
       // Negative flag is set but negative number operations are not supported.
       this.negative = this.value < 0 ? true : false;
-      // this.exp = 0;
+      this.exp = 0;
       this.value = Math.abs(this.value);
     }
 

@@ -69,7 +69,7 @@ export default async (app: Application) => {
   });
 
   // save game every 1s
-  setInterval(() => saveGame(), 1000);
+  // setInterval(() => saveGame(), 1000);
 };
 
 function loadGame() {
@@ -245,6 +245,7 @@ function createBackStations(app: Application) {
     ),
   );
   backStations.map((r) => app.stage.addChild(...r.getView()));
+  backStations[0].upgrade();
 }
 
 const gameLoop = (app: Application) => {
