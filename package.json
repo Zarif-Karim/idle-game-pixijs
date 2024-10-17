@@ -4,13 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
     "build": "tsc && vite build",
+    "dev": "vite --host",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "format:staged": "lint-staged",
+    "prepare": "husky",
     "preview": "vite preview",
     "test:build": "tsc --noEmit --strict",
     "test:build:watch": "tsc --noEmit --strict --watch"
   },
   "devDependencies": {
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "3.3.3",
     "typescript": "^5.5.3",
     "vite": "^5.4.1"
   },
@@ -18,5 +25,8 @@
     "@pixi/ui": "^2.1.5",
     "fastpriorityqueue": "^0.7.5",
     "pixi.js": "^8.3.4"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
