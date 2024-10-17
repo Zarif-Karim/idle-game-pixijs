@@ -13,7 +13,11 @@ import { CustomerWorker } from "./customer-worker";
 
 export class BackWorker extends Worker {
   doWork(
-    { type, customer, at }: {
+    {
+      type,
+      customer,
+      at,
+    }: {
       type: number;
       customer: CustomerWorker;
       at: FrontStation;

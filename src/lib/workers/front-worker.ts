@@ -14,10 +14,7 @@ import { DockPoint } from "../stations";
 import { getRandomInt, ICONS } from "../utils";
 
 export class FrontWorker extends Worker {
-  doWork(
-    job: FrontTakeOrder | FrontDelivery,
-    app: Application,
-  ) {
+  doWork(job: FrontTakeOrder | FrontDelivery, app: Application) {
     const context = { w: this, job, st: Date.now() };
     const jobType = "product" in job ? "FD" : "FTO";
     let state = jobType === "FD" ? "pick" : "customer";

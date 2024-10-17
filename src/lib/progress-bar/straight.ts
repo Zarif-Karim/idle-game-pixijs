@@ -24,13 +24,9 @@ export class StraightProgressBar extends ProgressBar {
   }
 
   createView(): void {
-    this.background.roundRect(
-      0,
-      0,
-      this.localWidth,
-      this.localHeight,
-      this.outerRadius,
-    ).fill("white");
+    this.background
+      .roundRect(0, 0, this.localWidth, this.localHeight, this.outerRadius)
+      .fill("white");
 
     const pw = this.localWidth * 0.8;
     const ph = this.localHeight * 0.5;
@@ -39,10 +35,7 @@ export class StraightProgressBar extends ProgressBar {
     // set static zero width to start empty
     this.progressFill.roundRect(px, py, 0, ph).fill("#a8c3ed");
 
-    this.addChild(...[
-      this.background,
-      this.progressFill,
-    ]);
+    this.addChild(...[this.background, this.progressFill]);
   }
 
   update(percentage: number) {
@@ -52,9 +45,6 @@ export class StraightProgressBar extends ProgressBar {
     const py = this.localHeight / 2 - ph / 2;
 
     pw = pw * percentage;
-    this.progressFill
-      .clear()
-      .roundRect(px, py, pw, ph).fill("#a8c3ed");
-
+    this.progressFill.clear().roundRect(px, py, pw, ph).fill("#a8c3ed");
   }
 }

@@ -12,7 +12,7 @@ export enum DockPoint {
 
 export type StationOptions = {
   color: Color | string;
-}
+};
 
 export class Station extends Rectangle {
   public static readonly SIZE = x(8);

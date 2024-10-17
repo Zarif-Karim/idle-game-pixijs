@@ -54,7 +54,7 @@ export class FullscreenButton extends Sprite {
     this.height = x(5);
 
     // this.position.set(x(94), y(1));
-    this.parent.toLocal(new Point(x(94), y(1)), undefined, this.position)
+    this.parent.toLocal(new Point(x(94), y(1)), undefined, this.position);
   }
 }
 
@@ -64,4 +64,3 @@ export async function addFullScreenButton(app: Application) {
   app.stage.addChild(btn);
   return btn;
 }
-

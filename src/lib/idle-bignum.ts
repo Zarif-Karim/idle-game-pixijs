@@ -36,7 +36,7 @@ export class BigNumber {
   }
 
   constructor(value: number, exp?: number, negative?: boolean) {
-    this.negative = negative || (value < 0);
+    this.negative = negative || value < 0;
     this.value = value;
     this.exp = exp ? exp : 0;
     this.normalize();
@@ -70,7 +70,7 @@ export class BigNumber {
   align(exp: number) {
     const d = exp - this.exp;
     if (d > 0) {
-      this.value = (d <= MAX_MAGNITUDE) ? this.value / Math.pow(10, d) : 0;
+      this.value = d <= MAX_MAGNITUDE ? this.value / Math.pow(10, d) : 0;
       this.exp = exp;
     }
   }
@@ -118,7 +118,9 @@ export class BigNumber {
 
   // getValue. Return the number value as string.
   getValue(precision: number) {
-    return Number(this.value.toFixed(precision >= 0 ? precision : 2)).toString();
+    return Number(
+      this.value.toFixed(precision >= 0 ? precision : 2),
+    ).toString();
   }
 
   // getExpName. Return the exponent name as string.
@@ -131,7 +133,7 @@ export class BigNumber {
     } else {
       const unitInt = magnitude - IdleGameExponents.length;
       const firstUnit = A_CharCode + unitInt / AMOUNT_OF_LETTERS_IN_ALPHABET;
-      const secondUnit = A_CharCode + unitInt % AMOUNT_OF_LETTERS_IN_ALPHABET;
+      const secondUnit = A_CharCode + (unitInt % AMOUNT_OF_LETTERS_IN_ALPHABET);
 
       unit = String.fromCharCode(firstUnit, secondUnit);
     }

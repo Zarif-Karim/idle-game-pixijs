@@ -23,15 +23,13 @@ export class RoundProgressBar extends ProgressBar {
     this.progressFill.circle(0, 0, this.outerRadius * 0.8).fill("white");
     this.foregroundCover.circle(0, 0, this.outerRadius * 0.4).fill("white");
 
-    this.addChild(...[
-      this.background,
-      this.progressFill,
-      this.foregroundCover,
-    ]);
+    this.addChild(
+      ...[this.background, this.progressFill, this.foregroundCover],
+    );
   }
 
   update(percentage: number) {
-    const endAngle = this.startAngle + (percentage * 2 * Math.PI);
+    const endAngle = this.startAngle + percentage * 2 * Math.PI;
 
     this.progressFill.clear();
     this.progressFill
@@ -39,7 +37,7 @@ export class RoundProgressBar extends ProgressBar {
       .lineTo(0, 0)
       .fill("#a8c3ed");
 
-    if(percentage === 0) this.visible = false;
+    if (percentage === 0) this.visible = false;
     else this.visible = true;
   }
 }

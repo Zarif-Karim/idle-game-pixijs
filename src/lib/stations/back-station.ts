@@ -42,11 +42,7 @@ export class BackStation extends Station {
   public infoPopup: StationDetails;
   private upgradableMarker: Graphics;
 
-  constructor(
-    x: number,
-    y: number,
-    opts: BackStationOptions,
-  ) {
+  constructor(x: number, y: number, opts: BackStationOptions) {
     super(x, y, { color: opts.color });
 
     this.category = opts.category;
@@ -74,10 +70,11 @@ export class BackStation extends Station {
 
     this.slotGrowDirection = opts.slotGrowDirection;
 
-    this.view.on("pointerover", () => this.view.scale = 1.07);
-    this.view.on("pointerout", () => this.view.scale = 1);
+    this.view.on("pointerover", () => (this.view.scale = 1.07));
+    this.view.on("pointerout", () => (this.view.scale = 1));
 
-    this.upgradableMarker = new Graphics().circle(0, 0, Station.SIZE * 0.25)
+    this.upgradableMarker = new Graphics()
+      .circle(0, 0, Station.SIZE * 0.25)
       .fill({ color: "red" });
     this.upgradableMarker.eventMode = "none";
     this.upgradableMarker.visible = false;
@@ -171,7 +168,7 @@ export class BackStation extends Station {
   contains(point: Point) {
     const inStationView = this.view.containsPoint(this.view.toLocal(point));
     const inSlotView = this.slots.some((s) =>
-      s.view.containsPoint(s.view.toLocal(point))
+      s.view.containsPoint(s.view.toLocal(point)),
     );
     const inDetailsView = this.infoPopup.contains(point);
     if (inStationView || inSlotView || inDetailsView) return true;

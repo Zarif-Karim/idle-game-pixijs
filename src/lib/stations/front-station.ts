@@ -26,13 +26,13 @@ export class FrontStation extends Station {
   }
 
   has(category: number) {
-    return !!(this.hold.get(category)?.length);
+    return !!this.hold.get(category)?.length;
   }
 
   occupy(customer: CustomerWorker) {
     this.occupants.add(customer);
   }
-  
+
   vacate(customer: CustomerWorker) {
     this.occupants.delete(customer);
   }

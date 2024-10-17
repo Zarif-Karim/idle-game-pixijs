@@ -67,7 +67,6 @@ export class Rectangle {
     );
   }
 
-
   getView() {
     return [this.view];
   }

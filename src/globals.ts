@@ -8,15 +8,15 @@ import { BigNumber } from "./lib/idle-bignum";
 
 export type StateInfo = {
   stage: string;
-  backWorkers: number,
-  frontWorkers: number,
-  customerWorkers: number,
-  stations: number[],
+  backWorkers: number;
+  frontWorkers: number;
+  customerWorkers: number;
+  stations: number[];
   bcoins: BigNumber;
 };
 
 export const StateData: StateInfo = {
-  stage: '1-1',
+  stage: "1-1",
   backWorkers: 1,
   frontWorkers: 1,
   customerWorkers: 1,
@@ -28,11 +28,11 @@ export const StateData: StateInfo = {
 export function getScreenSize() {
   const { innerHeight, innerWidth } = window;
   let height = innerHeight;
-  let width = height * 9 / 16;
+  let width = (height * 9) / 16;
 
   if (width > innerWidth) {
     width = innerWidth;
-    height = width * 16 / 9;
+    height = (width * 16) / 9;
   }
   return { width, height };
 }
@@ -82,9 +82,11 @@ type ViewAble = Graphics | Container;
 export const viewUpdateJob: Queue<{ job: string; child: ViewAble }> =
   new Queue();
 
-export const jobsBack: Queue<
-  { type: number; customer: CustomerWorker; at: FrontStation }
-> = new Queue();
+export const jobsBack: Queue<{
+  type: number;
+  customer: CustomerWorker;
+  at: FrontStation;
+}> = new Queue();
 export const workersBack: Queue<BackWorker> = new Queue();
 export const backStations: BackStation[] = [];
 

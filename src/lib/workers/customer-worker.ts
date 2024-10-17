@@ -22,7 +22,7 @@ export class CustomerWorker extends Worker {
         fontWeight: "bold",
         fontSize: "30vw",
         padding: 5,
-        stroke: 'black',
+        stroke: "black",
       },
     });
     this.quantityView.visible = false;
@@ -35,7 +35,7 @@ export class CustomerWorker extends Worker {
   }
 
   isProductChoosen() {
-    return (this.choosenProductType !== -1);
+    return this.choosenProductType !== -1;
   }
 
   takeProduct(p: Product) {
@@ -104,7 +104,7 @@ export class CustomerWorker extends Worker {
   ) {
     const context = { s: st, c: this, st: Date.now() };
     state = "waitArea";
-    
+
     st.occupy(this);
 
     const work = ({ deltaTime }: any) => {

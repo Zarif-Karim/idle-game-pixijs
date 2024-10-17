@@ -18,14 +18,14 @@ export class Product extends Circle {
       text: `${ICONS.MONEYSACK} ${this.price.toString(1)}`,
       anchor: 0.5,
       style: {
-        fill: 'white',
+        fill: "white",
         fontSize: x(6),
-        fontWeight: 'bold',
-        stroke: 'black',
-      }
+        fontWeight: "bold",
+        stroke: "black",
+      },
     });
 
-    this.priceView.y = -this.radius*2;
+    this.priceView.y = -this.radius * 2;
     this.addChild(this.priceView);
   }
 

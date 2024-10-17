@@ -46,11 +46,14 @@ export default async (app: Application) => {
   loadGame();
 
   // add workers
-  addWorkers({
-    back: StateData.backWorkers,
-    front: StateData.frontWorkers,
-    customer: StateData.customerWorkers,
-  }, app);
+  addWorkers(
+    {
+      back: StateData.backWorkers,
+      front: StateData.frontWorkers,
+      customer: StateData.customerWorkers,
+    },
+    app,
+  );
 
   // add the status last so its always visible
   app.stage.addChild(status.text);
@@ -173,7 +176,7 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
   const h = FrontStation.SIZE;
   const count = Math.floor(EDGES.width / h);
   const middlePoint = EDGES.height / 2;
-  const offset = (EDGES.width - (count * h)) / 2;
+  const offset = (EDGES.width - count * h) / 2;
   for (let i = 0; i < count; i++) {
     const loc = new FrontStation(offset + h * i, middlePoint - h / 2, {
       color: "grey",
@@ -207,18 +210,30 @@ function createCustomerWaitingArea(app: Application) {
 
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
-    [[x(7.95), y(55.9), 5, 7, 2_000], ["cyan", "bottom"]],
-    [[x(7.95), y(78.5), 700, 1500, 3_000], ["hotpink", "bottom"]],
-    [[x(35.6), y(92.7), 50_000, 170_000, 5_000], ["red", "right"]],
-    [[x(35.6), y(70.4), 250_000, 1_200_000, 7_000], ["pink", "right"]],
-    [[x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000], [
-      "yellow",
-      "bottom",
-    ]],
-    [[x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000], [
-      "purple",
-      "bottom",
-    ]],
+    [
+      [x(7.95), y(55.9), 5, 7, 2_000],
+      ["cyan", "bottom"],
+    ],
+    [
+      [x(7.95), y(78.5), 700, 1500, 3_000],
+      ["hotpink", "bottom"],
+    ],
+    [
+      [x(35.6), y(92.7), 50_000, 170_000, 5_000],
+      ["red", "right"],
+    ],
+    [
+      [x(35.6), y(70.4), 250_000, 1_200_000, 7_000],
+      ["pink", "right"],
+    ],
+    [
+      [x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000],
+      ["yellow", "bottom"],
+    ],
+    [
+      [x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000],
+      ["purple", "bottom"],
+    ],
   ];
 
   backStations.push(
@@ -307,7 +322,11 @@ const gameLoop = (app: Application) => {
 };
 
 const addWorkers = (
-  { back = 0, front = 0, customer = 0 }: {
+  {
+    back = 0,
+    front = 0,
+    customer = 0,
+  }: {
     back?: number;
     front?: number;
     customer?: number;

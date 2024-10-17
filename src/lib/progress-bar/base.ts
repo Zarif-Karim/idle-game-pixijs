@@ -2,12 +2,12 @@ import { Container } from "pixi.js";
 
 export abstract class ProgressBar extends Container {
   constructor(x: number, y: number) {
-    super({x,y});
+    super({ x, y });
   }
 
   /**
    * @description Defines how the progress bar will look
-   * by creating and then adding the view is the child 
+   * by creating and then adding the view is the child
    * of the current Container
    *
    * @constructor must be called in the child class constructor
@@ -25,6 +25,5 @@ export abstract class ProgressBar extends Container {
    */
   reset() {
     this.update(0);
-  };
+  }
 }
-

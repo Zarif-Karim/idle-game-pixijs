@@ -1,10 +1,8 @@
 # Idle Game
 
-
 ## What is this?
 
 This is a hobby project with a hope to eventually make a idle clicker game.
-
 
 ## Current State
 

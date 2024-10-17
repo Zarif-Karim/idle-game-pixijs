@@ -52,15 +52,9 @@ export class StationDetails extends Container {
     const b = this.getBgPosition();
     const w = b.w * 0.85;
     const h = b.h * 0.15;
-    const x = (b.x + b.w / 2) - w / 2;
+    const x = b.x + b.w / 2 - w / 2;
     const y = b.y + b.h * 0.25;
-    this.levelProgress = new StraightProgressBar(
-      x,
-      y,
-      w,
-      h,
-      h * 0.3,
-    );
+    this.levelProgress = new StraightProgressBar(x, y, w, h, h * 0.3);
     this.addChild(this.levelProgress);
     this.levelProgress.visible = false;
   }
@@ -73,13 +67,9 @@ export class StationDetails extends Container {
     const w = bgp.w * 0.75;
     let x = bgp.x + bgp.w / 2 - w / 2;
     let y = bgp.y + bgp.h * 0.65;
-    this.buttonViewEnabled = new Graphics().roundRect(
-      x,
-      y,
-      w,
-      bgp.h * 0.2,
-      radius,
-    ).fill({ color });
+    this.buttonViewEnabled = new Graphics()
+      .roundRect(x, y, w, bgp.h * 0.2, radius)
+      .fill({ color });
 
     this.upgradePriceText = new Status(`${upgradePrice}`, {
       x: x + this.buttonViewEnabled.width / 2,
@@ -89,13 +79,9 @@ export class StationDetails extends Container {
       fill: "white",
     });
 
-    this.buttonViewDisabled = new Graphics().roundRect(
-      x,
-      y,
-      w,
-      bgp.h * 0.2,
-      radius,
-    ).fill({ color: "grey" });
+    this.buttonViewDisabled = new Graphics()
+      .roundRect(x, y, w, bgp.h * 0.2, radius)
+      .fill({ color: "grey" });
     this.buttonViewDisabled.eventMode = "none";
     this.upgradePriceTextDisabled = new Status(`${upgradePrice}`, {
       x: x + this.buttonViewEnabled.width / 2,
@@ -169,16 +155,11 @@ export class StationDetails extends Container {
     });
     this.bgBoard.eventMode = "passive";
 
-    this.bgAnchor = new Graphics().star(
-      ss / 2,
-      -ss / 2,
-      3,
-      ss / 2,
-      ss / 4,
-      Math.PI,
-    ).fill({
-      color,
-    });
+    this.bgAnchor = new Graphics()
+      .star(ss / 2, -ss / 2, 3, ss / 2, ss / 4, Math.PI)
+      .fill({
+        color,
+      });
     this.bgAnchor.eventMode = "none";
 
     this.addChild(this.bgAnchor, this.bgBoard);
@@ -245,7 +226,8 @@ export class StationDetails extends Container {
     if (
       this.bgBoard?.containsPoint(this.bgBoard.toLocal(point)) ||
       this.bgAnchor?.containsPoint(this.bgAnchor.toLocal(point))
-    ) return true;
+    )
+      return true;
     return false;
   }
 }
