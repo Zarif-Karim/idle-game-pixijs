@@ -9,6 +9,7 @@ import {
   jobsFrontTakeOrder,
   StateData,
   status,
+  upgradeList,
   viewUpdateJob,
   waitingArea,
   workersBack,
@@ -24,6 +25,7 @@ import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
+import { Upgrade } from "./lib/upgrades";
 
 export default async (app: Application) => {
   // add a screen border for debugging
@@ -40,7 +42,7 @@ export default async (app: Application) => {
   // add stations
   createBackStations(app);
   // add workers count upgrade buttons
-  addWorkerIncreaseButtons(app);
+  addUpgrades(app);
 
   // load the game state
   loadGame();
@@ -135,10 +137,16 @@ function saveGame() {
   localStorage.setItem("lastUpdated", Date().toString());
 }
 
-function addWorkerIncreaseButtons(app: Application) {
+function addUpgrades(app: Application) {
   createButton(x(90), y(5), "white", "black", { customer: 1 }, app);
   createButton(x(90), y(11), "blue", "white", { front: 1 }, app);
   createButton(x(90), y(17), "green", "white", { back: 1 }, app);
+  upgradeList.push(
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+  );
 }
 
 function createButton(
