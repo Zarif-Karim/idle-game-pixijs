@@ -141,9 +141,40 @@ function addUpgrades(app: Application) {
   const fn = (obj: any) => {
     return () => addWorkers(obj, app);
   };
-  createButton(x(90), y(5), "white", "black", "+", fn({ customer: 1 }), app);
-  createButton(x(90), y(11), "blue", "white", "+", fn({ front: 1 }), app);
-  createButton(x(90), y(17), "green", "white", "+", fn({ back: 1 }), app);
+  createButton(
+    x(90),
+    y(5),
+    "white",
+    { txt: "+", color: "black", size: x(8) },
+    fn({ customer: 1 }),
+    app,
+  );
+  createButton(
+    x(90),
+    y(11),
+    "blue",
+    { txt: "+", color: "white", size: x(8) },
+    fn({ front: 1 }),
+    app,
+  );
+  createButton(
+    x(90),
+    y(17),
+    "green",
+    { txt: "+", color: "white", size: x(8) },
+    fn({ back: 1 }),
+    app,
+  );
+
+  const upgrageFn = () => console.log("upgrade pressed!");
+  createButton(
+    x(90),
+    y(32),
+    "brown",
+    { txt: "⬆", color: "yellow", size: x(5) },
+    upgrageFn,
+    app,
+  );
   upgradeList.push(
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
@@ -156,8 +187,7 @@ function createButton(
   _x: number,
   _y: number,
   bgColor: string,
-  txtColor: string,
-  text: string,
+  text: { txt: string; color: string; size: number },
   fn: () => void,
   app: Application,
 ) {
@@ -165,9 +195,9 @@ function createButton(
   btn.view.on("pointertap", fn);
 
   const txt = new Text({
-    text: text,
+    text: text.txt,
     anchor: 0.5,
-    style: { fontWeight: "bold", fontSize: x(8), fill: txtColor },
+    style: { fontWeight: "bold", fontSize: text.size, fill: text.color },
   });
   txt.position = btn.centre;
   txt.eventMode = "none";
