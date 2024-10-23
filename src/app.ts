@@ -138,9 +138,12 @@ function saveGame() {
 }
 
 function addUpgrades(app: Application) {
-  createButton(x(90), y(5), "white", "black", { customer: 1 }, app);
-  createButton(x(90), y(11), "blue", "white", { front: 1 }, app);
-  createButton(x(90), y(17), "green", "white", { back: 1 }, app);
+  const fn = (obj: any) => {
+    return () => addWorkers(obj, app);
+  };
+  createButton(x(90), y(5), "white", "black", "+", fn({ customer: 1 }), app);
+  createButton(x(90), y(11), "blue", "white", "+", fn({ front: 1 }), app);
+  createButton(x(90), y(17), "green", "white", "+", fn({ back: 1 }), app);
   upgradeList.push(
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
@@ -154,21 +157,22 @@ function createButton(
   _y: number,
   bgColor: string,
   txtColor: string,
-  worker: any,
+  text: string,
+  fn: () => void,
   app: Application,
 ) {
   const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
-  btn.view.on("pointertap", () => addWorkers(worker, app, true));
+  btn.view.on("pointertap", fn);
 
-  const text = new Text({
-    text: "+",
+  const txt = new Text({
+    text: text,
     anchor: 0.5,
-    style: { fontWeight: "bold", fontSize: "50em", fill: txtColor },
+    style: { fontWeight: "bold", fontSize: x(8), fill: txtColor },
   });
-  text.position = btn.centre;
-  text.eventMode = "none";
+  txt.position = btn.centre;
+  txt.eventMode = "none";
 
-  app.stage.addChild(btn.view, text);
+  app.stage.addChild(btn.view, txt);
 }
 
 function addScreenBorder(app: Application) {
