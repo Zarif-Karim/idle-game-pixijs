@@ -168,7 +168,7 @@ function addUpgrades(app: Application) {
 
   const upgradeView = new UpgradeModerator();
   app.stage.addChild(upgradeView.world);
-  const upgrageFn = () => upgradeView.toggleVisibility();
+  const upgrageFn = () => upgradeView.show();
   createButton(
     x(90),
     y(32),
