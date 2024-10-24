@@ -2,6 +2,8 @@ import { Button, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
 import { EDGES, x, y } from "../globals";
 import { Graphics, Text } from "pixi.js";
+import { Station } from "./stations";
+import { Worker } from "./workers";
 
 export class Upgrade<T> {
   public element: T;
@@ -76,10 +78,16 @@ export class UpgradeModerator {
     this.list.visible = !this.list.visible;
   }
 
-  addItem<T>(_item: Upgrade<T>) {
+  addItem<T>(item: Upgrade<T>) {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
     const view = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
+    if (item.element instanceof Station) {
+      console.log("square");
+    }
+    if (item.element instanceof Worker) {
+      console.log("circle");
+    }
     this.list.addItem(view);
   }
 
