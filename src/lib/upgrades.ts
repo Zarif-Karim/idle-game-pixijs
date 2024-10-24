@@ -1,7 +1,7 @@
 import { Button, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
 import { EDGES, x, y } from "../globals";
-import { Text } from "pixi.js";
+import { Graphics, Text } from "pixi.js";
 
 export class Upgrade<T> {
   public element: T;
@@ -28,8 +28,13 @@ export class UpgradeModerator {
       background: "lightyellow",
       type: "vertical",
       radius: x(5),
+      topPadding: y(10),
+      bottomPadding: y(2),
+      leftPadding: x(3),
+      elementsMargin: y(0.5),
     });
 
+    this.world;
     this.world.x = EDGES.width / 2 - this.world.width / 2;
     this.world.y = EDGES.height / 2 - this.world.height / 2;
     this.world.zIndex = 10;
@@ -56,5 +61,16 @@ export class UpgradeModerator {
 
   toggleVisibility() {
     this.world.visible = !this.world.visible;
+  }
+
+  addItem<T>(_item: Upgrade<T>) {
+    const w = this.world.width * 0.92;
+    const h = this.world.height / 10;
+    const view = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
+    this.world.addItem(view);
+  }
+
+  addItems(items: Upgrade<any>[]) {
+    items.forEach((i) => this.addItem(i));
   }
 }

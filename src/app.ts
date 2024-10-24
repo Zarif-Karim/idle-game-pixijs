@@ -166,9 +166,9 @@ function addUpgrades(app: Application) {
     app,
   );
 
-  const upgradeView = new UpgradeModerator();
-  app.stage.addChild(upgradeView.world);
-  const upgrageFn = () => upgradeView.show();
+  const upgradeWindow = new UpgradeModerator();
+  app.stage.addChild(upgradeWindow.world);
+  const upgrageFn = () => upgradeWindow.show();
   createButton(
     x(90),
     y(32),
@@ -182,7 +182,21 @@ function addUpgrades(app: Application) {
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
     new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
+    new Upgrade(backStations[0], BigNumber.from(1000), 2, "price-multiplier"),
   );
+
+  upgradeWindow.addItems(upgradeList);
 }
 
 function createButton(
