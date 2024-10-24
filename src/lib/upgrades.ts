@@ -45,10 +45,23 @@ export class UpgradeModerator {
     this.closeButton = new Button(
       new Text({ text: "X", style: { fill: "darkgrey", fontSize: x(5) } }),
     );
+
     this.closeButton.view.position.set(x(70.8), y(1.2));
     this.closeButton.view.scale = 0.6;
     this.closeButton.onPress.connect(() => this.hide());
-    this.list.addChild(this.closeButton.view);
+
+    const title = new Text({
+      text: "UPGRADES",
+      style: { fontSize: x(6), fontWeight: "bolder" },
+    });
+
+    title.position.set(x(20), y(3));
+    const titleBg = new Graphics()
+      .roundRect(0, 0, x(75), y(9), x(5))
+      .fill("lightyellow");
+    title.eventMode = "none";
+    titleBg.eventMode = "none";
+    this.list.addChild(titleBg, this.closeButton.view, title);
   }
 
   show() {
