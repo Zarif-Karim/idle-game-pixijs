@@ -25,7 +25,7 @@ import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
-import { Upgrade } from "./lib/upgrades";
+import { Upgrade, UpgradeModerator } from "./lib/upgrades";
 
 export default async (app: Application) => {
   // add a screen border for debugging
@@ -166,7 +166,9 @@ function addUpgrades(app: Application) {
     app,
   );
 
-  const upgrageFn = () => console.log("upgrade pressed!");
+  const upgradeView = new UpgradeModerator();
+  app.stage.addChild(upgradeView.world);
+  const upgrageFn = () => upgradeView.toggleVisibility();
   createButton(
     x(90),
     y(32),
