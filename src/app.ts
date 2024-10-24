@@ -138,40 +138,40 @@ function saveGame() {
 }
 
 function addUpgrades(app: Application) {
-  const fn = (obj: any) => {
-    return () => addWorkers(obj, app);
-  };
-  createButton(
-    x(90),
-    y(5),
-    "white",
-    { txt: "+", color: "black", size: x(8) },
-    fn({ customer: 1 }),
-    app,
-  );
-  createButton(
-    x(90),
-    y(11),
-    "blue",
-    { txt: "+", color: "white", size: x(8) },
-    fn({ front: 1 }),
-    app,
-  );
-  createButton(
-    x(90),
-    y(17),
-    "green",
-    { txt: "+", color: "white", size: x(8) },
-    fn({ back: 1 }),
-    app,
-  );
+  // const fn = (obj: any) => {
+  //   return () => addWorkers(obj, app);
+  // };
+  // createButton(
+  //   x(90),
+  //   y(11),
+  //   "white",
+  //   { txt: "+", color: "black", size: x(8) },
+  //   fn({ customer: 1 }),
+  //   app,
+  // );
+  // createButton(
+  //   x(90),
+  //   y(17),
+  //   "blue",
+  //   { txt: "+", color: "white", size: x(8) },
+  //   fn({ front: 1 }),
+  //   app,
+  // );
+  // createButton(
+  //   x(90),
+  //   y(23),
+  //   "green",
+  //   { txt: "+", color: "white", size: x(8) },
+  //   fn({ back: 1 }),
+  //   app,
+  // );
 
   const upgradeWindow = new UpgradeModerator();
   app.stage.addChild(upgradeWindow.list);
   const upgrageFn = () => upgradeWindow.show();
   createButton(
     x(90),
-    y(32),
+    y(5),
     "brown",
     { txt: "⬆", color: "yellow", size: x(5) },
     upgrageFn,
