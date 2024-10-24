@@ -18,11 +18,11 @@ export class Upgrade<T> {
 }
 
 export class UpgradeModerator {
-  public world: ScrollBox;
+  public list: ScrollBox;
   private closeButton: Button;
 
   constructor() {
-    this.world = new ScrollBox({
+    this.list = new ScrollBox({
       width: x(75),
       height: y(60),
       background: "lightyellow",
@@ -34,13 +34,13 @@ export class UpgradeModerator {
       elementsMargin: y(0.5),
     });
 
-    this.world;
-    this.world.x = EDGES.width / 2 - this.world.width / 2;
-    this.world.y = EDGES.height / 2 - this.world.height / 2;
-    this.world.zIndex = 10;
+    this.list;
+    this.list.x = EDGES.width / 2 - this.list.width / 2;
+    this.list.y = EDGES.height / 2 - this.list.height / 2;
+    this.list.zIndex = 10;
 
     // TODO: change to false, set to true while developing
-    this.world.visible = true;
+    this.list.visible = true;
 
     this.closeButton = new Button(
       new Text({ text: "X", style: { fill: "darkgrey", fontSize: x(5) } }),
@@ -48,26 +48,26 @@ export class UpgradeModerator {
     this.closeButton.view.position.set(x(70.8), y(1.2));
     this.closeButton.view.scale = 0.6;
     this.closeButton.onPress.connect(() => this.hide());
-    this.world.addChild(this.closeButton.view);
+    this.list.addChild(this.closeButton.view);
   }
 
   show() {
-    this.world.visible = true;
+    this.list.visible = true;
   }
 
   hide() {
-    this.world.visible = false;
+    this.list.visible = false;
   }
 
   toggleVisibility() {
-    this.world.visible = !this.world.visible;
+    this.list.visible = !this.list.visible;
   }
 
   addItem<T>(_item: Upgrade<T>) {
-    const w = this.world.width * 0.92;
-    const h = this.world.height / 10;
+    const w = this.list.width * 0.92;
+    const h = this.list.height / 10;
     const view = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
-    this.world.addItem(view);
+    this.list.addItem(view);
   }
 
   addItems(items: Upgrade<any>[]) {

@@ -167,7 +167,7 @@ function addUpgrades(app: Application) {
   );
 
   const upgradeWindow = new UpgradeModerator();
-  app.stage.addChild(upgradeWindow.world);
+  app.stage.addChild(upgradeWindow.list);
   const upgrageFn = () => upgradeWindow.show();
   createButton(
     x(90),
