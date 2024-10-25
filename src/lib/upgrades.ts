@@ -84,7 +84,31 @@ export class UpgradeModerator {
   addItem<T>(item: Upgrade<T>) {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
-    const view = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
+    const bg = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
+
+    let symbol = "";
+    if (item.element instanceof Station) {
+      symbol = "x";
+      const logo = new Rectangle(x(2), y(1), y(4), y(4), {
+        color: item.element.color,
+      });
+      logo.view.eventMode = "none";
+      bg.addChild(logo.view);
+    }
+    if (item.element instanceof Worker) {
+      symbol = item.type.includes("speed") ? "x" : "+";
+      const logo = new Worker(x(5.5), y(3), {
+        color: item.element.color,
+      });
+      logo.eventMode = "none";
+      bg.addChild(logo);
+    }
+
+    const title = new Text({ text: "untitled" });
+    title.position.set(x(15), y(2));
+    title.scale = 0.7;
+    title.text = `${symbol}${item.quantity}  ${item.type}`;
+    bg.addChild(title);
 
     const upgradeButton = this.addUpgradeButton(
       {
@@ -101,23 +125,9 @@ export class UpgradeModerator {
         console.log("clicked", item);
       },
     );
+    bg.addChild(upgradeButton);
 
-    view.addChild(upgradeButton);
-    if (item.element instanceof Station) {
-      const logo = new Rectangle(x(2), y(1), y(4), y(4), {
-        color: item.element.color,
-      });
-      logo.view.eventMode = "none";
-      view.addChild(logo.view);
-    }
-    if (item.element instanceof Worker) {
-      const logo = new Worker(x(5.5), y(3), {
-        color: item.element.color,
-      });
-      logo.eventMode = "none";
-      view.addChild(logo);
-    }
-    this.list.addItem(view);
+    this.list.addItem(bg);
   }
 
   addItems(items: Upgrade<any>[]) {

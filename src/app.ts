@@ -187,7 +187,7 @@ function addUpgrades(app: Application) {
     new Upgrade(
       new BackWorker(0, 0, { color: "green" }),
       BigNumber.from(850),
-      2,
+      1,
       "worker-back",
     ),
     new Upgrade(
