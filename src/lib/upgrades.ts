@@ -1,9 +1,11 @@
-import { Button, ScrollBox } from "@pixi/ui";
+import { Button, FancyButton, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
 import { EDGES, x, y } from "../globals";
 import { Graphics, Text } from "pixi.js";
 import { Station } from "./stations";
 import { Worker } from "./workers";
+import { Status } from "./status";
+import { ICONS } from "./utils";
 
 export class Upgrade<T> {
   public element: T;
@@ -82,6 +84,24 @@ export class UpgradeModerator {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
     const view = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
+
+    const upgradeButton = this.addUpgradeButton(
+      {
+        x: x(47),
+        y: y(0.5),
+        w: x(20),
+        h: y(5),
+        radius: 5,
+        upgradePrice: item.price,
+        color: "green",
+        fontSize: x(3),
+      },
+      () => {
+        console.log("clicked", item);
+      },
+    );
+
+    view.addChild(upgradeButton);
     if (item.element instanceof Station) {
       console.log("square");
     }
@@ -93,5 +113,48 @@ export class UpgradeModerator {
 
   addItems(items: Upgrade<any>[]) {
     items.forEach((i) => this.addItem(i));
+  }
+
+  private addUpgradeButton(
+    {
+      x,
+      y,
+      w,
+      h,
+      radius = 5,
+      upgradePrice,
+      fontSize,
+      color,
+    }: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      radius: number;
+      upgradePrice: BigNumber;
+      fontSize: number;
+      color: string;
+    },
+    upgradeFn: () => void,
+  ) {
+    const buttonViewEnabled = new Graphics()
+      .roundRect(0, 0, w, h, radius)
+      .fill({ color });
+    const upgradePriceText = new Status(`${upgradePrice}`, {
+      prefix: ICONS.MONEYSACK + " ",
+      fontSize,
+      fill: "white",
+    });
+
+    const upgradeButton = new FancyButton({
+      defaultView: buttonViewEnabled,
+      text: upgradePriceText.text,
+    });
+
+    upgradeButton.enabled = true;
+
+    upgradeButton.onPress.connect(upgradeFn);
+    upgradeButton.position.set(x, y);
+    return upgradeButton;
   }
 }
