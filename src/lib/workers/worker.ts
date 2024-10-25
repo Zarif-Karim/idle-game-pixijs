@@ -1,14 +1,13 @@
-import { Color, Point } from "pixi.js";
+import { Point } from "pixi.js";
 import { x } from "../../globals";
-import { Circle } from "../circle";
+import { Circle, CircleOptions } from "../circle";
 import { Product } from "../product";
 import { FrontStation, Station } from "../stations";
 import { generateRandomColorHex } from "../utils";
 import { RoundProgressBar } from "../progress-bar";
 
-export type WorkerOptions = {
+export type WorkerOptions = CircleOptions & {
   size?: number;
-  color?: Color | string;
 };
 
 export class Worker extends Circle {

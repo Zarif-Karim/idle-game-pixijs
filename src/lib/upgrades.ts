@@ -6,6 +6,7 @@ import { Station } from "./stations";
 import { Worker } from "./workers";
 import { Status } from "./status";
 import { ICONS } from "./utils";
+import { Rectangle } from "./rectangle";
 
 export class Upgrade<T> {
   public element: T;
@@ -103,10 +104,18 @@ export class UpgradeModerator {
 
     view.addChild(upgradeButton);
     if (item.element instanceof Station) {
-      console.log("square");
+      const logo = new Rectangle(x(2), y(1), y(4), y(4), {
+        color: item.element.color,
+      });
+      logo.view.eventMode = "none";
+      view.addChild(logo.view);
     }
     if (item.element instanceof Worker) {
-      console.log("circle");
+      const logo = new Worker(x(5.5), y(3), {
+        color: item.element.color,
+      });
+      logo.eventMode = "none";
+      view.addChild(logo);
     }
     this.list.addItem(view);
   }
