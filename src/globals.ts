@@ -45,6 +45,7 @@ export const status: Status = new Status("Initialising", {
   x: 20,
   y: 20,
   anchor: { x: 0, y: 0 },
+  fontSize: x(3),
 });
 
 /**

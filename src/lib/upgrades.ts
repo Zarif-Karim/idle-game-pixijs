@@ -104,7 +104,7 @@ export class UpgradeModerator {
       bg.addChild(logo);
     }
 
-    const title = new Text({ text: "untitled" });
+    const title = new Text({ text: "untitled", style: { fontSize: x(4) } });
     title.position.set(x(15), y(2));
     title.scale = 0.7;
     title.text = `${symbol}${item.quantity}  ${item.type}`;
