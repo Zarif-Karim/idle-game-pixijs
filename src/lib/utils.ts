@@ -1,7 +1,12 @@
 import { Application, Graphics, Point } from "pixi.js";
-import { Queue } from "./queue";
-import { customers, EDGES, StateData } from "../globals";
-import { Worker, BackWorker, FrontWorker, CustomerWorker } from "./workers";
+import {
+  customers,
+  EDGES,
+  StateData,
+  workersBack,
+  workersFront,
+} from "../globals";
+import { BackWorker, FrontWorker, CustomerWorker } from "./workers";
 
 interface Edges {
   top: number;
@@ -81,22 +86,22 @@ export function assert(condition: boolean, msg: string) {
 
 export function addNewWorker(
   app: Application,
-  group: Queue<Worker>,
-  color: string,
+  type: string,
   incrementMaxCounter = false,
 ) {
   const { x, y } = randomPositionMiddle(EDGES);
   let w: FrontWorker | BackWorker;
-  if (color === "blue") {
-    w = new FrontWorker(x, y, { color });
+  if (type === "front") {
+    w = new FrontWorker(x, y, { color: "blue" });
+    workersFront.push(w);
     if (incrementMaxCounter) StateData.frontWorkers += 1;
-  } else {
-    w = new BackWorker(x, y, { color });
+  } else if (type === "back") {
+    w = new BackWorker(x, y, { color: "green" });
+    workersBack.push(w);
     if (incrementMaxCounter) StateData.backWorkers += 1;
+  } else {
+    throw new Error("Wrong type");
   }
-
-  // add to queue
-  group.push(w);
 
   // add to screen
   app.stage.addChild(w);

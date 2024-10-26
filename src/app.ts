@@ -25,6 +25,8 @@ import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
 import { Upgrade, UpgradeModerator } from "./lib/upgrades";
 
+export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
+
 export default async (app: Application) => {
   // add a screen border for debugging
   addScreenBorder(app);
@@ -136,9 +138,8 @@ function saveGame() {
 }
 
 function addUpgrades(app: Application) {
-  const upgradeWindow = new UpgradeModerator();
-  app.stage.addChild(upgradeWindow.list);
-  const upgrageFn = () => upgradeWindow.show();
+  app.stage.addChild(upgradeModerator.list);
+  const upgrageFn = () => upgradeModerator.show();
   createButton(
     x(90),
     y(5),
@@ -148,7 +149,7 @@ function addUpgrades(app: Application) {
     app,
   );
 
-  upgradeWindow.load(
+  upgradeModerator.load(
     [
       new Upgrade(
         new CustomerWorker(0, 0, { color: "white" }),
@@ -437,12 +438,12 @@ const addWorkers = (
 ) => {
   // back workers
   for (let i = 0; i < back; i++) {
-    addNewWorker(app, workersBack, "green", incrementMaxCounter);
+    addNewWorker(app, "back", incrementMaxCounter);
   }
 
   // front workers
   for (let i = 0; i < front; i++) {
-    addNewWorker(app, workersFront, "blue", incrementMaxCounter);
+    addNewWorker(app, "front", incrementMaxCounter);
   }
 
   for (let i = 0; i < customer; i++) {

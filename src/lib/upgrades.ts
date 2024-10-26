@@ -1,6 +1,6 @@
 import { Button, FancyButton, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
-import { EDGES, workersBack, workersFront, x, y } from "../globals";
+import { x, y } from "../globals";
 import { Application, Graphics, Text } from "pixi.js";
 import { BackStation, Station } from "./stations";
 import { Worker } from "./workers";
@@ -48,10 +48,8 @@ export class Upgrade<T> {
         return;
       }
 
-      if (opp === "back") {
-        addNewWorker(app, workersBack, "green", true);
-      } else if (opp === "front") {
-        addNewWorker(app, workersFront, "blue", true);
+      if (["back", "front"].includes(opp)) {
+        addNewWorker(app, opp, true);
       } else {
         throw new Error("Incorrect format");
       }
@@ -79,8 +77,8 @@ export class UpgradeModerator {
     });
 
     this.list;
-    this.list.x = EDGES.width / 2 - this.list.width / 2;
-    this.list.y = EDGES.height / 2 - this.list.height / 2;
+    this.list.x = x(50) - this.list.width / 2;
+    this.list.y = y(50) - this.list.height / 2;
     this.list.zIndex = 10;
 
     // TODO: change to false, set to true while developing
