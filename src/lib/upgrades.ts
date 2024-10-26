@@ -5,7 +5,7 @@ import { Application, Graphics, Text } from "pixi.js";
 import { BackStation, Station } from "./stations";
 import { Worker } from "./workers";
 import { Status } from "./status";
-import { addNewWorker, createCustomer, ICONS } from "./utils";
+import { addNewWorker, assert, createCustomer, ICONS } from "./utils";
 import { Rectangle } from "./rectangle";
 
 export class Upgrade<T> {
@@ -57,12 +57,14 @@ export class Upgrade<T> {
   }
 }
 
-export class UpgradeRow extends Graphics {
+export class UpgradeRow<I> extends Graphics {
   private upgradeButton: FancyButton;
+  private upgradeItem: Upgrade<I>;
 
-  constructor(w: number, h: number, item: Upgrade<any>, upgradeFn: () => void) {
+  constructor(w: number, h: number, item: Upgrade<I>, upgradeFn: () => void) {
     super();
     this.roundRect(0, 0, w, h, 8).fill("lightgrey");
+    this.upgradeItem = item;
 
     let symbol = "";
     if (item.element instanceof Station) {
@@ -104,6 +106,19 @@ export class UpgradeRow extends Graphics {
     this.addChild(this.upgradeButton);
   }
 
+  // Sets the upgrade button state based on available coins
+  // also returns the result
+  refreshUpgradableStatus(wallet: BigNumber) {
+    const ubn = BigNumber.from(this.upgradeItem.price);
+    assert(!ubn.negative, "upgradePrice cannot be negative");
+
+    ubn.substract(wallet);
+    const canUpgrade = ubn.negative || ubn.isZero();
+
+    this.upgradeButton.enabled = canUpgrade;
+    return canUpgrade;
+  }
+
   private addUpgradeButton(
     {
       x,
@@ -129,6 +144,9 @@ export class UpgradeRow extends Graphics {
     const buttonViewEnabled = new Graphics()
       .roundRect(0, 0, w, h, radius)
       .fill({ color });
+    const buttonViewDisabled = new Graphics()
+      .roundRect(0, 0, w, h, radius)
+      .fill({ color: "grey" });
     const upgradePriceText = new Status(`${upgradePrice}`, {
       prefix: ICONS.MONEYSACK + " ",
       fontSize,
@@ -137,10 +155,11 @@ export class UpgradeRow extends Graphics {
 
     const upgradeButton = new FancyButton({
       defaultView: buttonViewEnabled,
+      disabledView: buttonViewDisabled,
       text: upgradePriceText.text,
     });
 
-    upgradeButton.enabled = true;
+    upgradeButton.enabled = false;
 
     upgradeButton.onPress.connect(upgradeFn);
     upgradeButton.position.set(x, y);

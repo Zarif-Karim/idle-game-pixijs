@@ -23,7 +23,7 @@ import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
-import { Upgrade, UpgradeModerator } from "./lib/upgrades";
+import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
 
 export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
 
@@ -370,6 +370,10 @@ const gameLoop = (app: Application) => {
       const ca = bs.canUpgrade(StateData.bcoins);
       bs.setUpgradable(ca);
     });
+
+    upgradeModerator.list.items.every((v) =>
+      (v as UpgradeRow<any>).refreshUpgradableStatus(StateData.bcoins),
+    );
 
     while (!viewUpdateJob.isEmpty) {
       const { job, child } = viewUpdateJob.pop();
