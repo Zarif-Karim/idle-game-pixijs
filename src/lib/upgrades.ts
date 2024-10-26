@@ -45,8 +45,7 @@ export class Upgrade<T> {
       if (w !== "worker") throw new Error("Incorrect format");
 
       if (opp === "speed") {
-        // TODO: increase worker speed by 10%
-        console.log("worker speed wip");
+        Worker.SPEED *= this.quantity;
         return;
       }
 
