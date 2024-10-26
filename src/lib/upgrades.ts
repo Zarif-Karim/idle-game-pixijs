@@ -168,6 +168,8 @@ export class UpgradeRow<I> extends Graphics {
   }
 }
 
+// TODO: make a whole screen container bg to dim the screen and close on click away
+// also need to implement save
 export class UpgradeModerator {
   public list: ScrollBox;
   private closeButton: Button;
@@ -192,8 +194,7 @@ export class UpgradeModerator {
     this.list.y = y(50) - this.list.height / 2;
     this.list.zIndex = 10;
 
-    // TODO: change to false, set to true while developing
-    this.list.visible = true;
+    this.list.visible = false;
 
     this.closeButton = new Button(
       new Text({ text: "X", style: { fill: "darkgrey", fontSize: x(5) } }),
