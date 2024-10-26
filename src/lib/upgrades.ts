@@ -57,6 +57,97 @@ export class Upgrade<T> {
   }
 }
 
+export class UpgradeRow extends Graphics {
+  private upgradeButton: FancyButton;
+
+  constructor(w: number, h: number, item: Upgrade<any>, upgradeFn: () => void) {
+    super();
+    this.roundRect(0, 0, w, h, 8).fill("lightgrey");
+
+    let symbol = "";
+    if (item.element instanceof Station) {
+      symbol = "x";
+      const logo = new Rectangle(x(2), y(1), y(4), y(4), {
+        color: item.element.color,
+      });
+      logo.view.eventMode = "none";
+      this.addChild(logo.view);
+    }
+    if (item.element instanceof Worker) {
+      symbol = item.type.includes("speed") ? "x" : "+";
+      const logo = new Worker(x(5.5), y(3), {
+        color: item.element.color,
+      });
+      logo.eventMode = "none";
+      this.addChild(logo);
+    }
+
+    const title = new Text({ text: "untitled", style: { fontSize: x(4) } });
+    title.position.set(x(15), y(2));
+    title.scale = 0.7;
+    title.text = `${symbol}${item.quantity}  ${item.type}`;
+    this.addChild(title);
+
+    this.upgradeButton = this.addUpgradeButton(
+      {
+        x: x(47),
+        y: y(0.5),
+        w: x(20),
+        h: y(5),
+        radius: 5,
+        upgradePrice: item.price,
+        color: "green",
+        fontSize: x(3),
+      },
+      upgradeFn,
+    );
+    this.addChild(this.upgradeButton);
+  }
+
+  private addUpgradeButton(
+    {
+      x,
+      y,
+      w,
+      h,
+      radius = 5,
+      upgradePrice,
+      fontSize,
+      color,
+    }: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      radius: number;
+      upgradePrice: BigNumber;
+      fontSize: number;
+      color: string;
+    },
+    upgradeFn: () => void,
+  ) {
+    const buttonViewEnabled = new Graphics()
+      .roundRect(0, 0, w, h, radius)
+      .fill({ color });
+    const upgradePriceText = new Status(`${upgradePrice}`, {
+      prefix: ICONS.MONEYSACK + " ",
+      fontSize,
+      fill: "white",
+    });
+
+    const upgradeButton = new FancyButton({
+      defaultView: buttonViewEnabled,
+      text: upgradePriceText.text,
+    });
+
+    upgradeButton.enabled = true;
+
+    upgradeButton.onPress.connect(upgradeFn);
+    upgradeButton.position.set(x, y);
+    return upgradeButton;
+  }
+}
+
 export class UpgradeModerator {
   public list: ScrollBox;
   private closeButton: Button;
@@ -126,96 +217,14 @@ export class UpgradeModerator {
   addItem<T>(item: Upgrade<T>, app: Application) {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
-    const bg = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
-
-    let symbol = "";
-    if (item.element instanceof Station) {
-      symbol = "x";
-      const logo = new Rectangle(x(2), y(1), y(4), y(4), {
-        color: item.element.color,
-      });
-      logo.view.eventMode = "none";
-      bg.addChild(logo.view);
-    }
-    if (item.element instanceof Worker) {
-      symbol = item.type.includes("speed") ? "x" : "+";
-      const logo = new Worker(x(5.5), y(3), {
-        color: item.element.color,
-      });
-      logo.eventMode = "none";
-      bg.addChild(logo);
-    }
-
-    const title = new Text({ text: "untitled", style: { fontSize: x(4) } });
-    title.position.set(x(15), y(2));
-    title.scale = 0.7;
-    title.text = `${symbol}${item.quantity}  ${item.type}`;
-    bg.addChild(title);
-
-    const upgradeButton = this.addUpgradeButton(
-      {
-        x: x(47),
-        y: y(0.5),
-        w: x(20),
-        h: y(5),
-        radius: 5,
-        upgradePrice: item.price,
-        color: "green",
-        fontSize: x(3),
-      },
-      () => {
-        item.makeUpgrade(app);
-        const index = this.upgradeList.findIndex((value) => value === item);
-        if (index === -1) throw new Error("Upgrade Item not on List");
-        this.upgradeList = this.upgradeList.filter((value) => value !== item);
-        this.list.removeItem(index);
-      },
-    );
-    bg.addChild(upgradeButton);
-
-    this.list.addItem(bg);
-  }
-
-  private addUpgradeButton(
-    {
-      x,
-      y,
-      w,
-      h,
-      radius = 5,
-      upgradePrice,
-      fontSize,
-      color,
-    }: {
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-      radius: number;
-      upgradePrice: BigNumber;
-      fontSize: number;
-      color: string;
-    },
-    upgradeFn: () => void,
-  ) {
-    const buttonViewEnabled = new Graphics()
-      .roundRect(0, 0, w, h, radius)
-      .fill({ color });
-    const upgradePriceText = new Status(`${upgradePrice}`, {
-      prefix: ICONS.MONEYSACK + " ",
-      fontSize,
-      fill: "white",
-    });
-
-    const upgradeButton = new FancyButton({
-      defaultView: buttonViewEnabled,
-      text: upgradePriceText.text,
-    });
-
-    upgradeButton.enabled = true;
-
-    upgradeButton.onPress.connect(upgradeFn);
-    upgradeButton.position.set(x, y);
-    return upgradeButton;
+    const upgradeFn = () => {
+      item.makeUpgrade(app);
+      const index = this.upgradeList.findIndex((value) => value === item);
+      if (index === -1) throw new Error("Upgrade Item not on List");
+      this.upgradeList = this.upgradeList.filter((value) => value !== item);
+      this.list.removeItem(index);
+    };
+    const row = new UpgradeRow(w, h, item, upgradeFn.bind(this));
+    this.list.addItem(row);
   }
 }
