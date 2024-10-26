@@ -9,7 +9,6 @@ import {
   jobsFrontTakeOrder,
   StateData,
   status,
-  upgradeList,
   viewUpdateJob,
   waitingArea,
   workersBack,
@@ -149,7 +148,8 @@ function addUpgrades(app: Application) {
     upgrageFn,
     app,
   );
-  upgradeList.push(
+
+  upgradeWindow.load([
     new Upgrade(
       new CustomerWorker(0, 0, { color: "white" }),
       BigNumber.from(190),
@@ -237,9 +237,7 @@ function addUpgrades(app: Application) {
       2,
       "customer",
     ),
-  );
-
-  upgradeWindow.addItems(upgradeList);
+  ]);
 }
 
 function createButton(

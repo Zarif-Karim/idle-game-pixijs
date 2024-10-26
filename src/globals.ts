@@ -5,7 +5,6 @@ import { BackStation, FrontStation } from "./lib/stations";
 import { Status } from "./lib/status";
 import { BackWorker, CustomerWorker, FrontWorker } from "./lib/workers";
 import { BigNumber } from "./lib/idle-bignum";
-import { Upgrade } from "./lib/upgrades";
 
 export type StateInfo = {
   stage: string;
@@ -100,4 +99,3 @@ export const workersFront: Queue<FrontWorker> = new Queue();
 export const waitingArea: FrontStation[] = [];
 
 export const customers: Queue<CustomerWorker> = new Queue();
-export const upgradeList: Upgrade<any>[] = [];

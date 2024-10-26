@@ -42,6 +42,7 @@ export class Upgrade<T> {
 export class UpgradeModerator {
   public list: ScrollBox;
   private closeButton: Button;
+  public upgradeList: Upgrade<any>[] = [];
 
   constructor() {
     this.list = new ScrollBox({
@@ -54,6 +55,7 @@ export class UpgradeModerator {
       bottomPadding: y(2),
       leftPadding: x(3),
       elementsMargin: y(0.5),
+      disableEasing: true,
     });
 
     this.list;
@@ -98,6 +100,11 @@ export class UpgradeModerator {
     this.list.visible = !this.list.visible;
   }
 
+  load(upgrades: Upgrade<any>[]) {
+    this.upgradeList = upgrades;
+    upgrades.forEach((i) => this.addItem(i));
+  }
+
   addItem<T>(item: Upgrade<T>) {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
@@ -138,15 +145,17 @@ export class UpgradeModerator {
         color: "green",
         fontSize: x(3),
       },
-      item.makeUpgrade.bind(item),
+      () => {
+        item.makeUpgrade();
+        const index = this.upgradeList.findIndex((value) => value === item);
+        if (index === -1) throw new Error("Upgrade Item not on List");
+        this.upgradeList = this.upgradeList.filter((value) => value !== item);
+        this.list.removeItem(index);
+      },
     );
     bg.addChild(upgradeButton);
 
     this.list.addItem(bg);
-  }
-
-  addItems(items: Upgrade<any>[]) {
-    items.forEach((i) => this.addItem(i));
   }
 
   private addUpgradeButton(
