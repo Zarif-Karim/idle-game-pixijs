@@ -65,10 +65,6 @@ export function y(percentage: number): number {
   return EDGES.height * (percentage / 100);
 }
 
-// the rate at which the objects move in the screen
-// always multiply this with the deltaTIme
-export const SPEED = x(0.6);
-
 export type FrontTakeOrder = {
   from: FrontStation;
   customer: CustomerWorker;

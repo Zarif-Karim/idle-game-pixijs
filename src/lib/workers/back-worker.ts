@@ -5,7 +5,6 @@ import {
   backStations,
   deliveryLocations,
   jobsFrontDelivery,
-  SPEED,
   workersBack,
 } from "../../globals";
 import { getRandomInt } from "../utils";
@@ -41,7 +40,7 @@ export class BackWorker extends Worker {
     let dl: FrontStation;
 
     const work = ({ deltaTime }: { deltaTime: number }) => {
-      const speed = SPEED * deltaTime;
+      const speed = Worker.SPEED * deltaTime;
       switch (state) {
         case "station":
           // go to the right station

@@ -4,7 +4,6 @@ import {
   FrontDelivery,
   FrontTakeOrder,
   jobsBack,
-  SPEED,
   StateData,
   status,
   workersFront,
@@ -24,7 +23,7 @@ export class FrontWorker extends Worker {
     let takeOrderStartTime: number;
 
     const work = ({ deltaTime }: { deltaTime: number }) => {
-      const speed = SPEED * deltaTime;
+      const speed = Worker.SPEED * deltaTime;
       switch (state) {
         case "pick":
           if (this.moveTo(jobFD.from.getDockingPoint(DockPoint.TOP), speed)) {

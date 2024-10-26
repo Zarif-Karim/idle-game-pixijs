@@ -109,6 +109,7 @@ function loadGame() {
   }
 }
 
+// TODO: save speed and upgrade state
 function saveGame() {
   for (let key in StateData) {
     switch (key) {

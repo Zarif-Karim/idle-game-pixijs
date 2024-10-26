@@ -11,6 +11,7 @@ export type WorkerOptions = CircleOptions & {
 };
 
 export class Worker extends Circle {
+  static SPEED = x(0.6);
   static identifier = 0;
   static defaultSize = x(8);
   public readonly id: number;
