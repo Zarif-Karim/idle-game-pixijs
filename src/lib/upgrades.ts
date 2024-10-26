@@ -1,6 +1,6 @@
 import { Button, FancyButton, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
-import { x, y } from "../globals";
+import { StateData, x, y, status } from "../globals";
 import { Application, Graphics, Text } from "pixi.js";
 import { BackStation, Station } from "./stations";
 import { Worker } from "./workers";
@@ -22,6 +22,8 @@ export class Upgrade<T> {
   }
 
   makeUpgrade(app: Application) {
+    StateData.bcoins.substract(this.price);
+    status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
     const isStationUpgrade = this.element instanceof Station;
     if (isStationUpgrade) {
       const backStation = this.element as BackStation;
