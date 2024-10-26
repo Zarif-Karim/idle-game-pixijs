@@ -9,6 +9,7 @@ interface Edges {
 
 export enum ICONS {
   MONEYSACK = "💰",
+  CLOCK = "🕒",
 }
 
 // generation random hex avoiding too much black

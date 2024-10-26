@@ -57,6 +57,7 @@ export class BackStation extends Station {
       this.LEVEL,
       this.upgradePrice,
       this.productPrice,
+      this.workDuration,
       () => this.upgrade(),
     );
     this.infoPopup.visible = false;
@@ -128,7 +129,12 @@ export class BackStation extends Station {
   }
 
   updateInfo() {
-    this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
+    this.infoPopup.update(
+      this.LEVEL,
+      this.productPrice,
+      this.upgradePrice,
+      this.workDuration,
+    );
   }
 
   getSlot(): BackStationSlot | undefined {

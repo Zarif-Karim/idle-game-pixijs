@@ -13,6 +13,7 @@ export class StationDetails extends Container {
   private upgradePriceText?: Status;
   private upgradePriceTextDisabled?: Status;
   private productPriceText?: Status;
+  private durationText?: Status;
 
   private bgBoard?: Graphics;
   private bgAnchor?: Graphics;
@@ -30,11 +31,12 @@ export class StationDetails extends Container {
     level: number,
     upgradePrice: BigNumber,
     productPrice: BigNumber,
+    duration: number,
     upgradeFn: () => void,
   ) {
     super({ x, y });
     this.createBackground();
-    this.fillInfo(level, productPrice);
+    this.fillInfo(level, productPrice, duration);
     this.addUpgradeButton(upgradeFn, upgradePrice);
     this.addProgressBar();
     // this is an info panel, should be above everything in the ingame screen
@@ -123,7 +125,7 @@ export class StationDetails extends Container {
     this.addChild(this.upgradeButton.view);
   }
 
-  private fillInfo(level: number, productPrice: BigNumber) {
+  private fillInfo(level: number, productPrice: BigNumber, duration: number) {
     const fontSize = Station.SIZE * 0.35;
     const bgp = this.getBgPosition();
 
@@ -136,14 +138,25 @@ export class StationDetails extends Container {
     });
 
     this.productPriceText = new Status(`${productPrice.toString(0)}`, {
-      x: bgp.x + bgp.w / 2,
+      x: bgp.x + bgp.w * 0.7,
       y: bgp.y + bgp.h * 0.55,
       prefix: `${ICONS.MONEYSACK}`,
       fontSize,
       fill: "black",
     });
+
+    duration /= 1000; // convert to seconds
+    this.durationText = new Status(duration.toString() + "s", {
+      x: bgp.x + bgp.w * 0.25,
+      y: bgp.y + bgp.h * 0.55,
+      prefix: `${ICONS.CLOCK} `,
+      fontSize,
+      fill: "black",
+    });
+
     this.addChild(this.levelText.text);
     this.addChild(this.productPriceText.text);
+    this.addChild(this.durationText.text);
   }
 
   private createBackground() {
@@ -183,11 +196,17 @@ export class StationDetails extends Container {
     return { x, y, w, h };
   }
 
-  update(level: number, productPrice: BigNumber, upgradePrice: BigNumber) {
+  update(
+    level: number,
+    productPrice: BigNumber,
+    upgradePrice: BigNumber,
+    duration: number,
+  ) {
     this.updateLevel(level);
     this.updateLevelProgressView(level);
     this.updateProductPrice(productPrice);
     this.updateUpgradePrice(upgradePrice);
+    this.updateDuration(duration);
   }
 
   updateLevel(level: number) {
@@ -220,6 +239,11 @@ export class StationDetails extends Container {
   updateUpgradePrice(price: BigNumber) {
     this.upgradePriceText?.update(price.toString(1));
     this.upgradePriceTextDisabled?.update(price.toString(1));
+  }
+
+  updateDuration(duration: number) {
+    const durationInSeconds = duration / 1000;
+    this.durationText?.update(durationInSeconds.toString() + "s");
   }
 
   contains(point: Point) {
