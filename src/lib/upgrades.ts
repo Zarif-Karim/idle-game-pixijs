@@ -1,11 +1,11 @@
 import { Button, FancyButton, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
-import { EDGES, x, y } from "../globals";
-import { Graphics, Text } from "pixi.js";
+import { EDGES, workersBack, workersFront, x, y } from "../globals";
+import { Application, Graphics, Text } from "pixi.js";
 import { BackStation, Station } from "./stations";
 import { Worker } from "./workers";
 import { Status } from "./status";
-import { ICONS } from "./utils";
+import { addNewWorker, createCustomer, ICONS } from "./utils";
 import { Rectangle } from "./rectangle";
 
 export class Upgrade<T> {
@@ -21,7 +21,7 @@ export class Upgrade<T> {
     this.quantity = quantity;
   }
 
-  makeUpgrade() {
+  makeUpgrade(app: Application) {
     const isStationUpgrade = this.element instanceof Station;
     if (isStationUpgrade) {
       const backStation = this.element as BackStation;
@@ -32,9 +32,29 @@ export class Upgrade<T> {
       }
       backStation.updateInfo();
     } else {
-      // TODO: do worker stuff
-      console.log("clicked", this);
-      console.log("worker");
+      if (this.type === "customer") {
+        createCustomer(app, true);
+        return;
+      }
+
+      // at this stage type should be in the form
+      // worker-front, worker-back, worker-speed
+      const [w, opp] = this.type.split("-");
+      if (w !== "worker") throw new Error("Incorrect format");
+
+      if (opp === "speed") {
+        // TODO: increase worker speed by 10%
+        console.log("worker speed wip");
+        return;
+      }
+
+      if (opp === "back") {
+        addNewWorker(app, workersBack, "green", true);
+      } else if (opp === "front") {
+        addNewWorker(app, workersFront, "blue", true);
+      } else {
+        throw new Error("Incorrect format");
+      }
     }
   }
 }
@@ -100,12 +120,12 @@ export class UpgradeModerator {
     this.list.visible = !this.list.visible;
   }
 
-  load(upgrades: Upgrade<any>[]) {
+  load(upgrades: Upgrade<any>[], app: Application) {
     this.upgradeList = upgrades;
-    upgrades.forEach((i) => this.addItem(i));
+    upgrades.forEach((i) => this.addItem(i, app));
   }
 
-  addItem<T>(item: Upgrade<T>) {
+  addItem<T>(item: Upgrade<T>, app: Application) {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
     const bg = new Graphics().roundRect(0, 0, w, h, 8).fill("lightgrey");
@@ -146,7 +166,7 @@ export class UpgradeModerator {
         fontSize: x(3),
       },
       () => {
-        item.makeUpgrade();
+        item.makeUpgrade(app);
         const index = this.upgradeList.findIndex((value) => value === item);
         if (index === -1) throw new Error("Upgrade Item not on List");
         this.upgradeList = this.upgradeList.filter((value) => value !== item);
