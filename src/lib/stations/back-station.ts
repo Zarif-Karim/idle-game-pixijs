@@ -123,8 +123,12 @@ export class BackStation extends Station {
       slot && viewUpdateJob.push({ job: "add", child: slot.view });
     }
 
-    this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
+    this.updateInfo();
     if (!onLoadRun) status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
+  }
+
+  updateInfo() {
+    this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
   }
 
   getSlot(): BackStationSlot | undefined {

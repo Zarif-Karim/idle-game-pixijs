@@ -2,7 +2,7 @@ import { Button, FancyButton, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
 import { EDGES, x, y } from "../globals";
 import { Graphics, Text } from "pixi.js";
-import { Station } from "./stations";
+import { BackStation, Station } from "./stations";
 import { Worker } from "./workers";
 import { Status } from "./status";
 import { ICONS } from "./utils";
@@ -19,6 +19,23 @@ export class Upgrade<T> {
     this.type = type;
     this.price = price;
     this.quantity = quantity;
+  }
+
+  makeUpgrade() {
+    const isStationUpgrade = this.element instanceof Station;
+    if (isStationUpgrade) {
+      const backStation = this.element as BackStation;
+      if (this.type === "speed") {
+        backStation.workDuration /= this.quantity;
+      } else {
+        backStation.productPrice.multiply(this.quantity);
+      }
+      backStation.updateInfo();
+    } else {
+      // TODO: do worker stuff
+      console.log("clicked", this);
+      console.log("worker");
+    }
   }
 }
 
@@ -121,9 +138,7 @@ export class UpgradeModerator {
         color: "green",
         fontSize: x(3),
       },
-      () => {
-        console.log("clicked", item);
-      },
+      item.makeUpgrade.bind(item),
     );
     bg.addChild(upgradeButton);
 
