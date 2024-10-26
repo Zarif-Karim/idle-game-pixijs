@@ -1,4 +1,7 @@
-import { Graphics, Point } from "pixi.js";
+import { Application, Graphics, Point } from "pixi.js";
+import { Queue } from "./queue";
+import { customers, EDGES, StateData } from "../globals";
+import { Worker, BackWorker, FrontWorker, CustomerWorker } from "./workers";
 
 interface Edges {
   top: number;
@@ -74,4 +77,47 @@ export const randomPoint = (a: Point, b: Point) => {
  */
 export function assert(condition: boolean, msg: string) {
   if (!condition) throw new Error(msg);
+}
+
+export function addNewWorker(
+  app: Application,
+  group: Queue<Worker>,
+  color: string,
+  incrementMaxCounter = false,
+) {
+  const { x, y } = randomPositionMiddle(EDGES);
+  let w: FrontWorker | BackWorker;
+  if (color === "blue") {
+    w = new FrontWorker(x, y, { color });
+    if (incrementMaxCounter) StateData.frontWorkers += 1;
+  } else {
+    w = new BackWorker(x, y, { color });
+    if (incrementMaxCounter) StateData.backWorkers += 1;
+  }
+
+  // add to queue
+  group.push(w);
+
+  // add to screen
+  app.stage.addChild(w);
+}
+
+export function createCustomer(app: Application, incrementMaxCounter = false) {
+  const generationPoints: Point[] = [
+    new Point(-100, 20),
+    new Point(EDGES.width / 2, -100),
+    new Point(EDGES.width + 100, 100),
+  ];
+
+  const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
+
+  const { x, y } = gp;
+  const w = new CustomerWorker(x, y, { color: "beige" });
+
+  // add to screen
+  app.stage.addChild(w);
+  // add to queue
+  customers.push(w);
+  // update StateData
+  if (incrementMaxCounter) StateData.customerWorkers += 1;
 }

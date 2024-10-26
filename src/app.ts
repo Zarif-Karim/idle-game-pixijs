@@ -17,9 +17,8 @@ import {
   y,
 } from "./globals";
 
-import { Queue } from "./lib/queue";
-import { BackWorker, FrontWorker, Worker } from "./lib/workers";
-import { getRandomInt, ICONS, randomPositionMiddle } from "./lib/utils";
+import { BackWorker, FrontWorker } from "./lib/workers";
+import { addNewWorker, createCustomer, ICONS } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
@@ -447,46 +446,3 @@ const addWorkers = (
     createCustomer(app, incrementMaxCounter);
   }
 };
-
-function addNewWorker(
-  app: Application,
-  group: Queue<Worker>,
-  color: string,
-  incrementMaxCounter = false,
-) {
-  const { x, y } = randomPositionMiddle(EDGES);
-  let w: FrontWorker | BackWorker;
-  if (color === "blue") {
-    w = new FrontWorker(x, y, { color });
-    if (incrementMaxCounter) StateData.frontWorkers += 1;
-  } else {
-    w = new BackWorker(x, y, { color });
-    if (incrementMaxCounter) StateData.backWorkers += 1;
-  }
-
-  // add to queue
-  group.push(w);
-
-  // add to screen
-  app.stage.addChild(w);
-}
-
-function createCustomer(app: Application, incrementMaxCounter = false) {
-  const generationPoints: Point[] = [
-    new Point(-100, 20),
-    new Point(EDGES.width / 2, -100),
-    new Point(EDGES.width + 100, 100),
-  ];
-
-  const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
-
-  const { x, y } = gp;
-  const w = new CustomerWorker(x, y, { color: "beige" });
-
-  // add to screen
-  app.stage.addChild(w);
-  // add to queue
-  customers.push(w);
-  // update StateData
-  if (incrementMaxCounter) StateData.customerWorkers += 1;
-}
