@@ -1,7 +1,7 @@
 import { Button, FancyButton, ScrollBox } from "@pixi/ui";
 import { BigNumber } from "./idle-bignum";
 import { StateData, x, y, status } from "../globals";
-import { Application, Graphics, Text } from "pixi.js";
+import { Application, Container, Graphics, Text } from "pixi.js";
 import { BackStation, Station } from "./stations";
 import { Worker } from "./workers";
 import { Status } from "./status";
@@ -168,14 +168,15 @@ export class UpgradeRow<I> extends Graphics {
   }
 }
 
-// TODO: make a whole screen container bg to dim the screen and close on click away
-// also need to implement save
-export class UpgradeModerator {
+// TODO: also need to implement save
+export class UpgradeModerator extends Container {
+  private screenOverlayBg: Rectangle;
   public list: ScrollBox;
   private closeButton: Button;
   public upgradeList: Upgrade<any>[] = [];
 
   constructor() {
+    super();
     this.list = new ScrollBox({
       width: x(75),
       height: y(60),
@@ -192,9 +193,6 @@ export class UpgradeModerator {
     this.list;
     this.list.x = x(50) - this.list.width / 2;
     this.list.y = y(50) - this.list.height / 2;
-    this.list.zIndex = 10;
-
-    this.list.visible = false;
 
     this.closeButton = new Button(
       new Text({ text: "X", style: { fill: "darkgrey", fontSize: x(5) } }),
@@ -216,18 +214,30 @@ export class UpgradeModerator {
     title.eventMode = "none";
     titleBg.eventMode = "none";
     this.list.addChild(titleBg, this.closeButton.view, title);
+
+    this.screenOverlayBg = new Rectangle(0, 0, x(100), y(100), {
+      color: "black",
+      interactive: true,
+    });
+    this.screenOverlayBg.view.alpha = 0.5;
+    this.screenOverlayBg.view.cursor = "default";
+    this.screenOverlayBg.view.on("pointertap", this.hide.bind(this));
+
+    this.addChild(this.screenOverlayBg.view, this.list);
+    this.zIndex = 10;
+    this.visible = false;
   }
 
   show() {
-    this.list.visible = true;
+    this.visible = true;
   }
 
   hide() {
-    this.list.visible = false;
+    this.visible = false;
   }
 
   toggleVisibility() {
-    this.list.visible = !this.list.visible;
+    this.visible = !this.visible;
   }
 
   load(upgrades: Upgrade<any>[], app: Application) {

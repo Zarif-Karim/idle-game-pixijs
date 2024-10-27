@@ -139,7 +139,7 @@ function saveGame() {
 }
 
 function addUpgrades(app: Application) {
-  app.stage.addChild(upgradeModerator.list);
+  app.stage.addChild(upgradeModerator);
   const upgrageFn = () => upgradeModerator.show();
   createButton(
     x(90),
