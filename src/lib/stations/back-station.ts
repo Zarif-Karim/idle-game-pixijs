@@ -43,7 +43,7 @@ export class BackStation extends Station {
   private upgradableMarker: Graphics;
 
   constructor(x: number, y: number, opts: BackStationOptions) {
-    super(x, y, { color: opts.color });
+    super(x, y, { color: opts.color, interactive: true });
 
     this.category = opts.category;
     this.productPrice = BigNumber.from(opts.productPrice);

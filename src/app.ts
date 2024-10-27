@@ -251,8 +251,12 @@ function createButton(
   text: { txt: string; color: string; size: number },
   fn: () => void,
   app: Application,
+  interactive = true,
 ) {
-  const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
+  const btn = new Rectangle(_x, _y, x(8), y(5), {
+    color: bgColor,
+    interactive,
+  });
   btn.view.on("pointertap", fn);
 
   const txt = new Text({
