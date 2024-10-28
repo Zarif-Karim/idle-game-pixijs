@@ -203,6 +203,7 @@ export class UpgradeModerator extends Container {
       leftPadding: x(3),
       elementsMargin: y(0.5),
       disableEasing: true,
+      globalScroll: false,
     });
 
     this.list;
