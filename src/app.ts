@@ -74,7 +74,21 @@ export default async (app: Application) => {
   });
 
   // save game every 1s
-  setInterval(() => saveGame(), 1000);
+  const saveIntervalId = setInterval(() => saveGame(), 1000);
+  createButton(
+    x(80),
+    y(0.25),
+    "black",
+    { txt: "🔄", color: "yellow", size: x(5) },
+    () => {
+      if (confirm("Restart from beginning?")) {
+        clearInterval(saveIntervalId);
+        localStorage.clear();
+        location.reload();
+      }
+    },
+    app,
+  );
 };
 
 function loadGame(app: Application) {
@@ -328,7 +342,7 @@ function createCustomerWaitingArea(app: Application) {
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
     [
-      [x(7.95), y(55.9), 5, 7, 2_000],
+      [x(7.95), y(55.9), 5000000, 7, 2_000],
       ["cyan", "bottom"],
     ],
     [
