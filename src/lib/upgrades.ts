@@ -59,11 +59,19 @@ export class Upgrade<T> {
 }
 
 export class UpgradeRow<I> extends Graphics {
+  public key: number;
   private upgradeButton: FancyButton;
   private upgradeItem: Upgrade<I>;
 
-  constructor(w: number, h: number, item: Upgrade<I>, upgradeFn: () => void) {
+  constructor(
+    id: number,
+    w: number,
+    h: number,
+    item: Upgrade<I>,
+    upgradeFn: () => void,
+  ) {
     super();
+    this.key = id;
     this.roundRect(0, 0, w, h, 8).fill("lightgrey");
     this.upgradeItem = item;
 
@@ -173,7 +181,6 @@ export class UpgradeModerator extends Container {
   private screenOverlayBg: Rectangle;
   public list: ScrollBox;
   private closeButton: Button;
-  public upgradeList: Upgrade<any>[] = [];
 
   constructor() {
     super();
@@ -241,21 +248,21 @@ export class UpgradeModerator extends Container {
   }
 
   load(upgrades: Upgrade<any>[], app: Application) {
-    this.upgradeList = upgrades;
-    upgrades.forEach((i) => this.addItem(i, app));
+    upgrades.forEach((value, key) => this.addItem(key, value, app));
   }
 
-  addItem<T>(item: Upgrade<T>, app: Application) {
+  addItem<T>(id: number, item: Upgrade<T>, app: Application) {
     const w = this.list.width * 0.92;
     const h = this.list.height / 10;
     const upgradeFn = () => {
       item.makeUpgrade(app);
-      const index = this.upgradeList.findIndex((value) => value === item);
-      if (index === -1) throw new Error("Upgrade Item not on List");
-      this.upgradeList = this.upgradeList.filter((value) => value !== item);
+      const index = this.list.items.findIndex(
+        (v) => (v as UpgradeRow<any>).key === id,
+      );
       this.list.removeItem(index);
     };
-    const row = new UpgradeRow(w, h, item, upgradeFn.bind(this));
+
+    const row = new UpgradeRow(id, w, h, item, upgradeFn.bind(this));
     this.list.addItem(row);
   }
 }

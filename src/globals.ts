@@ -12,6 +12,8 @@ export type StateInfo = {
   frontWorkers: number;
   customerWorkers: number;
   stations: number[];
+  // store the index of the upgrades purchased
+  upgrades: number[];
   bcoins: BigNumber;
 };
 
@@ -21,6 +23,7 @@ export const StateData: StateInfo = {
   frontWorkers: 1,
   customerWorkers: 1,
   stations: [],
+  upgrades: [],
   bcoins: new BigNumber(8),
 };
 
