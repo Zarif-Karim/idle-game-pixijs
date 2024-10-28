@@ -45,7 +45,7 @@ export default async (app: Application) => {
   addUpgrades(app);
 
   // load the game state
-  loadGame();
+  loadGame(app);
 
   // add workers
   addWorkers(
@@ -77,7 +77,7 @@ export default async (app: Application) => {
   setInterval(() => saveGame(), 1000);
 };
 
-function loadGame() {
+function loadGame(app: Application) {
   for (let key in StateData) {
     const data = localStorage.getItem(key);
     if (data) {
@@ -95,15 +95,20 @@ function loadGame() {
           StateData[key] = Number(data);
           break;
         case "stations":
-          const parsedData = JSON.parse(data);
+          const parsedStationData = JSON.parse(data);
           for (let i = 0; i < backStations.length; i++) {
-            for (let l = 0; l < parsedData[i]; l++) {
+            for (let l = 0; l < parsedStationData[i]; l++) {
               backStations[i].upgrade(true);
             }
           }
           break;
+        case "upgrades":
+          const parsedUpgradesData = JSON.parse(data);
+          StateData.upgrades = parsedUpgradesData;
+          upgradeModerator.onLoad(parsedUpgradesData, app);
+          break;
         default:
-          throw new Error("unrecognised keyword in StateData");
+          throw new Error(`unrecognised keyword in StateData: ${key}`);
       }
     }
   }
@@ -131,8 +136,11 @@ function saveGame() {
           JSON.stringify(backStations.map((bs) => bs.LEVEL)),
         );
         break;
+      case "upgrades":
+        localStorage.setItem(key, JSON.stringify(StateData[key]));
+        break;
       default:
-        throw new Error("unrecognised keyword in StateData");
+        throw new Error(`unrecognised keyword in StateData: ${key}`);
     }
   }
   localStorage.setItem("lastUpdated", Date().toString());
@@ -150,7 +158,7 @@ function addUpgrades(app: Application) {
     app,
   );
 
-  upgradeModerator.load(
+  upgradeModerator.setup(
     [
       new Upgrade(
         new CustomerWorker(0, 0, { color: "white" }),

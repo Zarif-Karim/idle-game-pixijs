@@ -21,9 +21,11 @@ export class Upgrade<T> {
     this.quantity = quantity;
   }
 
-  makeUpgrade(app: Application) {
-    StateData.bcoins.substract(this.price);
-    status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
+  makeUpgrade(app: Application, onLoad = false) {
+    if (!onLoad) {
+      StateData.bcoins.substract(this.price);
+      status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
+    }
     const isStationUpgrade = this.element instanceof Station;
     if (isStationUpgrade) {
       const backStation = this.element as BackStation;
@@ -35,7 +37,7 @@ export class Upgrade<T> {
       backStation.updateInfo();
     } else {
       if (this.type === "customer") {
-        createCustomer(app, true);
+        createCustomer(app, false);
         return;
       }
 
@@ -50,7 +52,7 @@ export class Upgrade<T> {
       }
 
       if (["back", "front"].includes(opp)) {
-        addNewWorker(app, opp, true);
+        addNewWorker(app, opp, false);
       } else {
         throw new Error("Incorrect format");
       }
@@ -126,6 +128,10 @@ export class UpgradeRow<I> extends Graphics {
 
     this.upgradeButton.enabled = canUpgrade;
     return canUpgrade;
+  }
+
+  onLoadUpgrade(app: Application) {
+    this.upgradeItem.makeUpgrade(app, true);
   }
 
   private addUpgradeButton(
@@ -247,8 +253,19 @@ export class UpgradeModerator extends Container {
     this.visible = !this.visible;
   }
 
-  load(upgrades: Upgrade<any>[], app: Application) {
+  setup(upgrades: Upgrade<any>[], app: Application) {
     upgrades.forEach((value, key) => this.addItem(key, value, app));
+  }
+
+  onLoad(upgradeIndexes: number[], app: Application) {
+    upgradeIndexes.forEach((id) => {
+      const index = this.list.items.findIndex(
+        (v) => (v as UpgradeRow<any>).key === id,
+      );
+      const upgradeRow = this.list.items[index] as UpgradeRow<any>;
+      upgradeRow.onLoadUpgrade(app);
+      this.removeUpgradeWithKey(id);
+    });
   }
 
   addItem<T>(id: number, item: Upgrade<T>, app: Application) {
@@ -256,13 +273,18 @@ export class UpgradeModerator extends Container {
     const h = this.list.height / 10;
     const upgradeFn = () => {
       item.makeUpgrade(app);
-      const index = this.list.items.findIndex(
-        (v) => (v as UpgradeRow<any>).key === id,
-      );
-      this.list.removeItem(index);
+      StateData.upgrades.push(id);
+      this.removeUpgradeWithKey(id);
     };
 
     const row = new UpgradeRow(id, w, h, item, upgradeFn.bind(this));
     this.list.addItem(row);
+  }
+
+  private removeUpgradeWithKey(id: number) {
+    const index = this.list.items.findIndex(
+      (v) => (v as UpgradeRow<any>).key === id,
+    );
+    this.list.removeItem(index);
   }
 }
