@@ -342,27 +342,33 @@ function createCustomerWaitingArea(app: Application) {
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
     [
-      [x(7.95), y(55.9), 5000000, 7, 2_000],
+      [x(7.95), y(55.9), 12, 7, 3_600],
       ["cyan", "bottom"],
     ],
     [
-      [x(7.95), y(78.5), 700, 1500, 3_000],
+      [x(7.95), y(78.5), 700, 3_540, 7_200],
       ["hotpink", "bottom"],
     ],
     [
-      [x(35.6), y(92.7), 50_000, 170_000, 5_000],
+      [x(35.6), y(92.7), 35_400, 177_000, 21_500],
       ["red", "right"],
     ],
     [
-      [x(35.6), y(70.4), 250_000, 1_200_000, 7_000],
+      [x(35.6), y(70.4), 1_774_000, 8_870_000, 45_500],
       ["pink", "right"],
     ],
     [
-      [x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000],
+      [x(92.04) - BackStation.SIZE, y(55.9), 88_700_000, 441_875_000, 60_800],
       ["yellow", "bottom"],
     ],
     [
-      [x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000],
+      [
+        x(92.04) - BackStation.SIZE,
+        y(78.5),
+        4_418_750_000,
+        22_093_750_000,
+        90_000,
+      ],
       ["purple", "bottom"],
     ],
   ];
