@@ -187,6 +187,8 @@ export class UpgradeModerator extends Container {
   private screenOverlayBg: Rectangle;
   public list: ScrollBox;
   private closeButton: Button;
+  private upgradableMarker: Graphics;
+  private upgradeButton?: Rectangle;
 
   constructor() {
     super();
@@ -236,6 +238,12 @@ export class UpgradeModerator extends Container {
     this.screenOverlayBg.view.cursor = "default";
     this.screenOverlayBg.view.on("pointertap", this.hide.bind(this));
 
+    this.upgradableMarker = new Graphics()
+      .circle(0, 0, Station.SIZE * 0.25)
+      .fill({ color: "red" });
+    this.upgradableMarker.eventMode = "none";
+    this.upgradableMarker.visible = false;
+
     this.addChild(this.screenOverlayBg.view, this.list);
     this.zIndex = 10;
     this.visible = false;
@@ -253,7 +261,9 @@ export class UpgradeModerator extends Container {
     this.visible = !this.visible;
   }
 
-  setup(upgrades: Upgrade<any>[], app: Application) {
+  setup(upgradeButton: Rectangle, upgrades: Upgrade<any>[], app: Application) {
+    this.upgradeButton = upgradeButton;
+    this.upgradeButton.view.addChild(this.upgradableMarker);
     upgrades.forEach((value, key) => this.addItem(key, value, app));
   }
 
@@ -266,6 +276,10 @@ export class UpgradeModerator extends Container {
       upgradeRow.onLoadUpgrade(app);
       this.removeUpgradeWithKey(id);
     });
+  }
+
+  setAvailableUpgradesMarker(value: boolean) {
+    this.upgradableMarker.visible = value;
   }
 
   addItem<T>(id: number, item: Upgrade<T>, app: Application) {

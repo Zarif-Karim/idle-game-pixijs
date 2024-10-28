@@ -149,7 +149,7 @@ function saveGame() {
 function addUpgrades(app: Application) {
   app.stage.addChild(upgradeModerator);
   const upgrageFn = () => upgradeModerator.show();
-  createButton(
+  const ub = createButton(
     x(90),
     y(5),
     "brown",
@@ -159,6 +159,7 @@ function addUpgrades(app: Application) {
   );
 
   upgradeModerator.setup(
+    ub,
     [
       new Upgrade(
         new CustomerWorker(0, 0, { color: "white" }),
@@ -276,6 +277,7 @@ function createButton(
   txt.eventMode = "none";
 
   app.stage.addChild(btn.view, txt);
+  return btn;
 }
 
 function addScreenBorder(app: Application) {
@@ -384,9 +386,14 @@ const gameLoop = (app: Application) => {
       bs.setUpgradable(ca);
     });
 
-    upgradeModerator.list.items.every((v) =>
-      (v as UpgradeRow<any>).refreshUpgradableStatus(StateData.bcoins),
-    );
+    upgradeModerator.setAvailableUpgradesMarker(false);
+    upgradeModerator.list.items.every((v) => {
+      const isUpgradable = (v as UpgradeRow<any>).refreshUpgradableStatus(
+        StateData.bcoins,
+      );
+      isUpgradable && upgradeModerator.setAvailableUpgradesMarker(true);
+      return isUpgradable;
+    });
 
     while (!viewUpdateJob.isEmpty) {
       const { job, child } = viewUpdateJob.pop();
