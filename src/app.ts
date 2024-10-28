@@ -17,13 +17,15 @@ import {
   y,
 } from "./globals";
 
-import { Queue } from "./lib/queue";
-import { BackWorker, FrontWorker, Worker } from "./lib/workers";
-import { getRandomInt, ICONS, randomPositionMiddle } from "./lib/utils";
+import { BackWorker, FrontWorker } from "./lib/workers";
+import { addNewWorker, createCustomer, ICONS } from "./lib/utils";
 import { BackStation, FrontStation } from "./lib/stations";
 import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
+import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
+
+export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
 
 export default async (app: Application) => {
   // add a screen border for debugging
@@ -40,10 +42,10 @@ export default async (app: Application) => {
   // add stations
   createBackStations(app);
   // add workers count upgrade buttons
-  addWorkerIncreaseButtons(app);
+  addUpgrades(app);
 
   // load the game state
-  loadGame();
+  loadGame(app);
 
   // add workers
   addWorkers(
@@ -72,10 +74,24 @@ export default async (app: Application) => {
   });
 
   // save game every 1s
-  setInterval(() => saveGame(), 1000);
+  const saveIntervalId = setInterval(() => saveGame(), 1000);
+  createButton(
+    x(80),
+    y(0.25),
+    "black",
+    { txt: "🔄", color: "yellow", size: x(5) },
+    () => {
+      if (confirm("Restart from beginning?")) {
+        clearInterval(saveIntervalId);
+        localStorage.clear();
+        location.reload();
+      }
+    },
+    app,
+  );
 };
 
-function loadGame() {
+function loadGame(app: Application) {
   for (let key in StateData) {
     const data = localStorage.getItem(key);
     if (data) {
@@ -93,20 +109,26 @@ function loadGame() {
           StateData[key] = Number(data);
           break;
         case "stations":
-          const parsedData = JSON.parse(data);
+          const parsedStationData = JSON.parse(data);
           for (let i = 0; i < backStations.length; i++) {
-            for (let l = 0; l < parsedData[i]; l++) {
+            for (let l = 0; l < parsedStationData[i]; l++) {
               backStations[i].upgrade(true);
             }
           }
           break;
+        case "upgrades":
+          const parsedUpgradesData = JSON.parse(data);
+          StateData.upgrades = parsedUpgradesData;
+          upgradeModerator.onLoad(parsedUpgradesData, app);
+          break;
         default:
-          throw new Error("unrecognised keyword in StateData");
+          throw new Error(`unrecognised keyword in StateData: ${key}`);
       }
     }
   }
 }
 
+// TODO: save speed and upgrade state
 function saveGame() {
   for (let key in StateData) {
     switch (key) {
@@ -128,39 +150,148 @@ function saveGame() {
           JSON.stringify(backStations.map((bs) => bs.LEVEL)),
         );
         break;
+      case "upgrades":
+        localStorage.setItem(key, JSON.stringify(StateData[key]));
+        break;
       default:
-        throw new Error("unrecognised keyword in StateData");
+        throw new Error(`unrecognised keyword in StateData: ${key}`);
     }
   }
   localStorage.setItem("lastUpdated", Date().toString());
 }
 
-function addWorkerIncreaseButtons(app: Application) {
-  createButton(x(90), y(5), "white", "black", { customer: 1 }, app);
-  createButton(x(90), y(11), "blue", "white", { front: 1 }, app);
-  createButton(x(90), y(17), "green", "white", { back: 1 }, app);
+function addUpgrades(app: Application) {
+  app.stage.addChild(upgradeModerator);
+  const upgrageFn = () => upgradeModerator.show();
+  const ub = createButton(
+    x(90),
+    y(5),
+    "brown",
+    { txt: "⬆", color: "yellow", size: x(5) },
+    upgrageFn,
+    app,
+  );
+
+  upgradeModerator.setup(
+    ub,
+    [
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        BigNumber.from(190),
+        1,
+        "customer",
+      ),
+      new Upgrade(
+        new BackWorker(0, 0, { color: "green" }),
+        BigNumber.from(850),
+        1,
+        "worker-back",
+      ),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(5.67, 3),
+        1,
+        "customer",
+      ),
+      new Upgrade(backStations[0], new BigNumber(14.2, 3), 2, "speed"),
+      new Upgrade(
+        new FrontWorker(0, 0, { color: "blue" }),
+        new BigNumber(21.3, 3),
+        1,
+        "worker-front",
+      ),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(42.5, 3),
+        1,
+        "customer",
+      ),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(142, 3),
+        1,
+        "customer",
+      ),
+      new Upgrade(
+        new BackWorker(0, 0, { color: "green" }),
+        new BigNumber(170, 3),
+        1,
+        "worker-back",
+      ),
+      new Upgrade(backStations[0], new BigNumber(425, 3), 3, "price"),
+      new Upgrade(backStations[1], new BigNumber(709, 3), 2, "speed"),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(1.14, 6),
+        1,
+        "customer",
+      ),
+      // walk faster 2.84million
+      new Upgrade(
+        new BackWorker(0, 0, { color: "green" }),
+        new BigNumber(2.84, 6),
+        1.2,
+        "worker-speed",
+      ),
+      new Upgrade(backStations[0], new BigNumber(11.4, 6), 2, "speed"),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(12.8, 6),
+        1,
+        "customer",
+      ),
+      new Upgrade(
+        new BackWorker(0, 0, { color: "green" }),
+        new BigNumber(14.2, 6),
+        1,
+        "worker-back",
+      ),
+      new Upgrade(backStations[1], new BigNumber(21.3, 6), 3, "price"),
+      new Upgrade(backStations[2], new BigNumber(35.5, 6), 2, "speed"),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(120, 6),
+        2,
+        "customer",
+      ),
+      new Upgrade(backStations[0], new BigNumber(128, 6), 5, "price"),
+      new Upgrade(backStations[1], new BigNumber(567, 6), 2, "speed"),
+      new Upgrade(
+        new CustomerWorker(0, 0, { color: "white" }),
+        new BigNumber(850, 6),
+        2,
+        "customer",
+      ),
+    ],
+    app,
+  );
 }
 
 function createButton(
   _x: number,
   _y: number,
   bgColor: string,
-  txtColor: string,
-  worker: any,
+  text: { txt: string; color: string; size: number },
+  fn: () => void,
   app: Application,
+  interactive = true,
 ) {
-  const btn = new Rectangle(_x, _y, x(8), y(5), { color: bgColor });
-  btn.view.on("pointertap", () => addWorkers(worker, app, true));
-
-  const text = new Text({
-    text: "+",
-    anchor: 0.5,
-    style: { fontWeight: "bold", fontSize: "50em", fill: txtColor },
+  const btn = new Rectangle(_x, _y, x(8), y(5), {
+    color: bgColor,
+    interactive,
   });
-  text.position = btn.centre;
-  text.eventMode = "none";
+  btn.view.on("pointertap", fn);
 
-  app.stage.addChild(btn.view, text);
+  const txt = new Text({
+    text: text.txt,
+    anchor: 0.5,
+    style: { fontWeight: "bold", fontSize: text.size, fill: text.color },
+  });
+  txt.position = btn.centre;
+  txt.eventMode = "none";
+
+  app.stage.addChild(btn.view, txt);
+  return btn;
 }
 
 function addScreenBorder(app: Application) {
@@ -211,27 +342,33 @@ function createCustomerWaitingArea(app: Application) {
 function createBackStations(app: Application) {
   const stationsParams: Array<[Array<number>, Array<string>]> = [
     [
-      [x(7.95), y(55.9), 5, 7, 2_000],
+      [x(7.95), y(55.9), 12, 7, 3_600],
       ["cyan", "bottom"],
     ],
     [
-      [x(7.95), y(78.5), 700, 1500, 3_000],
+      [x(7.95), y(78.5), 700, 3_540, 7_200],
       ["hotpink", "bottom"],
     ],
     [
-      [x(35.6), y(92.7), 50_000, 170_000, 5_000],
+      [x(35.6), y(92.7), 35_400, 177_000, 21_500],
       ["red", "right"],
     ],
     [
-      [x(35.6), y(70.4), 250_000, 1_200_000, 7_000],
+      [x(35.6), y(70.4), 1_774_000, 8_870_000, 45_500],
       ["pink", "right"],
     ],
     [
-      [x(92.04) - BackStation.SIZE, y(55.9), 1_000_000, 50_000_000, 9_000],
+      [x(92.04) - BackStation.SIZE, y(55.9), 88_700_000, 441_875_000, 60_800],
       ["yellow", "bottom"],
     ],
     [
-      [x(92.04) - BackStation.SIZE, y(78.5), 50_000_000, 1000_000_000, 13_000],
+      [
+        x(92.04) - BackStation.SIZE,
+        y(78.5),
+        4_418_750_000,
+        22_093_750_000,
+        90_000,
+      ],
       ["purple", "bottom"],
     ],
   ];
@@ -267,6 +404,15 @@ const gameLoop = (app: Application) => {
     backStations.forEach((bs) => {
       const ca = bs.canUpgrade(StateData.bcoins);
       bs.setUpgradable(ca);
+    });
+
+    upgradeModerator.setAvailableUpgradesMarker(false);
+    upgradeModerator.list.items.every((v) => {
+      const isUpgradable = (v as UpgradeRow<any>).refreshUpgradableStatus(
+        StateData.bcoins,
+      );
+      isUpgradable && upgradeModerator.setAvailableUpgradesMarker(true);
+      return isUpgradable;
     });
 
     while (!viewUpdateJob.isEmpty) {
@@ -336,58 +482,15 @@ const addWorkers = (
 ) => {
   // back workers
   for (let i = 0; i < back; i++) {
-    addNewWorker(app, workersBack, "green", incrementMaxCounter);
+    addNewWorker(app, "back", incrementMaxCounter);
   }
 
   // front workers
   for (let i = 0; i < front; i++) {
-    addNewWorker(app, workersFront, "blue", incrementMaxCounter);
+    addNewWorker(app, "front", incrementMaxCounter);
   }
 
   for (let i = 0; i < customer; i++) {
     createCustomer(app, incrementMaxCounter);
   }
 };
-
-function addNewWorker(
-  app: Application,
-  group: Queue<Worker>,
-  color: string,
-  incrementMaxCounter = false,
-) {
-  const { x, y } = randomPositionMiddle(EDGES);
-  let w: FrontWorker | BackWorker;
-  if (color === "blue") {
-    w = new FrontWorker(x, y, { color });
-    if (incrementMaxCounter) StateData.frontWorkers += 1;
-  } else {
-    w = new BackWorker(x, y, { color });
-    if (incrementMaxCounter) StateData.backWorkers += 1;
-  }
-
-  // add to queue
-  group.push(w);
-
-  // add to screen
-  app.stage.addChild(w);
-}
-
-function createCustomer(app: Application, incrementMaxCounter = false) {
-  const generationPoints: Point[] = [
-    new Point(-100, 20),
-    new Point(EDGES.width / 2, -100),
-    new Point(EDGES.width + 100, 100),
-  ];
-
-  const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
-
-  const { x, y } = gp;
-  const w = new CustomerWorker(x, y, { color: "beige" });
-
-  // add to screen
-  app.stage.addChild(w);
-  // add to queue
-  customers.push(w);
-  // update StateData
-  if (incrementMaxCounter) StateData.customerWorkers += 1;
-}

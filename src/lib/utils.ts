@@ -1,4 +1,12 @@
-import { Graphics, Point } from "pixi.js";
+import { Application, Graphics, Point } from "pixi.js";
+import {
+  customers,
+  EDGES,
+  StateData,
+  workersBack,
+  workersFront,
+} from "../globals";
+import { BackWorker, FrontWorker, CustomerWorker } from "./workers";
 
 interface Edges {
   top: number;
@@ -9,6 +17,7 @@ interface Edges {
 
 export enum ICONS {
   MONEYSACK = "💰",
+  CLOCK = "🕒",
 }
 
 // generation random hex avoiding too much black
@@ -73,4 +82,47 @@ export const randomPoint = (a: Point, b: Point) => {
  */
 export function assert(condition: boolean, msg: string) {
   if (!condition) throw new Error(msg);
+}
+
+export function addNewWorker(
+  app: Application,
+  type: string,
+  incrementMaxCounter = false,
+) {
+  const { x, y } = randomPositionMiddle(EDGES);
+  let w: FrontWorker | BackWorker;
+  if (type === "front") {
+    w = new FrontWorker(x, y, { color: "blue" });
+    workersFront.push(w);
+    if (incrementMaxCounter) StateData.frontWorkers += 1;
+  } else if (type === "back") {
+    w = new BackWorker(x, y, { color: "green" });
+    workersBack.push(w);
+    if (incrementMaxCounter) StateData.backWorkers += 1;
+  } else {
+    throw new Error("Wrong type");
+  }
+
+  // add to screen
+  app.stage.addChild(w);
+}
+
+export function createCustomer(app: Application, incrementMaxCounter = false) {
+  const generationPoints: Point[] = [
+    new Point(-100, 20),
+    new Point(EDGES.width / 2, -100),
+    new Point(EDGES.width + 100, 100),
+  ];
+
+  const gp = generationPoints[getRandomInt(0, generationPoints.length - 1)];
+
+  const { x, y } = gp;
+  const w = new CustomerWorker(x, y, { color: "beige" });
+
+  // add to screen
+  app.stage.addChild(w);
+  // add to queue
+  customers.push(w);
+  // update StateData
+  if (incrementMaxCounter) StateData.customerWorkers += 1;
 }

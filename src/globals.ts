@@ -12,6 +12,8 @@ export type StateInfo = {
   frontWorkers: number;
   customerWorkers: number;
   stations: number[];
+  // store the index of the upgrades purchased
+  upgrades: number[];
   bcoins: BigNumber;
 };
 
@@ -21,6 +23,7 @@ export const StateData: StateInfo = {
   frontWorkers: 1,
   customerWorkers: 1,
   stations: [],
+  upgrades: [],
   bcoins: new BigNumber(8),
 };
 
@@ -44,6 +47,7 @@ export const status: Status = new Status("Initialising", {
   x: 20,
   y: 20,
   anchor: { x: 0, y: 0 },
+  fontSize: x(3),
 });
 
 /**
@@ -63,10 +67,6 @@ export function x(percentage: number): number {
 export function y(percentage: number): number {
   return EDGES.height * (percentage / 100);
 }
-
-// the rate at which the objects move in the screen
-// always multiply this with the deltaTIme
-export const SPEED = x(0.6);
 
 export type FrontTakeOrder = {
   from: FrontStation;

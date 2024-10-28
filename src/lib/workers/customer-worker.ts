@@ -1,7 +1,7 @@
 import { Application, Point, Text } from "pixi.js";
 import { DockPoint, FrontStation } from "../stations";
 import { Worker, type WorkerOptions } from "./worker";
-import { backStations, EDGES, jobsFrontTakeOrder, SPEED } from "../../globals";
+import { backStations, EDGES, jobsFrontTakeOrder } from "../../globals";
 import { getRandomInt } from "../utils";
 import { Product } from "../product";
 
@@ -108,7 +108,7 @@ export class CustomerWorker extends Worker {
     st.occupy(this);
 
     const work = ({ deltaTime }: any) => {
-      const speed = SPEED * deltaTime;
+      const speed = Worker.SPEED * deltaTime;
       switch (state) {
         case "waitArea":
           if (this.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {

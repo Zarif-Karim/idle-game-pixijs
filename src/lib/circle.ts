@@ -1,15 +1,17 @@
-import { Color, Container, Graphics } from "pixi.js";
+import { ColorSource, Container, Graphics } from "pixi.js";
 
-type CircleOptions = {
-  color?: Color | string;
+export type CircleOptions = {
+  color?: ColorSource;
 };
 
 export class Circle extends Container {
   public view: Graphics;
   public radius: number;
+  public color: ColorSource;
 
   constructor(x: number, y: number, radius: number, options?: CircleOptions) {
     super();
+    this.color = options?.color || "pink";
     this.view = new Graphics()
       .circle(0, 0, radius)
       .fill({ color: options?.color || "pink" });

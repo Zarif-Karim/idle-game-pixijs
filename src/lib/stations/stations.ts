@@ -12,6 +12,7 @@ export enum DockPoint {
 
 export type StationOptions = {
   color: Color | string;
+  interactive?: boolean;
 };
 
 export class Station extends Rectangle {
@@ -19,8 +20,12 @@ export class Station extends Rectangle {
   public color: Color | string;
   private dockingPoints: Point[] = [];
 
-  constructor(x: number, y: number, { color }: StationOptions) {
-    super(x, y, Station.SIZE, Station.SIZE, { color });
+  constructor(
+    x: number,
+    y: number,
+    { color, interactive = false }: StationOptions,
+  ) {
+    super(x, y, Station.SIZE, Station.SIZE, { color, interactive });
     this.color = color;
 
     const hs = Station.SIZE / 2;

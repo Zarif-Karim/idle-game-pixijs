@@ -2,6 +2,7 @@ import { Color, Graphics, Point } from "pixi.js";
 
 type RectangleOptions = {
   color?: Color | string;
+  interactive?: boolean;
 };
 
 export class Rectangle {
@@ -22,22 +23,26 @@ export class Rectangle {
     this.view.width = w;
     this.view.height = h;
 
-    this.view.eventMode = "static";
-    this.view.cursor = "pointer";
+    if (options?.interactive) {
+      this.view.eventMode = "static";
+      this.view.cursor = "pointer";
 
-    this.view.on("pointerover", () => {
-      this.view.tint = "lightgrey";
-    });
-    this.view.on("pointerout", () => {
-      this.view.tint = "white";
-    });
+      this.view.on("pointerover", () => {
+        this.view.tint = "lightgrey";
+      });
+      this.view.on("pointerout", () => {
+        this.view.tint = "white";
+      });
 
-    this.view.on("pointerdown", () => {
-      this.view.tint = "grey";
-    });
-    this.view.on("pointerup", () => {
-      this.view.tint = "lightgrey";
-    });
+      this.view.on("pointerdown", () => {
+        this.view.tint = "grey";
+      });
+      this.view.on("pointerup", () => {
+        this.view.tint = "lightgrey";
+      });
+    } else {
+      this.view.eventMode = "none";
+    }
   }
 
   get x() {

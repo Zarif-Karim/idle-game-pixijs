@@ -43,7 +43,7 @@ export class BackStation extends Station {
   private upgradableMarker: Graphics;
 
   constructor(x: number, y: number, opts: BackStationOptions) {
-    super(x, y, { color: opts.color });
+    super(x, y, { color: opts.color, interactive: true });
 
     this.category = opts.category;
     this.productPrice = BigNumber.from(opts.productPrice);
@@ -57,6 +57,7 @@ export class BackStation extends Station {
       this.LEVEL,
       this.upgradePrice,
       this.productPrice,
+      this.workDuration,
       () => this.upgrade(),
     );
     this.infoPopup.visible = false;
@@ -123,8 +124,17 @@ export class BackStation extends Station {
       slot && viewUpdateJob.push({ job: "add", child: slot.view });
     }
 
-    this.infoPopup.update(this.LEVEL, this.productPrice, this.upgradePrice);
+    this.updateInfo();
     if (!onLoadRun) status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
+  }
+
+  updateInfo() {
+    this.infoPopup.update(
+      this.LEVEL,
+      this.productPrice,
+      this.upgradePrice,
+      this.workDuration,
+    );
   }
 
   getSlot(): BackStationSlot | undefined {
