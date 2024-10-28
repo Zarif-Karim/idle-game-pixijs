@@ -108,7 +108,7 @@ export class StationDetails extends Container {
       this.upgradeButton!.view.scale = 0.98;
       held = true;
       setTimeout(() => {
-        if (held) {
+        if (held && !intervalId) {
           intervalId = setInterval(upgradeFn, 100);
         }
       }, 400);
@@ -116,10 +116,8 @@ export class StationDetails extends Container {
     this.upgradeButton.onUp.connect(() => {
       this.upgradeButton!.view.scale = 1;
       held = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = undefined;
-      }
+      clearInterval(intervalId);
+      intervalId = undefined;
     });
     this.addChild(this.buttonViewDisabled);
     this.addChild(this.upgradeButton.view);
