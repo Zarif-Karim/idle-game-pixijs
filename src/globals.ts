@@ -43,6 +43,13 @@ export function getScreenSize() {
 // right and bottom are dynamically set by app.screen
 export const EDGES = { top: 0, left: 0, ...getScreenSize() };
 
+export const fpsText: Status = new Status("0", {
+  x: x(60),
+  y: y(1),
+  anchor: { x: 0, y: 0 },
+  fontSize: x(3),
+  prefix: "FPS: ",
+});
 export const status: Status = new Status("Initialising", {
   x: 20,
   y: 20,

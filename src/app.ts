@@ -4,6 +4,7 @@ import {
   customers,
   deliveryLocations,
   EDGES,
+  fpsText,
   jobsBack,
   jobsFrontDelivery,
   jobsFrontTakeOrder,
@@ -27,6 +28,8 @@ import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
 
 export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
 
+let startTime = performance.now();
+let frameCounter = 0;
 export default async (app: Application) => {
   // add a screen border for debugging
   addScreenBorder(app);
@@ -60,8 +63,11 @@ export default async (app: Application) => {
   // add the status last so its always visible
   app.stage.addChild(status.text);
   status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
+  // add fps display
+  app.stage.addChild(fpsText.text);
 
   // start the game loop
+  startTime = performance.now();
   gameLoop(app);
 
   // close the station details view with clicked outside the station boundary
@@ -398,6 +404,18 @@ function createBackStations(app: Application) {
 
 const gameLoop = (app: Application) => {
   app.ticker.add(() => {
+    // print fps
+    ++frameCounter;
+    const now = performance.now();
+    const diff = now - startTime;
+    if (diff >= 1000) {
+      const fps = (frameCounter * 1000) / diff;
+      fpsText.update(fps.toFixed(2));
+
+      frameCounter = 0;
+      startTime = now;
+    }
+
     // the upgradable loop
     // check all the objects to see if they are upgradable and mark them
     // for now only checking back stations
