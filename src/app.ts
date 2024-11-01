@@ -25,6 +25,7 @@ import { Rectangle } from "./lib/rectangle";
 import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
 import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
+import { Grid } from "./lib/grid";
 
 export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
 
@@ -95,6 +96,8 @@ export default async (app: Application) => {
     },
     app,
   );
+
+  new Grid();
 };
 
 function loadGame(app: Application) {
