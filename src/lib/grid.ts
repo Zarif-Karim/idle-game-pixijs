@@ -4,6 +4,7 @@ import { Circle } from "./circle";
 
 export class Grid extends Container {
   public readonly dotRadius: number;
+  public world: Array<Array<Circle>>;
 
   constructor(radius = x(1)) {
     super({
@@ -15,6 +16,7 @@ export class Grid extends Container {
       zIndex: 1,
     });
     this.eventMode = "none";
+    // this.visible = false;
 
     this.dotRadius = radius;
 
@@ -25,17 +27,24 @@ export class Grid extends Container {
     const pih = 100 / hc;
     const piv = 100 / vc;
 
+    this.world = new Array(hc);
     for (let i = 0; i <= hc; i++) {
+      this.world[i] = new Array(vc);
       for (let j = 0; j <= vc; j++) {
-        this.createDot(x(pih * i), y(piv * j));
+        this.world[i][j] = this.createDot(x(pih * i), y(piv * j));
       }
     }
-
-    // this.visible = false;
   }
 
   private createDot(x: number, y: number) {
     const dot = new Circle(x, y, this.dotRadius, { color: "blue" });
     this.addChild(dot);
+    return dot;
+  }
+
+  toggleHighlight(row: number, column: number) {
+    const dot = this.world[row][column];
+    const color = dot.color === "blue" ? "yellow" : "blue";
+    dot.color = color;
   }
 }
