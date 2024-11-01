@@ -97,6 +97,7 @@ export class StationDetails extends Container {
     this.buttonViewEnabled.addChild(this.upgradePriceText.text);
     this.buttonViewDisabled.addChild(this.upgradePriceTextDisabled.text);
 
+    // TODO: change this to Fancy Button
     this.upgradeButton = new Button(this.buttonViewEnabled);
 
     this.upgradeButton.enabled = false;
