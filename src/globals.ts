@@ -49,6 +49,7 @@ export const fpsText: Status = new Status("0", {
   anchor: { x: 0, y: 0 },
   fontSize: x(3),
   prefix: "FPS: ",
+  zIndex: 10,
 });
 export const status: Status = new Status("Initialising", {
   x: 20,
@@ -86,7 +87,7 @@ export type FrontDelivery = FrontTakeOrder & {
 };
 
 type ViewAble = Graphics | Container;
-export const viewUpdateJob: Queue<{ job: string; child: ViewAble }> =
+export const viewUpdateJob: Queue<{ job: "add" | "remove"; child: ViewAble }> =
   new Queue();
 
 export const jobsBack: Queue<{

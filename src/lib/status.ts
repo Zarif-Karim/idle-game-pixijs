@@ -14,6 +14,7 @@ export type StatusOptions = {
   app?: Application;
   prefix?: string;
   anchor?: { x: number; y: number };
+  zIndex?: number;
 };
 
 export class Status {
@@ -36,6 +37,7 @@ export class Status {
 
     this.prefixText = opts?.prefix || "";
     this.onScreenText = new Text({ text: msg, style: this.style });
+    this.onScreenText.zIndex = opts?.zIndex || 0;
 
     this.onScreenText.anchor = opts?.anchor || { x: 0.5, y: 0.5 };
     this.onScreenText.x = opts?.x || 0;
