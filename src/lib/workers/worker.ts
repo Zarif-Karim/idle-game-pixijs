@@ -5,7 +5,7 @@ import { Product } from "../product";
 import { FrontStation, Station } from "../stations";
 import { generateRandomColorHex } from "../utils";
 import { RoundProgressBar } from "../progress-bar";
-// import { grid } from "../../app";
+import { grid } from "../../app";
 
 export type WorkerOptions = CircleOptions & {
   size?: number;
@@ -19,6 +19,9 @@ export class Worker extends Circle {
 
   public hold: Product | null = null;
   public progressBar: RoundProgressBar;
+
+  private travelPath: number[][] = [];
+  private pathProgression = 0;
 
   constructor(x: number, y: number, options?: WorkerOptions) {
     const size = options?.size || Worker.defaultSize;
@@ -36,11 +39,28 @@ export class Worker extends Circle {
 
   moveTo({ x, y }: Station | Product | Point, speed: number, state: string) {
     if (state === "start") {
-      // const afterStart = grid.getClosestUnobstractedCell(new Point(this.x, this.y));
-      // const beforeEnd = grid.getClosestUnobstractedCell(new Point(x, y));
+      const { x: sx, y: sy } = grid.getClosestUnobstractedCell(
+        new Point(this.x, this.y),
+      )!;
+      const { x: ex, y: ey } = grid.getClosestUnobstractedCell(
+        new Point(x, y),
+      )!;
+      this.travelPath = grid.findPath(new Point(sx, sy), new Point(ex, ey));
+      this.travelPath.push([x, y]);
+      // intentionally skipping a few step to prevent the workers to move
+      // in a jittery manner
+      this.pathProgression = Math.min(3, this.travelPath.length - 1);
     }
-    if (this._moveTo(new Point(x, y), speed)) {
-      return "done";
+
+    const [fx, fy] = this.travelPath[this.pathProgression];
+    if (this._moveTo(new Point(fx, fy), speed)) {
+      if (this.pathProgression === this.travelPath.length - 1) {
+        return "done";
+      }
+      this.pathProgression = Math.min(
+        this.pathProgression + 3,
+        this.travelPath.length - 1,
+      );
     }
 
     return "continue";

@@ -10,7 +10,7 @@ export class Circle extends Container {
   public _color: ColorSource;
 
   constructor(x: number, y: number, radius: number, options?: CircleOptions) {
-    super();
+    super({ x, y });
     this._color = options?.color || "pink";
     this._radius = radius;
 
@@ -19,7 +19,6 @@ export class Circle extends Container {
     this.addChild(this.view);
 
     // settin size and pos of the container
-    this.position.set(x, y);
     this.setSize(radius, radius);
   }
 

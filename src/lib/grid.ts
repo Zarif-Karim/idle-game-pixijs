@@ -14,13 +14,11 @@ class Cell extends Circle {
   static HIGHLIGHT_COLOR: ColorSource = "yellow";
 
   public obstructed: boolean;
-  public neighbours: Array<Cell>;
   public highlighted: boolean;
 
   constructor(x: number, y: number, radius: number, options: CellOptions) {
     super(x, y, radius, { color: options.color });
     this.obstructed = options?.obstructed || false;
-    this.neighbours = options?.neighbours || [];
     this.highlighted = false;
   }
 
@@ -44,9 +42,10 @@ class Cell extends Circle {
   }
 }
 
+const DOTS = 10;
 export class Grid extends Container {
-  static HORIZONTAL_CELL_COUNT = 9 * 5;
-  static VERTICAL_CELL_COUNT = 16 * 5;
+  static HORIZONTAL_CELL_COUNT = 9 * DOTS;
+  static VERTICAL_CELL_COUNT = 16 * DOTS;
 
   private astarInstance?: AStarFinder;
 
@@ -55,7 +54,7 @@ export class Grid extends Container {
   // things that add or remove objects on the grid can utilise this to refresh the astar grid
   public needsUpdate = false;
 
-  constructor(radius = x(1)) {
+  constructor(radius = x(0.5), debug = false) {
     super({
       x: 0,
       y: 0,
@@ -65,7 +64,10 @@ export class Grid extends Container {
       zIndex: 1,
     });
     this.eventMode = "none";
-    // this.visible = false;
+    // only enable for debugging
+    // this is a very resource intensive class when displayed
+    // meant to only be desplayed for debugging
+    this.visible = debug;
 
     this.dotRadius = radius;
 
@@ -121,7 +123,7 @@ export class Grid extends Container {
         const fy = Math.min(Math.max(y, 0), Grid.VERTICAL_CELL_COUNT - 1);
         const cell = this.world[fx][fy];
         if (!cell.obstructed) {
-          return cell;
+          return { x: fx, y: fy };
         }
       }
     }
@@ -145,9 +147,7 @@ export class Grid extends Container {
 
     for (let x = lbx; x <= hbx; x++) {
       for (let y = lby; y <= hby; y++) {
-        const fx = Math.min(Math.max(x, 0), Grid.HORIZONTAL_CELL_COUNT - 1);
-        const fy = Math.min(Math.max(y, 0), Grid.VERTICAL_CELL_COUNT - 1);
-        this.world[fx][fy].markObstructed(add);
+        this.world[x][y].markObstructed(add);
       }
     }
   }
@@ -162,6 +162,9 @@ export class Grid extends Container {
       new Point(end.y, end.x),
     );
     assert(path.length !== 0, "No path found");
-    path.forEach(([y, x]) => this.world[x][y].toggleHighlight());
+    return path.map(([y, x]) => {
+      const cell = this.world[x][y];
+      return [cell.x, cell.y];
+    });
   }
 }
