@@ -92,11 +92,11 @@ export function addNewWorker(
   const { x, y } = randomPositionMiddle(EDGES);
   let w: FrontWorker | BackWorker;
   if (type === "front") {
-    w = new FrontWorker(x, y, { color: "blue" });
+    w = new FrontWorker(x, y - 30, { color: "blue" });
     workersFront.push(w);
     if (incrementMaxCounter) StateData.frontWorkers += 1;
   } else if (type === "back") {
-    w = new BackWorker(x, y, { color: "green" });
+    w = new BackWorker(x, y + 30, { color: "green" });
     workersBack.push(w);
     if (incrementMaxCounter) StateData.backWorkers += 1;
   } else {

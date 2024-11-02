@@ -5,6 +5,7 @@ import { Product } from "../product";
 import { FrontStation, Station } from "../stations";
 import { generateRandomColorHex } from "../utils";
 import { RoundProgressBar } from "../progress-bar";
+// import { grid } from "../../app";
 
 export type WorkerOptions = CircleOptions & {
   size?: number;
@@ -33,13 +34,25 @@ export class Worker extends Circle {
     this.addChild(this.progressBar);
   }
 
+  moveTo({ x, y }: Station | Product | Point, speed: number, state: string) {
+    if (state === "start") {
+      // const afterStart = grid.getClosestUnobstractedCell(new Point(this.x, this.y));
+      // const beforeEnd = grid.getClosestUnobstractedCell(new Point(x, y));
+    }
+    if (this._moveTo(new Point(x, y), speed)) {
+      return "done";
+    }
+
+    return "continue";
+  }
+
   /**
    * Move to obj per tick at the given speed
    * @param obj the object to move towards
    * @param speed the speed at which to move per tick
    * @returns true if already reached object, false othewise
    */
-  moveTo({ x, y }: Station | Product | Point, speed: number) {
+  private _moveTo({ x, y }: Point, speed: number) {
     // Calculate the distance between the object and the target
     const dx = x - this.x;
     const dy = y - this.y;

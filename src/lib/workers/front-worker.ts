@@ -21,12 +21,19 @@ export class FrontWorker extends Worker {
     const jobFTO = job as FrontTakeOrder;
 
     let takeOrderStartTime: number;
+    let moveState = "start";
 
     const work = ({ deltaTime }: { deltaTime: number }) => {
       const speed = Worker.SPEED * deltaTime;
       switch (state) {
         case "pick":
-          if (this.moveTo(jobFD.from.getDockingPoint(DockPoint.TOP), speed)) {
+          moveState = this.moveTo(
+            jobFD.from.getDockingPoint(DockPoint.TOP),
+            speed,
+            moveState,
+          );
+          if (moveState === "done") {
+            moveState = "start";
             // pick product
             app.stage.removeChild(jobFD.product);
             this.takeProduct(jobFD.product);
@@ -34,7 +41,13 @@ export class FrontWorker extends Worker {
           }
           break;
         case "deliver":
-          if (this.moveTo(jobFD.to.getDockingPoint(DockPoint.BOTTOM), speed)) {
+          moveState = this.moveTo(
+            jobFD.to.getDockingPoint(DockPoint.BOTTOM),
+            speed,
+            moveState,
+          );
+          if (moveState === "done") {
+            moveState = "start";
             const p = this.leaveProduct(jobFD.to);
             app.stage.addChild(p);
 
@@ -46,9 +59,13 @@ export class FrontWorker extends Worker {
           break;
 
         case "customer":
-          if (
-            this.moveTo(jobFTO.from.getDockingPoint(DockPoint.BOTTOM), speed)
-          ) {
+          moveState = this.moveTo(
+            jobFTO.from.getDockingPoint(DockPoint.BOTTOM),
+            speed,
+            moveState,
+          );
+          if (moveState === "done") {
+            moveState = "start";
             // Take Order
             state = "takeOrder";
             takeOrderStartTime = Date.now();

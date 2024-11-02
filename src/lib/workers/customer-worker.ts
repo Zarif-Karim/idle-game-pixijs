@@ -104,6 +104,7 @@ export class CustomerWorker extends Worker {
   ) {
     const context = { s: st, c: this, st: Date.now() };
     state = "waitArea";
+    let moveState = "start";
 
     st.occupy(this);
 
@@ -111,7 +112,13 @@ export class CustomerWorker extends Worker {
       const speed = Worker.SPEED * deltaTime;
       switch (state) {
         case "waitArea":
-          if (this.moveTo(st.getDockingPoint(DockPoint.TOP), speed)) {
+          moveState = this.moveTo(
+            st.getDockingPoint(DockPoint.TOP),
+            speed,
+            moveState,
+          );
+          if (moveState === "done") {
+            moveState = "start";
             // wait for atleast 1 station to be unlocked
             const availableStations = backStations.filter((s) => s.isUnlocked);
             if (availableStations.length === 0) {
@@ -153,7 +160,9 @@ export class CustomerWorker extends Worker {
           break;
         case "leave":
           const exitPoint = new Point(EDGES.width + 100, 50);
-          if (this.moveTo(exitPoint, speed)) {
+          moveState = this.moveTo(exitPoint, speed, moveState);
+          if (moveState === "done") {
+            moveState = "start";
             state = "done";
           }
           break;

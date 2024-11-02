@@ -38,14 +38,17 @@ export class BackWorker extends Worker {
     let workStartTime = -1;
     let dt = 0;
     let dl: FrontStation;
+    let moveState = "start";
 
     const work = ({ deltaTime }: { deltaTime: number }) => {
       const speed = Worker.SPEED * deltaTime;
       switch (state) {
         case "station":
           // go to the right station
-          if (this.moveTo(slot.getDock(), speed)) {
+          moveState = this.moveTo(slot.getDock(), speed, moveState);
+          if (moveState === "done") {
             state = "work";
+            moveState = "start";
             workStartTime = Date.now();
           }
           break;
@@ -73,7 +76,13 @@ export class BackWorker extends Worker {
 
         case "deliver":
           // deliver product
-          if (this.moveTo(dl.getDockingPoint(DockPoint.BOTTOM), speed)) {
+          moveState = this.moveTo(
+            dl.getDockingPoint(DockPoint.BOTTOM),
+            speed,
+            moveState,
+          );
+          if (moveState === "done") {
+            moveState = "start";
             // move product from hand to table
             const p = this.leaveProduct(dl);
             app.stage.addChild(p);
