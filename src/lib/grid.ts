@@ -1,10 +1,26 @@
 import { Container } from "pixi.js";
 import { viewUpdateJob, x, y } from "../globals";
-import { Circle } from "./circle";
+import { Circle, CircleOptions } from "./circle";
+
+type CellOptions = CircleOptions & {
+  obstructed?: boolean;
+  neighbours?: Array<Cell>;
+};
+
+class Cell extends Circle {
+  public obstructed: boolean;
+  public neighbours: Array<Cell>;
+
+  constructor(x: number, y: number, radius: number, options: CellOptions) {
+    super(x, y, radius, { color: options.color });
+    this.obstructed = options?.obstructed || false;
+    this.neighbours = options?.neighbours || [];
+  }
+}
 
 export class Grid extends Container {
   public readonly dotRadius: number;
-  public world: Array<Array<Circle>>;
+  public world: Array<Array<Cell>>;
 
   constructor(radius = x(1)) {
     super({
@@ -31,13 +47,13 @@ export class Grid extends Container {
     for (let i = 0; i <= hc; i++) {
       this.world[i] = new Array(vc);
       for (let j = 0; j <= vc; j++) {
-        this.world[i][j] = this.createDot(x(pih * i), y(piv * j));
+        this.world[i][j] = this.createCell(x(pih * i), y(piv * j));
       }
     }
   }
 
-  private createDot(x: number, y: number) {
-    const dot = new Circle(x, y, this.dotRadius, { color: "blue" });
+  private createCell(x: number, y: number) {
+    const dot = new Cell(x, y, this.dotRadius, { color: "blue" });
     this.addChild(dot);
     return dot;
   }
