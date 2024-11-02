@@ -102,6 +102,33 @@ export class Grid extends Container {
     return dot;
   }
 
+  // get the closest unobstructed cell from the obj
+  getClosestUnobstractedCell(obj: Point) {
+    const hp = 100 / Grid.HORIZONTAL_CELL_COUNT;
+    const vp = 100 / Grid.VERTICAL_CELL_COUNT;
+
+    const cxtp = (obj.x * 100) / x(100);
+    const cytp = (obj.y * 100) / y(100);
+
+    const lbx = Math.floor(cxtp / hp);
+    const hbx = Math.ceil(cxtp / hp);
+    const lby = Math.floor(cytp / vp);
+    const hby = Math.ceil(cytp / vp);
+
+    for (let x = lbx - 1; x <= hbx + 1; x++) {
+      for (let y = lby - 1; y <= hby + 1; y++) {
+        const fx = Math.min(Math.max(x, 0), Grid.HORIZONTAL_CELL_COUNT - 1);
+        const fy = Math.min(Math.max(y, 0), Grid.VERTICAL_CELL_COUNT - 1);
+        const cell = this.world[fx][fy];
+        if (!cell.obstructed) {
+          return cell;
+        }
+      }
+    }
+
+    assert(false, "No unobstructed cells found nearby");
+  }
+
   obstructions(obj: Container, add = true) {
     const hp = 100 / Grid.HORIZONTAL_CELL_COUNT;
     const vp = 100 / Grid.VERTICAL_CELL_COUNT;
@@ -116,10 +143,8 @@ export class Grid extends Container {
     const lby = Math.floor(cytp / vp);
     const hby = Math.ceil(chtp / vp);
 
-    // NOTE: doing the -1 +1 business to add extra padding for paths
-    // TODO: this should be handled in the path finding logic!
-    for (let x = lbx - 1; x <= hbx + 1; x++) {
-      for (let y = lby - 1; y <= hby + 1; y++) {
+    for (let x = lbx; x <= hbx; x++) {
+      for (let y = lby; y <= hby; y++) {
         const fx = Math.min(Math.max(x, 0), Grid.HORIZONTAL_CELL_COUNT - 1);
         const fy = Math.min(Math.max(y, 0), Grid.VERTICAL_CELL_COUNT - 1);
         this.world[fx][fy].markObstructed(add);

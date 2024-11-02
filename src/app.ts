@@ -97,10 +97,6 @@ export default async (app: Application) => {
     },
     app,
   );
-
-  // TODO: Example path highlight
-  const [sx, sy, ex, ey] = [5, 36, 35, 13];
-  grid.findPath(new Point(sx, sy), new Point(ex, ey));
 };
 
 function loadGame(app: Application) {
