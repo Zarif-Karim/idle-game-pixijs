@@ -1,11 +1,11 @@
-import { Color, Graphics, Point } from "pixi.js";
+import { Color, Container, Graphics, Point } from "pixi.js";
 
 type RectangleOptions = {
   color?: Color | string;
   interactive?: boolean;
 };
 
-export class Rectangle {
+export class Rectangle extends Container {
   public view: Graphics;
 
   constructor(
@@ -15,6 +15,7 @@ export class Rectangle {
     h: number,
     options?: RectangleOptions,
   ) {
+    super();
     this.view = new Graphics().rect(0, 0, w, h).fill({
       color: options?.color || "orange",
     });
