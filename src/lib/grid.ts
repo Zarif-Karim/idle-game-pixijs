@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { ColorSource, Container } from "pixi.js";
 import { viewUpdateJob, x, y } from "../globals";
 import { Circle, CircleOptions } from "./circle";
 
@@ -8,6 +8,9 @@ type CellOptions = CircleOptions & {
 };
 
 class Cell extends Circle {
+  static NORMAL_COLOR: ColorSource = "blue";
+  static HIGHLIGHT_COLOR: ColorSource = "yellow";
+
   public obstructed: boolean;
   public neighbours: Array<Cell>;
 
@@ -15,6 +18,13 @@ class Cell extends Circle {
     super(x, y, radius, { color: options.color });
     this.obstructed = options?.obstructed || false;
     this.neighbours = options?.neighbours || [];
+  }
+
+  toggleHighlight() {
+    this.color =
+      this.color === Cell.NORMAL_COLOR
+        ? Cell.HIGHLIGHT_COLOR
+        : Cell.NORMAL_COLOR;
   }
 }
 
@@ -56,11 +66,5 @@ export class Grid extends Container {
     const dot = new Cell(x, y, this.dotRadius, { color: "blue" });
     this.addChild(dot);
     return dot;
-  }
-
-  toggleHighlight(row: number, column: number) {
-    const dot = this.world[row][column];
-    const color = dot.color === "blue" ? "yellow" : "blue";
-    dot.color = color;
   }
 }
