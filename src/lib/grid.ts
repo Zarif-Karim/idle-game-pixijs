@@ -1,7 +1,8 @@
-import { ColorSource, Container } from "pixi.js";
+import { ColorSource, Container, Point } from "pixi.js";
 import { viewUpdateJob, x, y } from "../globals";
 import { Circle, CircleOptions } from "./circle";
 import { assert } from "./utils";
+import { AStarFinder } from "astar-typescript";
 
 type CellOptions = CircleOptions & {
   obstructed?: boolean;
@@ -44,11 +45,15 @@ class Cell extends Circle {
 }
 
 export class Grid extends Container {
-  static HORIZONTAL_CELL_COUNT = 40;
-  static VERTICAL_CELL_COUNT = 80;
+  static HORIZONTAL_CELL_COUNT = 9 * 5;
+  static VERTICAL_CELL_COUNT = 16 * 5;
+
+  private astarInstance?: AStarFinder;
 
   public readonly dotRadius: number;
   public world: Array<Array<Cell>>;
+  // things that add or remove objects on the grid can utilise this to refresh the astar grid
+  public needsUpdate = false;
 
   constructor(radius = x(1)) {
     super({
@@ -80,6 +85,17 @@ export class Grid extends Container {
     }
   }
 
+  setupAStar() {
+    this.astarInstance = new AStarFinder({
+      grid: {
+        matrix: this.world.map((arr) => {
+          return arr.map((c) => (c.obstructed ? 1 : 0));
+        }),
+      },
+      heuristic: "Manhatten",
+    });
+  }
+
   private createCell(x: number, y: number) {
     const dot = new Cell(x, y, this.dotRadius, { color: "blue" });
     this.addChild(dot);
@@ -100,10 +116,27 @@ export class Grid extends Container {
     const lby = Math.floor(cytp / vp);
     const hby = Math.ceil(chtp / vp);
 
-    for (let x = lbx; x <= hbx; x++) {
-      for (let y = lby; y <= hby; y++) {
-        this.world[x][y].markObstructed(add);
+    // NOTE: doing the -1 +1 business to add extra padding for paths
+    // TODO: this should be handled in the path finding logic!
+    for (let x = lbx - 1; x <= hbx + 1; x++) {
+      for (let y = lby - 1; y <= hby + 1; y++) {
+        const fx = Math.min(Math.max(x, 0), Grid.HORIZONTAL_CELL_COUNT - 1);
+        const fy = Math.min(Math.max(y, 0), Grid.VERTICAL_CELL_COUNT - 1);
+        this.world[fx][fy].markObstructed(add);
       }
     }
+  }
+
+  findPath(start: Point, end: Point) {
+    if (!this.astarInstance || this.needsUpdate) this.setupAStar();
+
+    assert(!!this.astarInstance, "AStar must be initiated");
+    // astar library axis is flipped
+    const path = this.astarInstance!.findPath(
+      new Point(start.y, start.x),
+      new Point(end.y, end.x),
+    );
+    assert(path.length !== 0, "No path found");
+    path.forEach(([y, x]) => this.world[x][y].toggleHighlight());
   }
 }
