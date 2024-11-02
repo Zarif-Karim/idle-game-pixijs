@@ -61,7 +61,7 @@ export class BackStation extends Station {
       () => this.upgrade(),
     );
     this.infoPopup.visible = false;
-    viewUpdateJob.push({ job: "add", child: this.infoPopup });
+    viewUpdateJob.push({ job: "add", child: this.infoPopup, obstruct: false });
 
     this.view.alpha = 0.5;
 
@@ -121,7 +121,8 @@ export class BackStation extends Station {
 
     if (BackStation.ADD_SLOTS_AT.includes(this.LEVEL)) {
       const slot = this.addSlot();
-      slot && viewUpdateJob.push({ job: "add", child: slot.view });
+      slot &&
+        viewUpdateJob.push({ job: "add", child: slot.view, obstruct: true });
     }
 
     this.updateInfo();

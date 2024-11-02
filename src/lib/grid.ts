@@ -64,7 +64,7 @@ export class Grid extends Container {
 
     this.dotRadius = radius;
 
-    viewUpdateJob.push({ job: "add", child: this });
+    viewUpdateJob.push({ job: "add", child: this, obstruct: false });
 
     const pih = 100 / Grid.HORIZONTAL_CELL_COUNT;
     const piv = 100 / Grid.VERTICAL_CELL_COUNT;
@@ -86,7 +86,7 @@ export class Grid extends Container {
     return dot;
   }
 
-  addObstructions(obj: Container) {
+  obstructions(obj: Container, add = true) {
     const hp = 100 / Grid.HORIZONTAL_CELL_COUNT;
     const vp = 100 / Grid.VERTICAL_CELL_COUNT;
 
@@ -102,7 +102,7 @@ export class Grid extends Container {
 
     for (let x = lbx; x <= hbx; x++) {
       for (let y = lby; y <= hby; y++) {
-        this.world[x][y].toggleHighlight();
+        this.world[x][y].markObstructed(add);
       }
     }
   }

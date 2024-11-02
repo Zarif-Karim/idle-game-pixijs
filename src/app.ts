@@ -28,6 +28,7 @@ import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
 import { Grid } from "./lib/grid";
 
 export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
+export const grid: Grid = new Grid();
 
 let startTime = performance.now();
 let frameCounter = 0;
@@ -96,8 +97,6 @@ export default async (app: Application) => {
     },
     app,
   );
-
-  new Grid();
 };
 
 function loadGame(app: Application) {
@@ -321,6 +320,7 @@ function createMiddlePointHorizontalDeliveryTable(app: Application) {
     const loc = new FrontStation(offset + h * i, middlePoint - h / 2, {
       color: "grey",
     });
+    grid.obstructions(loc);
     deliveryLocations.push(loc);
     app.stage.addChild(loc.view);
   }
@@ -336,6 +336,7 @@ function createCustomerWaitingArea(app: Application) {
       new FrontStation(x + FrontStation.SIZE + stsg, y, options),
       new FrontStation(x + (FrontStation.SIZE + stsg) * 2, y, options),
     ].forEach((s) => {
+      grid.obstructions(s);
       waitingArea.push(s);
       app.stage.addChild(s.view);
     });
@@ -391,7 +392,7 @@ function createBackStations(app: Application) {
         ],
         category,
       ) => {
-        return new BackStation(x, y, {
+        const bs = new BackStation(x, y, {
           category,
           color,
           productPrice,
@@ -399,6 +400,8 @@ function createBackStations(app: Application) {
           workDuration,
           slotGrowDirection,
         });
+        grid.obstructions(bs);
+        return bs;
       },
     ),
   );
@@ -437,13 +440,15 @@ const gameLoop = (app: Application) => {
     });
 
     while (!viewUpdateJob.isEmpty) {
-      const { job, child } = viewUpdateJob.pop();
+      const { job, child, obstruct } = viewUpdateJob.pop();
 
       // add to stage
       if (job === "add") {
         app.stage.addChild(child);
+        if (obstruct) grid.obstructions(child, true);
       } else if (job === "remove") {
         app.stage.removeChild(child);
+        if (obstruct) grid.obstructions(child, false);
       }
     }
 

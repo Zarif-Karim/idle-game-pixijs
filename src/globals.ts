@@ -87,8 +87,11 @@ export type FrontDelivery = FrontTakeOrder & {
 };
 
 type ViewAble = Graphics | Container;
-export const viewUpdateJob: Queue<{ job: "add" | "remove"; child: ViewAble }> =
-  new Queue();
+export const viewUpdateJob: Queue<{
+  job: "add" | "remove";
+  child: ViewAble;
+  obstruct: boolean;
+}> = new Queue();
 
 export const jobsBack: Queue<{
   type: number;
