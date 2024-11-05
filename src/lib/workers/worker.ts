@@ -39,13 +39,10 @@ export class Worker extends Circle {
 
   moveTo({ x, y }: Station | Product | Point, speed: number, state: string) {
     if (state === "start") {
-      const { x: sx, y: sy } = grid.getClosestUnobstractedCell(
-        new Point(this.x, this.y),
-      )!;
-      const { x: ex, y: ey } = grid.getClosestUnobstractedCell(
-        new Point(x, y),
-      )!;
-      this.travelPath = grid.findPath(new Point(sx, sy), new Point(ex, ey));
+      const from = grid.getClosestUnobstractedCell(new Point(this.x, this.y))!;
+      const to = grid.getClosestUnobstractedCell(new Point(x, y))!;
+
+      this.travelPath = grid.findPath(from, to);
       this.travelPath.push([x, y]);
       // intentionally skipping a few step to prevent the workers to move
       // in a jittery manner

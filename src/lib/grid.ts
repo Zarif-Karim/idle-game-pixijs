@@ -3,6 +3,7 @@ import { viewUpdateJob, x, y } from "../globals";
 import { Circle, CircleOptions } from "./circle";
 import { assert } from "./utils";
 import { AStarFinder } from "astar-typescript";
+import { Queue } from "./queue";
 
 type CellOptions = CircleOptions & {
   obstructed?: boolean;
@@ -16,8 +17,20 @@ class Cell extends Circle {
   public obstructed: boolean;
   public highlighted: boolean;
 
-  constructor(x: number, y: number, radius: number, options: CellOptions) {
+  private world_x: number;
+  private world_y: number;
+
+  constructor(
+    x: number,
+    y: number,
+    radius: number,
+    wx: number,
+    wy: number,
+    options: CellOptions,
+  ) {
     super(x, y, radius, { color: options.color });
+    this.world_x = wx;
+    this.world_y = wy;
     this.obstructed = options?.obstructed || false;
     this.highlighted = false;
   }
@@ -40,12 +53,21 @@ class Cell extends Circle {
       this.color = this.highlighted ? Cell.HIGHLIGHT_COLOR : Cell.NORMAL_COLOR;
     }
   }
+
+  get wx() {
+    return this.world_x;
+  }
+
+  get wy() {
+    return this.world_y;
+  }
 }
 
 const DOTS = 10;
 export class Grid extends Container {
   static HORIZONTAL_CELL_COUNT = 9 * DOTS;
   static VERTICAL_CELL_COUNT = 16 * DOTS;
+  private debug: boolean;
 
   private astarInstance?: AStarFinder;
 
@@ -67,7 +89,8 @@ export class Grid extends Container {
     // only enable for debugging
     // this is a very resource intensive class when displayed
     // meant to only be desplayed for debugging
-    this.visible = debug;
+    this.debug = debug;
+    this.visible = this.debug;
 
     this.dotRadius = radius;
 
@@ -82,7 +105,7 @@ export class Grid extends Container {
       this.world[i] = new Array(Grid.VERTICAL_CELL_COUNT);
 
       for (let j = 0; j <= Grid.VERTICAL_CELL_COUNT; j++) {
-        this.world[i][j] = this.createCell(x(pih * i), y(piv * j));
+        this.world[i][j] = this.createCell(x(pih * i), y(piv * j), i, j);
       }
     }
   }
@@ -98,8 +121,8 @@ export class Grid extends Container {
     });
   }
 
-  private createCell(x: number, y: number) {
-    const dot = new Cell(x, y, this.dotRadius, { color: "blue" });
+  private createCell(x: number, y: number, wx: number, wy: number) {
+    const dot = new Cell(x, y, this.dotRadius, wx, wy, { color: "blue" });
     this.addChild(dot);
     return dot;
   }
@@ -113,22 +136,14 @@ export class Grid extends Container {
     const cytp = (obj.y * 100) / y(100);
 
     const lbx = Math.floor(cxtp / hp);
-    const hbx = Math.ceil(cxtp / hp);
     const lby = Math.floor(cytp / vp);
-    const hby = Math.ceil(cytp / vp);
 
-    for (let x = lbx - 1; x <= hbx + 1; x++) {
-      for (let y = lby - 1; y <= hby + 1; y++) {
-        const fx = Math.min(Math.max(x, 0), Grid.HORIZONTAL_CELL_COUNT - 1);
-        const fy = Math.min(Math.max(y, 0), Grid.VERTICAL_CELL_COUNT - 1);
-        const cell = this.world[fx][fy];
-        if (!cell.obstructed) {
-          return { x: fx, y: fy };
-        }
-      }
-    }
+    const fx = Math.min(Math.max(lbx, 0), Grid.HORIZONTAL_CELL_COUNT - 1);
+    const fy = Math.min(Math.max(lby, 0), Grid.VERTICAL_CELL_COUNT - 1);
 
-    assert(false, "No unobstructed cells found nearby");
+    const closest = this.bfs(this.world[fx][fy]);
+    if (this.debug) closest?.toggleHighlight();
+    return new Point(closest?.wx, closest?.wy);
   }
 
   obstructions(obj: Container, add = true) {
@@ -166,5 +181,64 @@ export class Grid extends Container {
       const cell = this.world[x][y];
       return [cell.x, cell.y];
     });
+  }
+
+  private getAdjacentNodes(node: Cell) {
+    const x = node.wx;
+    const y = node.wy;
+
+    const neighbours: Cell[] = [];
+    for (let i = -1; i <= 1; ++i) {
+      for (let j = -1; j <= 1; ++j) {
+        const dx = x + i;
+        const dy = y + j;
+
+        if (
+          dx > 0 &&
+          dx < this.world.length - 1 &&
+          dy > 0 &&
+          dy < this.world[0].length - 1 &&
+          !(j === 0 && i === j)
+        ) {
+          neighbours.push(this.world[dx][dy]);
+        }
+      }
+    }
+
+    return neighbours;
+  }
+
+  /**
+   * breadth-first search traversal of a node
+   * @returns void
+   */
+
+  private bfs(startNode: Cell) {
+    if (!startNode) {
+      return;
+    }
+    const visited: Set<Cell> = new Set();
+    const queue: Queue<Cell> = new Queue();
+    let current: Cell | undefined = undefined;
+
+    queue.push(startNode);
+
+    while (!queue.isEmpty) {
+      current = queue.pop();
+      if (!current) {
+        break;
+      }
+      if (!current.obstructed) return current;
+
+      visited.add(current);
+      this.getAdjacentNodes(current).forEach((node) => {
+        // if the node has not been visited
+        if (!visited.has(node)) {
+          visited.add(node);
+          queue.push(node);
+        }
+      });
+    }
+    assert(false, "No unobstructed cells found nearby");
   }
 }
