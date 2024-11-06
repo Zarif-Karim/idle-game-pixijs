@@ -3,6 +3,7 @@ import { Color, Container, Graphics, Point } from "pixi.js";
 type RectangleOptions = {
   color?: Color | string;
   interactive?: boolean;
+  zIndex?: number;
 };
 
 export class Rectangle extends Container {
@@ -23,6 +24,7 @@ export class Rectangle extends Container {
     this.view.position.y = y;
     this.view.width = w;
     this.view.height = h;
+    this.view.zIndex = options?.zIndex || 0;
 
     if (options?.interactive) {
       this.view.eventMode = "static";

@@ -26,6 +26,7 @@ import { CustomerWorker } from "./lib/workers/customer-worker";
 import { BigNumber } from "./lib/idle-bignum";
 import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
 import { Grid } from "./lib/grid";
+import { TopBoarder } from "./lib/overlay-menu/top";
 
 export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
 export const grid: Grid = new Grid();
@@ -63,9 +64,11 @@ export default async (app: Application) => {
   );
 
   // add the status last so its always visible
+  status.text.zIndex = 20;
   app.stage.addChild(status.text);
   status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
   // add fps display
+  fpsText.text.zIndex = 20;
   app.stage.addChild(fpsText.text);
 
   // start the game loop
@@ -96,6 +99,8 @@ export default async (app: Application) => {
       }
     },
     app,
+    true,
+    20,
   );
 };
 
@@ -178,6 +183,8 @@ function addUpgrades(app: Application) {
     { txt: "⬆", color: "yellow", size: x(5) },
     upgrageFn,
     app,
+    true,
+    20,
   );
 
   upgradeModerator.setup(
@@ -283,12 +290,14 @@ function createButton(
   fn: () => void,
   app: Application,
   interactive = true,
+  zIndex = 0,
 ) {
   const btn = new Rectangle(_x, _y, x(8), y(5), {
     color: bgColor,
     interactive,
   });
   btn.view.on("pointertap", fn);
+  btn.view.zIndex = zIndex;
 
   const txt = new Text({
     text: text.txt,
@@ -297,16 +306,19 @@ function createButton(
   });
   txt.position = btn.centre;
   txt.eventMode = "none";
+  txt.zIndex = zIndex;
 
   app.stage.addChild(btn.view, txt);
   return btn;
 }
 
 function addScreenBorder(app: Application) {
-  const top = new Rectangle(0, 0, EDGES.width, 2);
-  const bottom = new Rectangle(0, EDGES.height - 2, EDGES.width, 2);
-  const left = new Rectangle(0, 0, 2, EDGES.height);
-  const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height);
+  const opt = { color: "#1a4761", interactive: false, zIndex: 20 };
+
+  const top = new TopBoarder(0, 0, EDGES.width, y(5), opt);
+  const bottom = new Rectangle(0, EDGES.height - 2, EDGES.width, 2, opt);
+  const left = new Rectangle(0, 0, 2, EDGES.height, opt);
+  const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height, opt);
 
   app.stage.addChild(...[top, bottom, left, right].map((r) => r.view));
 }
