@@ -178,7 +178,7 @@ function addUpgrades(app: Application) {
   const upgrageFn = () => upgradeModerator.show();
   const ub = createButton(
     x(90),
-    y(5),
+    y(8),
     "brown",
     { txt: "⬆", color: "yellow", size: x(5) },
     upgrageFn,
