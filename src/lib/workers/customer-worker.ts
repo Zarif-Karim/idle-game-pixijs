@@ -159,7 +159,10 @@ export class CustomerWorker extends Worker {
           }
           break;
         case "leave":
-          const exitPoint = new Point(EDGES.width + 100, 50);
+          const exitPoint = new Point(
+            getRandomInt(0, EDGES.width - this.radius),
+            -50,
+          );
           moveState = this.moveTo(exitPoint, speed, moveState);
           if (moveState === "done") {
             moveState = "start";
