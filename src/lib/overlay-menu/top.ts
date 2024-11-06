@@ -5,6 +5,7 @@ import { fpsText, x as gx, y as gy } from "../../globals";
 
 export class TopBoarder extends Rectangle {
   private btn: Button;
+  private resetBtn: Button;
 
   private screenOverlayBg: Rectangle;
 
@@ -29,12 +30,26 @@ export class TopBoarder extends Rectangle {
     });
     this.screenOverlayBg.view.alpha = 0.5;
     this.screenOverlayBg.view.cursor = "default";
-    // this.screenOverlayBg.view.visible = false;
+    this.screenOverlayBg.view.visible = false;
     this.screenOverlayBg.view.on("pointertap", () => this.settingsViewToggle());
     this.view.addChild(this.screenOverlayBg.view);
 
     // add fps display
     this.screenOverlayBg.view.addChild(fpsText.text);
+
+    this.resetBtn = new Button(
+      new Text({ text: "🔄", style: { fontSize: gx(5) } }),
+    );
+    this.resetBtn.onPress.connect(() => {
+      if (confirm("Restart from beginning?")) {
+        const id = localStorage.getItem("saveIntervalId") || "0";
+        clearInterval(parseInt(id));
+        localStorage.clear();
+        location.reload();
+      }
+    });
+    this.resetBtn.view.position.set(gx(80), gy(0.25));
+    this.screenOverlayBg.view.addChild(this.resetBtn.view);
   }
 
   settingsViewToggle() {

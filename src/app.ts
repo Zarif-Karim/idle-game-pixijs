@@ -83,22 +83,7 @@ export default async (app: Application) => {
 
   // save game every 1s
   const saveIntervalId = setInterval(() => saveGame(), 1000);
-  createButton(
-    x(80),
-    y(0.25),
-    "black",
-    { txt: "🔄", color: "yellow", size: x(5) },
-    () => {
-      if (confirm("Restart from beginning?")) {
-        clearInterval(saveIntervalId);
-        localStorage.clear();
-        location.reload();
-      }
-    },
-    app,
-    true,
-    20,
-  );
+  localStorage.setItem("saveIntervalId", saveIntervalId.toString());
 };
 
 function loadGame(app: Application) {
