@@ -45,15 +45,15 @@ export const EDGES = { top: 0, left: 0, ...getScreenSize() };
 
 export const fpsText: Status = new Status("0", {
   x: x(60),
-  y: y(1),
+  y: y(1.5),
   anchor: { x: 0, y: 0 },
   fontSize: x(3),
   prefix: "FPS: ",
   zIndex: 10,
 });
 export const status: Status = new Status("Initialising", {
-  x: 20,
-  y: 20,
+  x: x(5),
+  y: y(1.5),
   anchor: { x: 0, y: 0 },
   fontSize: x(3),
 });

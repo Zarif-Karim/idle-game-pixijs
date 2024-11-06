@@ -35,7 +35,8 @@ export class TopBoarder extends Rectangle {
     this.view.addChild(this.screenOverlayBg.view);
 
     // add fps display
-    this.screenOverlayBg.view.addChild(fpsText.text);
+    fpsText.text.visible = false;
+    this.view.addChild(fpsText.text);
 
     this.resetBtn = new Button(
       new Text({ text: "🔄", style: { fontSize: gx(5) } }),
@@ -48,11 +49,14 @@ export class TopBoarder extends Rectangle {
         location.reload();
       }
     });
-    this.resetBtn.view.position.set(gx(80), gy(0.25));
-    this.screenOverlayBg.view.addChild(this.resetBtn.view);
+    this.resetBtn.view.position.set(gx(80), gy(1));
+    this.resetBtn.view.visible = false;
+    this.view.addChild(this.resetBtn.view);
   }
 
   settingsViewToggle() {
     this.screenOverlayBg.view.visible = !this.screenOverlayBg.view.visible;
+    fpsText.text.visible = !fpsText.text.visible;
+    this.resetBtn.view.visible = !this.resetBtn.view.visible;
   }
 }
