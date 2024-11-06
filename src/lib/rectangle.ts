@@ -1,6 +1,6 @@
 import { Color, Container, Graphics, Point } from "pixi.js";
 
-type RectangleOptions = {
+export type RectangleOptions = {
   color?: Color | string;
   interactive?: boolean;
   zIndex?: number;
