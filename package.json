@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://Zarif-Karim.github.io/idle-game-pixijs/",
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite --host",
@@ -12,9 +13,12 @@
     "prepare": "husky",
     "preview": "vite preview",
     "test:build": "tsc --noEmit --strict",
-    "test:build:watch": "tsc --noEmit --strict --watch"
+    "test:build:watch": "tsc --noEmit --strict --watch",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
+    "gh-pages": "^6.2.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "prettier": "3.3.3",
