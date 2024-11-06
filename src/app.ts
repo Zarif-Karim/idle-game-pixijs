@@ -67,9 +67,6 @@ export default async (app: Application) => {
   status.text.zIndex = 20;
   app.stage.addChild(status.text);
   status.update(`${ICONS.MONEYSACK} ${StateData.bcoins}`);
-  // add fps display
-  fpsText.text.zIndex = 20;
-  app.stage.addChild(fpsText.text);
 
   // start the game loop
   startTime = performance.now();
@@ -184,7 +181,7 @@ function addUpgrades(app: Application) {
     upgrageFn,
     app,
     true,
-    20,
+    5,
   );
 
   upgradeModerator.setup(

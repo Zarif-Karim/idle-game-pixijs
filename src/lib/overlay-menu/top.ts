@@ -1,7 +1,7 @@
 import { Button } from "@pixi/ui";
 import { Rectangle, RectangleOptions } from "../rectangle";
 import { Text } from "pixi.js";
-import { x as gx, y as gy } from "../../globals";
+import { fpsText, x as gx, y as gy } from "../../globals";
 
 export class TopBoarder extends Rectangle {
   private btn: Button;
@@ -29,9 +29,12 @@ export class TopBoarder extends Rectangle {
     });
     this.screenOverlayBg.view.alpha = 0.5;
     this.screenOverlayBg.view.cursor = "default";
-    this.screenOverlayBg.view.visible = false;
+    // this.screenOverlayBg.view.visible = false;
     this.screenOverlayBg.view.on("pointertap", () => this.settingsViewToggle());
     this.view.addChild(this.screenOverlayBg.view);
+
+    // add fps display
+    this.screenOverlayBg.view.addChild(fpsText.text);
   }
 
   settingsViewToggle() {
