@@ -27,6 +27,7 @@ import { BigNumber } from "./lib/idle-bignum";
 import { Upgrade, UpgradeModerator, UpgradeRow } from "./lib/upgrades";
 import { Grid } from "./lib/grid";
 import { TopBoarder } from "./lib/overlay-menu/top";
+import { addFullScreenButton } from "./screen-resize";
 
 export const upgradeModerator: UpgradeModerator = new UpgradeModerator();
 export const grid: Grid = new Grid();
@@ -297,7 +298,11 @@ function createButton(
 function addScreenBorder(app: Application) {
   const opt = { color: "#1a4761", interactive: false, zIndex: 20 };
 
-  const top = new TopBoarder(0, 0, EDGES.width, y(5), opt);
+  // full screen button factory
+  const fsbf = async (x?: number, y?: number) => {
+    return await addFullScreenButton(app, x, y);
+  };
+  const top = new TopBoarder(0, 0, EDGES.width, y(5), fsbf, opt);
   const bottom = new Rectangle(0, EDGES.height - 2, EDGES.width, 2, opt);
   const left = new Rectangle(0, 0, 2, EDGES.height, opt);
   const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height, opt);

@@ -27,13 +27,13 @@ export function addFullScreenToggle(app: Application) {
 }
 
 export class FullscreenButton extends Sprite {
-  constructor(img: any, app: Application) {
+  constructor(img: any, app: Application, _x?: number, _y?: number) {
     super(img);
 
     this.width = x(5);
     this.height = x(5);
 
-    this.position.set(x(94), x(1));
+    this.position.set(_x || x(94), _y || x(1));
     this.eventMode = "static";
     this.cursor = "pointer";
 
@@ -58,9 +58,12 @@ export class FullscreenButton extends Sprite {
   }
 }
 
-export async function addFullScreenButton(app: Application) {
+export async function addFullScreenButton(
+  app: Application,
+  x?: number,
+  y?: number,
+) {
   const imgFullScreenBtn = await Assets.load("full-screen-button.png");
-  const btn = new FullscreenButton(imgFullScreenBtn, app);
-  app.stage.addChild(btn);
+  const btn = new FullscreenButton(imgFullScreenBtn, app, x, y);
   return btn;
 }
