@@ -5,10 +5,7 @@ import { fpsText, x as gx, y as gy } from "../../globals";
 import { ICONS } from "../utils";
 
 export class TopBoarder extends Rectangle {
-  private btn: Button;
-
-  private infoBtn: Button;
-  private resetBtn: Button;
+  private btnMap: Map<string, Button> = new Map();
 
   private screenOverlayBg: Rectangle;
   private fullScreenBtn!: Sprite;
@@ -27,7 +24,8 @@ export class TopBoarder extends Rectangle {
 
     this.view.eventMode = "passive";
 
-    this.btn = this.createBtn(
+    this.createBtn(
+      "main",
       gx(90),
       gy(1),
       ICONS.GEAR,
@@ -49,7 +47,7 @@ export class TopBoarder extends Rectangle {
     fpsText.text.visible = false;
     this.view.addChild(fpsText.text);
 
-    this.resetBtn = this.createBtn(gx(84), gy(1), ICONS.RESET, () => {
+    this.createBtn("reset", gx(84), gy(1), ICONS.RESET, () => {
       if (confirm("Restart from beginning?")) {
         const id = localStorage.getItem("saveIntervalId") || "0";
         clearInterval(parseInt(id));
@@ -58,7 +56,7 @@ export class TopBoarder extends Rectangle {
       }
     });
 
-    this.infoBtn = this.createBtn(gx(78), gy(1), ICONS.INFO, () => {
+    this.createBtn("info", gx(78), gy(1), ICONS.INFO, () => {
       alert("infoBtn");
     });
   }
@@ -66,10 +64,11 @@ export class TopBoarder extends Rectangle {
   settingsViewToggle() {
     this.screenOverlayBg.view.visible = !this.screenOverlayBg.view.visible;
     fpsText.text.visible = !fpsText.text.visible;
-    this.resetBtn.view.visible = !this.resetBtn.view.visible;
     this.fullScreenBtn.visible = !this.fullScreenBtn.visible;
-    this.btn.view.visible = !this.btn.view.visible;
-    this.infoBtn.view.visible = !this.infoBtn.view.visible;
+
+    for (let [_, btn] of this.btnMap) {
+      btn.view.visible = !btn.view.visible;
+    }
   }
 
   private async setupFullScreenBtn(
@@ -83,6 +82,7 @@ export class TopBoarder extends Rectangle {
   }
 
   private createBtn(
+    name: string,
     x: number,
     y: number,
     label: string,
@@ -96,6 +96,7 @@ export class TopBoarder extends Rectangle {
     btn.view.position.set(x, y);
     btn.view.visible = visible;
     this.view.addChild(btn.view);
+    this.btnMap.set(name, btn);
     return btn;
   }
 }
