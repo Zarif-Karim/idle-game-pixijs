@@ -6,7 +6,7 @@ import {
   workersBack,
   workersFront,
 } from "../globals";
-import { BackWorker, FrontWorker, CustomerWorker } from "./workers";
+import { BackWorker, CustomerWorker, FrontWorker } from "./workers";
 
 interface Edges {
   top: number;
@@ -18,6 +18,9 @@ interface Edges {
 export enum ICONS {
   MONEYSACK = "💰",
   CLOCK = "🕒",
+  GEAR = "⚙️",
+  INFO = "ℹ️",
+  RESET = "🔄",
 }
 
 // generation random hex avoiding too much black

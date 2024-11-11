@@ -2,9 +2,12 @@ import { Button } from "@pixi/ui";
 import { Rectangle, RectangleOptions } from "../rectangle";
 import { Sprite, Text } from "pixi.js";
 import { fpsText, x as gx, y as gy } from "../../globals";
+import { ICONS } from "../utils";
 
 export class TopBoarder extends Rectangle {
   private btn: Button;
+
+  private infoBtn: Button;
   private resetBtn: Button;
 
   private screenOverlayBg: Rectangle;
@@ -23,10 +26,14 @@ export class TopBoarder extends Rectangle {
     this.setupFullScreenBtn(fullScreenBtnFactory, gx(90), gy(1));
 
     this.view.eventMode = "passive";
-    this.btn = new Button(new Text({ text: "⚙️", style: { fontSize: gx(5) } }));
-    this.btn.view.position.set(gx(90), gy(1));
-    this.btn.onPress.connect(() => this.settingsViewToggle());
-    this.view.addChild(this.btn.view);
+
+    this.btn = this.createBtn(
+      gx(90),
+      gy(1),
+      ICONS.GEAR,
+      () => this.settingsViewToggle(),
+      true,
+    );
 
     this.screenOverlayBg = new Rectangle(0, 0, gx(100), gy(100), {
       color: "black",
@@ -42,10 +49,7 @@ export class TopBoarder extends Rectangle {
     fpsText.text.visible = false;
     this.view.addChild(fpsText.text);
 
-    this.resetBtn = new Button(
-      new Text({ text: "🔄", style: { fontSize: gx(5) } }),
-    );
-    this.resetBtn.onPress.connect(() => {
+    this.resetBtn = this.createBtn(gx(84), gy(1), ICONS.RESET, () => {
       if (confirm("Restart from beginning?")) {
         const id = localStorage.getItem("saveIntervalId") || "0";
         clearInterval(parseInt(id));
@@ -53,11 +57,10 @@ export class TopBoarder extends Rectangle {
         location.reload();
       }
     });
-    this.resetBtn.view.position.set(gx(80), gy(1));
-    this.resetBtn.view.visible = false;
-    this.view.addChild(this.resetBtn.view);
 
-    // this.settingsViewToggle();
+    this.infoBtn = this.createBtn(gx(78), gy(1), ICONS.INFO, () => {
+      alert("infoBtn");
+    });
   }
 
   settingsViewToggle() {
@@ -66,6 +69,7 @@ export class TopBoarder extends Rectangle {
     this.resetBtn.view.visible = !this.resetBtn.view.visible;
     this.fullScreenBtn.visible = !this.fullScreenBtn.visible;
     this.btn.view.visible = !this.btn.view.visible;
+    this.infoBtn.view.visible = !this.infoBtn.view.visible;
   }
 
   private async setupFullScreenBtn(
@@ -76,5 +80,22 @@ export class TopBoarder extends Rectangle {
     this.fullScreenBtn = await factory(x, y);
     this.fullScreenBtn.visible = false;
     this.view.addChild(this.fullScreenBtn);
+  }
+
+  private createBtn(
+    x: number,
+    y: number,
+    label: string,
+    callback: () => void,
+    visible = false,
+  ) {
+    const btn = new Button(
+      new Text({ text: label, style: { fontSize: gx(5) } }),
+    );
+    btn.onPress.connect(callback);
+    btn.view.position.set(x, y);
+    btn.view.visible = visible;
+    this.view.addChild(btn.view);
+    return btn;
   }
 }
