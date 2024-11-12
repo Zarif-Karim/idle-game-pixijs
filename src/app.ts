@@ -303,6 +303,10 @@ function addScreenBorder(app: Application) {
     return await addFullScreenButton(app, x, y);
   };
   const top = new TopBoarder(0, 0, EDGES.width, y(5), fsbf, opt);
+  // show the info screen if no save found
+  if (localStorage.length === 0) {
+    top.settingsViewToggle(true);
+  }
   const bottom = new Rectangle(0, EDGES.height - 2, EDGES.width, 2, opt);
   const left = new Rectangle(0, 0, 2, EDGES.height, opt);
   const right = new Rectangle(EDGES.width - 2, 0, 2, EDGES.height, opt);

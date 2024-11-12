@@ -11,6 +11,7 @@ export class TopBoarder extends Rectangle {
   private screenOverlayBg: Rectangle;
   private infoContainer: ScrollBox;
   private fullScreenBtn!: Sprite;
+  private fullScreenBtnFactory: (x?: number, y?: number) => Promise<Sprite>;
 
   constructor(
     x: number,
@@ -22,6 +23,7 @@ export class TopBoarder extends Rectangle {
   ) {
     super(x, y, w, h, options);
 
+    this.fullScreenBtnFactory = fullScreenBtnFactory;
     this.setupFullScreenBtn(fullScreenBtnFactory, gx(90), gy(1));
 
     this.view.eventMode = "passive";
@@ -87,15 +89,18 @@ export class TopBoarder extends Rectangle {
     this.view.addChild(this.infoContainer);
   }
 
-  settingsViewToggle() {
+  async settingsViewToggle(showInfo = false) {
     this.screenOverlayBg.view.visible = !this.screenOverlayBg.view.visible;
     fpsText.text.visible = !fpsText.text.visible;
+    if (!this.fullScreenBtn) {
+      await this.setupFullScreenBtn(this.fullScreenBtnFactory, gx(90), gy(1));
+    }
     this.fullScreenBtn.visible = !this.fullScreenBtn.visible;
 
     for (let [_, btn] of this.btnMap) {
       btn.view.visible = !btn.view.visible;
     }
-    this.infoContainer.visible = false;
+    this.infoContainer.visible = showInfo;
   }
 
   private async setupFullScreenBtn(

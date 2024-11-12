@@ -44,4 +44,5 @@ Your aim is to make as much money as possible
 and live the luxury life 💸
 
 Lets get cracking 🚀
+(click outside to continue)
 `;
