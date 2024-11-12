@@ -206,7 +206,6 @@ export class UpgradeModerator extends Container {
       globalScroll: false,
     });
 
-    this.list;
     this.list.x = x(50) - this.list.width / 2;
     this.list.y = y(50) - this.list.height / 2;
 

@@ -1,13 +1,15 @@
-import { Button } from "@pixi/ui";
+import { Button, ScrollBox } from "@pixi/ui";
 import { Rectangle, RectangleOptions } from "../rectangle";
 import { Sprite, Text } from "pixi.js";
 import { fpsText, x as gx, y as gy } from "../../globals";
 import { ICONS } from "../utils";
+import INFO from "../../instructions";
 
 export class TopBoarder extends Rectangle {
   private btnMap: Map<string, Button> = new Map();
 
   private screenOverlayBg: Rectangle;
+  private infoContainer: ScrollBox;
   private fullScreenBtn!: Sprite;
 
   constructor(
@@ -56,9 +58,33 @@ export class TopBoarder extends Rectangle {
       }
     });
 
-    this.createBtn("info", gx(78), gy(1), ICONS.INFO, () => {
-      alert("infoBtn");
+    this.infoContainer = new ScrollBox({
+      width: gx(95),
+      height: gy(60),
+      background: "lightyellow",
+      type: "vertical",
+      radius: gx(5),
+      padding: gx(3),
+      elementsMargin: gy(0.5),
+      // disableEasing: true,
+      globalScroll: false,
+      // dragTrashHold?: number;
+      // shiftScroll?: boolean;
+      // proximityRange?: number;
+      // proximityDebounce?: number;
+      // disableProximityCheck?: boolean;
     });
+    this.infoContainer.x = gx(50) - this.infoContainer.width / 2;
+    this.infoContainer.y = gy(50) - this.infoContainer.height / 2;
+    this.infoContainer.addItem(
+      new Text({ text: INFO, style: { fontSize: gx(3) } }),
+    );
+    this.infoContainer.visible = false;
+    this.createBtn("info", gx(78), gy(1), ICONS.INFO, () => {
+      this.infoContainer.visible = true;
+    });
+
+    this.view.addChild(this.infoContainer);
   }
 
   settingsViewToggle() {
@@ -69,6 +95,7 @@ export class TopBoarder extends Rectangle {
     for (let [_, btn] of this.btnMap) {
       btn.view.visible = !btn.view.visible;
     }
+    this.infoContainer.visible = false;
   }
 
   private async setupFullScreenBtn(

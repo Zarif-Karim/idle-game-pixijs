@@ -10,7 +10,7 @@ This is a hobby project with a hope to eventually make a idle clicker game.
 
 ## Current Game State
 
-See [Instructions](instructions.md)
+See [Instructions](./src/instructions.ts)
 
 ## How to run locally
 

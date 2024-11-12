@@ -102,7 +102,7 @@ export class StationDetails extends Container {
 
     this.upgradeButton.enabled = false;
 
-    let intervalId: number | undefined;
+    let intervalId: any;
     let held = false;
     this.upgradeButton.onPress.connect(upgradeFn);
     this.upgradeButton.onDown.connect(() => {
