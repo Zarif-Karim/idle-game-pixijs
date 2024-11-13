@@ -165,6 +165,8 @@ export class Grid extends Container {
         this.world[x][y].markObstructed(add);
       }
     }
+
+    this.needsUpdate = true;
   }
 
   findPath(start: Point, end: Point) {
