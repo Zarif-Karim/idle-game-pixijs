@@ -1,13 +1,6 @@
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-#app {
-  max-width: 640px;
-  margin: 0 auto;
-  text-align: center;
+body,
+canvas,
+div {
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
