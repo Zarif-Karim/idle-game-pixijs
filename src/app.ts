@@ -82,10 +82,32 @@ export default async (app: Application) => {
     });
   });
 
+  offlineReward(app);
   // save game every 1s
   const saveIntervalId = setInterval(() => saveGame(), 1000);
   localStorage.setItem("saveIntervalId", saveIntervalId.toString());
 };
+
+function offlineReward(_app: Application) {
+  const n = 0.1;
+  // trigger only if there is n minute difference
+  const THRESHOLD_IN_MILLISECONDS = n * 60_000;
+  const lastUpdated = localStorage.getItem("lastUpdated");
+  if (!lastUpdated) return;
+
+  const dateNumber = parseInt(lastUpdated);
+  const dateObj = new Date(dateNumber);
+  const difference = Date.now() - dateObj.valueOf();
+  const logs = [
+    ["last saved:", dateObj],
+    ["difference:", difference, "s"],
+    [
+      difference < THRESHOLD_IN_MILLISECONDS ? "Less" : "More",
+      `than ${n} minutes`,
+    ],
+  ];
+  logs.forEach((arr) => console.log(...arr));
+}
 
 function loadGame(app: Application) {
   for (let key in StateData) {
@@ -153,7 +175,7 @@ function saveGame() {
         throw new Error(`unrecognised keyword in StateData: ${key}`);
     }
   }
-  localStorage.setItem("lastUpdated", Date().toString());
+  localStorage.setItem("lastUpdated", Date.now().toString());
 }
 
 function addUpgrades(app: Application) {
